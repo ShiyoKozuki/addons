@@ -1,0 +1,30 @@
+[submodule "addons/combatmessages"]
+	path = addons/combatmessages
+	url = https://github.com/ShiyoKozuki/combatmessages
+[submodule "addons/details"]
+	path = addons/details
+	url = https://github.com/ShiyoKozuki/details
+[submodule "addons/enemycastbar"]
+	path = addons/enemycastbar
+	url = https://github.com/ShiyoKozuki/enemycastbar
+[submodule "addons/finishingmoves"]
+	path = addons/finishingmoves
+	url = https://github.com/ShiyoKozuki/finishingmoves
+[submodule "addons/inventorycounter"]
+	path = addons/inventorycounter
+	url = https://github.com/ShiyoKozuki/inventorycounter
+[submodule "addons/mobdb"]
+	path = addons/mobdb
+	url = https://github.com/ShiyoKozuki/mobdb
+[submodule "addons/rdmtracker"]
+	path = addons/rdmtracker
+	url = https://github.com/ShiyoKozuki/rdmtracker
+[submodule "addons/shadows"]
+	path = addons/shadows
+	url = https://github.com/ShiyoKozuki/shadows
+[submodule "addons/synthrecipes"]
+	path = addons/synthrecipes
+	url = https://github.com/ShiyoKozuki/synthrecipes
+[submodule "addons/treasurepool"]
+	path = addons/treasurepool
+	url = https://github.com/ShiyoKozuki/treasurepool
