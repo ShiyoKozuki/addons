@@ -1,0 +1,77 @@
+```lua
+<commands>
+        <command input="/DDType">
+            <if advanced="$u_DDType=Normal">
+                <setvar name="DDType" value="PDT" />
+            </if>
+            <elseif advanced="$u_DDType=PDT">
+                <setvar name="DDType" value="MDT" />
+            </elseif>
+            <else>
+                <setvar name="DDType" value="Normal" />
+            </else>
+            <command>/achelper DDType</command>
+        </command>
+        <command input="/Follow">
+            <if advanced="$u_Follow=Off">
+                <setvar name="Follow" value="On" />
+                <command>/ms send /ms follow on</command>
+                <command>/ms sendto yukiko /addon unload yukibot</command>
+                <command>/ms sendto sayaki /addon unload sayakibot</command>
+            </if>
+            <else>
+                <setvar name="Follow" value="Off" />
+                <command>/ms send /ms follow off</command>
+                <command>/ms sendto yukiko /addon load yukibot</command>
+                <command>/ms sendto sayaki /addon load sayakibot</command>
+            </else>
+            <command>/achelper Follow</command>
+        </command>
+        <command input="/Barspell">
+            <if advanced="$u_Barspell=Barfira">
+                <setvar name="Barspell" value="Barblizzara" />
+            </if>
+            <elseif advanced="$u_Barspell=Barblizzara">
+                <setvar name="Barspell" value="Baraera" />
+            </elseif>
+            <elseif advanced="$u_Barspell=Baraera">
+                <setvar name="Barspell" value="Barstonra" />
+            </elseif>
+            <elseif advanced="$u_Barspell=Barstonra">
+                <setvar name="Barspell" value="Barthundra" />
+            </elseif>
+            <elseif advanced="$u_Barspell=Barthundra">
+                <setvar name="Barspell" value="Barwatera" />
+            </elseif>                
+            <else>
+                <setvar name="Barspell" value="Barfira" />
+            </else>
+            <command>/achelper Barspell</command>
+            <command>/ms sendto Yukiko /Barspell</command>
+        </command>
+        <command input="/Barstatus">
+            <if advanced="$u_Barstatus=Barsleepra">
+                <setvar name="Barstatus" value="Barpoisonra" />
+            </if>
+            <elseif advanced="$u_Barstatus=Barpoisonra">
+                <setvar name="Barstatus" value="Barparalyzra" />
+            </elseif>
+            <elseif advanced="$u_Barstatus=Barparalyzra">
+                <setvar name="Barstatus" value="Barblindra" />
+            </elseif>
+            <elseif advanced="$u_Barstatus=Barsblindra">
+                <setvar name="Barstatus" value="Barsilencera" />
+            </elseif>
+            <elseif advanced="$u_Barstatus=Barsilencera">
+                <setvar name="Barstatus" value="Barpetra" />
+            </elseif>    
+            <elseif advanced="$u_Barstatus=Barpetra">
+                <setvar name="Barstatus" value="Barvira" />
+            </elseif>            
+            <else>
+                <setvar name="Barstatus" value="Barsleepra" />
+            </else>
+            <command>/achelper Barstatus</command>
+            <command>/ms sendto Yukiko /Barstatus</command>
+        </command>
+    </commands>```

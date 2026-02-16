@@ -1,0 +1,43 @@
+addon.name      = 'reraise';
+addon.author    = 'Shiyo';
+addon.version   = '1.0.2.0';
+addon.desc      = 'Reminds you to keep up RR';
+addon.link      = 'https://ashitaxi.com/';
+
+require('common');
+require ('shiyolibs')
+statusEffect = require('statuseffect')
+local settings = require('settings')
+job = require('job')
+local statusEffect = require('statuseffect')
+local mChatTimer = 0
+
+
+ashita.events.register('d3d_present', 'present_cb', function ()
+    local mJob = AshitaCore:GetMemoryManager():GetPlayer():GetMainJob()
+    local sJob = AshitaCore:GetMemoryManager():GetPlayer():GetSubJob()
+	local mJobLevel = AshitaCore:GetMemoryManager():GetPlayer():GetMainJobLevel()
+	local sJobLevel = AshitaCore:GetMemoryManager():GetPlayer():GetSubJobLevel()
+    if not GetBuffActive(statusEffect.RERAISE) then
+        
+        -- Check for main job
+        if (mJob == job.WHM or mJob == job.SCH) then
+            if (mJobLevel >= 35) then
+                if (os.time() > mChatTimer) then
+                    AshitaCore:GetChatManager():QueueCommand(0, ('/p I don\'t have reraise ective!'))
+                    mChatTimer = os.time() + 30;
+                end
+            end
+        end
+
+        -- Check for sub job
+        if (sJob == job.WHM or sJob == job.SCH) then
+            if (sJobLevel >= 35) then
+                if (os.time() > mChatTimer) then
+                    AshitaCore:GetChatManager():QueueCommand(0, ('/p I don\'t have reraise ective!'))
+                    mChatTimer = os.time() + 30;
+                end
+            end
+        end
+    end
+  end);
