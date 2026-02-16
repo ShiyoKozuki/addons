@@ -13,7 +13,7 @@ return {
     [10] = 'ITEM:18264', --Final Heaven
     [11] = 'ITEM:18972', --Ascetic's Fury
     [12] = 'ITEM:18988', --Stringing Pummel
-    [13] = 'ITEM:17509', --Tornado Kick
+    [13] = 'ITEM:16413', --Tornado Kick
     [14] = 'ITEM:19397', --Victory Smite
     [15] = 'ITEM:20515', --Shijin Spiral
     [16] = 'ITEM:18020', --Wasp Sting
@@ -30,7 +30,7 @@ return {
     [27] = 'ITEM:18976', --Mandalic Stab
     [28] = 'ITEM:18980', --Mordant Rime
     [29] = 'ITEM:18969', --Pyrrhic Kleos
-    [30] = 'ITEM:18020', --Aeolian Edge
+    [30] = 'ITEM:18830', --Aeolian Edge
     [31] = 'ITEM:19398', --Rudra's Storm
     [32] = 'ITEM:16555', --Fast Blade
     [33] = 'ITEM:16555', --Burning Blade
@@ -47,7 +47,7 @@ return {
     [44] = 'ITEM:18975', --Death Blossom
     [45] = 'ITEM:18977', --Atonement
     [46] = 'ITEM:18986', --Expiacion
-    [47] = 'ITEM:16555', --Sanguine Blade
+    [47] = 'ITEM:17669', --Sanguine Blade
     [48] = 'ITEM:16942', --Hard Slash
     [49] = 'ITEM:16942', --Power Slash
     [50] = 'ITEM:16942', --Frostbite
@@ -58,7 +58,7 @@ return {
     [55] = 'ITEM:16942', --Spinning Slash
     [56] = 'ITEM:21674', --Ground Strike
     [57] = 'ITEM:18282', --Scourge
-    [58] = 'ITEM:16942', --Herculean Slash
+    [58] = 'ITEM:19174', --Herculean Slash
     [59] = 'ITEM:19400', --Torcleaver
     [60] = 'ITEM:21694', --Resolution
     [61] = 'ITEM:20753', --Dimidiation
@@ -73,7 +73,7 @@ return {
     [72] = 'ITEM:21722', --Decimation
     [73] = 'ITEM:18288', --Onslaught
     [74] = 'ITEM:18999', --Primal Rend
-    [75] = 'ITEM:17928', --Bora Axe
+    [75] = 'ITEM:17932/', --Bora Axe
     [76] = 'ITEM:19401', --Cloudsplitter
     [77] = 'ITEM:21753', --Ruinator
     [80] = 'ITEM:18206', --Shield Break
@@ -87,7 +87,7 @@ return {
     [88] = 'ITEM:21779', --Steel Cyclone
     [89] = 'ITEM:18294', --Metatron Torment
     [90] = 'ITEM:18971', --King's Justice
-    [91] = 'ITEM:18206', --Fell Cleave
+    [91] = 'ITEM:16708', --Fell Cleave
     [92] = 'ITEM:19402', --Ukko's Fury
     [93] = 'ITEM:20843', --Upheaval
     [96] = 'ITEM:16777', --Slice
@@ -101,7 +101,7 @@ return {
     [104] = 'ITEM:21830', --Spiral Hell
     [105] = 'ITEM:18306', --Catastrophe
     [106] = 'ITEM:18978', --Insurgency
-    [107] = 'ITEM:16777', --Infernal Scythe
+    [107] = 'ITEM:18565', --Infernal Scythe
     [108] = 'ITEM:19462', --Quietus
     [109] = 'ITEM:20890', --Entropy
     [112] = 'ITEM:16885', --Double Thrust
@@ -115,7 +115,7 @@ return {
     [120] = 'ITEM:21883', --Impulse Drive
     [121] = 'ITEM:18300', --Geirskogul
     [122] = 'ITEM:19004', --Drakesbane
-    [123] = 'ITEM:16885', --Sonic Thrust
+    [123] = 'ITEM:18099', --Sonic Thrust
     [124] = 'ITEM:19463', --Camlann's Torment
     [125] = 'ITEM:20935', --Stardiver
     [128] = 'ITEM:17793', --Blade: Rin
@@ -129,7 +129,7 @@ return {
     [136] = 'ITEM:21922', --Blade: Ku
     [137] = 'ITEM:18312', --Blade: Metsu
     [138] = 'ITEM:19003', --Blade: Kamu
-    [139] = 'ITEM:17793', --Blade: Yu
+    [139] = 'ITEM:19298', --Blade: Yu
     [140] = 'ITEM:19405', --Blade: Hi
     [141] = 'ITEM:20977', --Blade: Shun
     [144] = 'ITEM:17829', --Tachi: Enpi
@@ -143,7 +143,7 @@ return {
     [152] = 'ITEM:21975', --Tachi: Kasha
     [153] = 'ITEM:18318', --Tachi: Kaiten
     [154] = 'ITEM:19002', --Tachi: Rana
-    [155] = 'ITEM:17829', --Tachi: Ageha
+    [155] = 'ITEM:18466', --Tachi: Ageha
     [156] = 'ITEM:19465', --Tachi: Fudo
     [157] = 'ITEM:21025', --Tachi: Shoha
     [158] = 'ITEM:21967', --Tachi: Suikawari
@@ -159,7 +159,7 @@ return {
     [169] = 'ITEM:22031', --Black Halo
     [170] = 'ITEM:17440', --Randgrith
     [171] = 'ITEM:18993', --Mystic Boon
-    [172] = 'ITEM:17440', --Flash Nova
+    [172] = 'ITEM:18887', --Flash Nova
     [173] = 'ITEM:19466', --Dagan
     [174] = 'ITEM:21082', --Realmrazer
     [175] = 'ITEM:21070', --Exudation
@@ -176,7 +176,7 @@ return {
     [186] = 'ITEM:18994', --Vidohunir
     [187] = 'ITEM:19005', --Garland of Bliss
     [188] = 'ITEM:18990', --Omniscience
-    [189] = 'ITEM:17559', --Cataclysm
+    [189] = 'ITEM:22101', --Cataclysm
     [190] = 'ITEM:19467', --Myrkr
     [191] = 'ITEM:21147', --Shattersoul
     [192] = 'ITEM:18714', --Flaming Arrow
@@ -187,7 +187,7 @@ return {
     [198] = 'ITEM:18714', --Arching Arrow
     [199] = 'ITEM:22107', --Empyreal Arrow
     [200] = 'ITEM:18348', --Namas Arrow
-    [201] = 'ITEM:18714', --Refulgent Arrow
+    [201] = 'ITEM:22117', --Refulgent Arrow
     [202] = 'ITEM:19468', --Jishnu's Radiance
     [203] = 'ITEM:22117', --Apex Arrow
     [208] = 'ITEM:17244', --Hot Shot
@@ -200,7 +200,7 @@ return {
     [216] = 'ITEM:18336', --Coronach
     [217] = 'ITEM:19001', --Trueflight
     [218] = 'ITEM:19007', --Leaden Salute
-    [219] = 'ITEM:17244', --Numbing Shot
+    [219] = 'ITEM:17252', --Numbing Shot
     [220] = 'ITEM:19469', --Wildfire
     [221] = 'ITEM:21485', --Last Stand
     [224] = 'ITEM:20594', --Exenterator

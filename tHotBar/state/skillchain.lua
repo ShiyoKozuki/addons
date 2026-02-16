@@ -1,4 +1,4 @@
-local Resonation = {
+local Resonation = T{
     None = 0,
     Liquefaction = 1,
     Induration = 2,
@@ -19,8 +19,28 @@ local Resonation = {
     Radiance = 17,
     Umbra = 18
 };
+local names = T{
+    'Liquefaction',
+    'Induration',
+    'Detonation',
+    'Scission',
+    'Impaction',
+    'Reverberation',
+    'Transfixion',
+    'Compression',
+    'Fusion',
+    'Gravitation',
+    'Distortion',
+    'Fragmentation',
+    'Light',
+    'Darkness',
+    'Light',
+    'Darkness',
+    'Light',
+    'Darkness',
+};
 
-local possibleSkillchains = {
+local possibleSkillchains = T{
     { Resonation.Light, Resonation.Light, Resonation.Light },
     { Resonation.Light, Resonation.Fragmentation, Resonation.Fusion },
     { Resonation.Light, Resonation.Fusion, Resonation.Fragmentation },
@@ -52,7 +72,7 @@ local possibleSkillchains = {
     { Resonation.Compression, Resonation.Induration, Resonation.Compression }   
 }
 
-local skillchainMessageIds = {
+local skillchainMessageIds = T{
     [288] = Resonation.Light,
     [289] = Resonation.Darkness,
     [290] = Resonation.Gravitation,
@@ -94,8 +114,8 @@ local weaponskillMessageIds = T{
     238  --"${actor} uses ${weapon_skill}.${lb}${target} recovers ${number} HP."
 };
 
-local immanenceMap = {};
-local immanenceResonationMap = {
+local immanenceMap = T{};
+local immanenceResonationMap = T{
     [144] = T{ Resonation.Liquefaction }, --Fire
     [145] = T{ Resonation.Liquefaction }, --Fire II
     [146] = T{ Resonation.Liquefaction }, --Fire III
@@ -137,7 +157,9 @@ local immanenceResonationMap = {
     [503] = T{ Resonation.Compression } --Impact
 };
 
-local chainAffinityMap = {};
+local playerBuffTable = T{};
+local partyBuffTable = T{};
+local estimatedBuffMap = T{};
 local chainAffinityResonationMap = {
     [519] = T{ Resonation.Transfixion, Resonation.Scission }, --Screwdriver
     [527] = T{ Resonation.Detonation }, --Smite of Rage
@@ -153,7 +175,7 @@ local chainAffinityResonationMap = {
     [567] = T{ Resonation.Transfixion }, --Helldive
     [569] = T{ Resonation.Impaction }, --Jet Stream
     [577] = T{ Resonation.Detonation }, --Foot Kick
-    [585] = T{ Resonation.Fragmentation }, --Ram Charge
+    [585] = T{ Resonation.Fusion }, --Ram Charge
     [587] = T{ Resonation.Scission }, --Claw Cyclone
     [589] = T{ Resonation.Transfixion, Resonation.Impaction }, --Dimensional Death
     [594] = T{ Resonation.Liquefaction, Resonation.Impaction }, --Uppercut
@@ -208,9 +230,9 @@ local chainAffinityResonationMap = {
 };
 
 local weaponskillResonationMap = {
-    [1] = T{ Resonation.Impaction }, --Combo
+    [1] = T{ Resonation.Impaction, Resonation.Induration }, --Combo
     [2] = T{ Resonation.Reverberation, Resonation.Impaction }, --Shoulder Tackle
-    [3] = T{ Resonation.Compression }, --One Inch Punch
+    [3] = T{ Resonation.Compression, Resonation.Reverberation }, --One Inch Punch
     [4] = T{ Resonation.Detonation }, --Backhand Blow
     [5] = T{ Resonation.Impaction }, --Raging Fists
     [6] = T{ Resonation.Liquefaction, Resonation.Impaction }, --Spinning Attack
@@ -220,13 +242,13 @@ local weaponskillResonationMap = {
     [10] = T{ Resonation.Light, Resonation.Fusion }, --Final Heaven
     [11] = T{ Resonation.Fusion, Resonation.Transfixion }, --Ascetic's Fury
     [12] = T{ Resonation.Gravitation, Resonation.Liquefaction }, --Stringing Pummel
-    [13] = T{ Resonation.Induration, Resonation.Detonation, Resonation.Impaction }, --Tornado Kick
+    [13] = T{ Resonation.Darkness, Resonation.Detonation, Resonation.Impaction }, --Tornado Kick
     [14] = T{ Resonation.Light, Resonation.Fragmentation }, --Victory Smite
     [15] = T{ Resonation.Fusion, Resonation.Reverberation }, --Shijin Spiral
-    [16] = T{ Resonation.Scission }, --Wasp Sting
-    [17] = T{ Resonation.Scission }, --Viper Bite
-    [18] = T{ Resonation.Reverberation }, --Shadowstitch
-    [19] = T{ Resonation.Detonation }, --Gust Slash
+    [16] = T{ Resonation.Scission, Resonation.Compression }, --Wasp Sting
+    [17] = T{ Resonation.Scission, Resonation.Transfixion }, --Viper Bite
+    [18] = T{ Resonation.Reverberation, Resonation.Impaction }, --Shadowstitch
+    [19] = T{ Resonation.Detonation, Resonation.Impaction }, --Gust Slash
     [20] = T{ Resonation.Detonation, Resonation.Impaction }, --Cyclone
     [23] = T{ Resonation.Scission, Resonation.Detonation }, --Dancing Edge
     [24] = T{ Resonation.Fragmentation }, --Shark Bite
@@ -235,14 +257,14 @@ local weaponskillResonationMap = {
     [27] = T{ Resonation.Fusion, Resonation.Compression }, --Mandalic Stab
     [28] = T{ Resonation.Fragmentation, Resonation.Distortion }, --Mordant Rime
     [29] = T{ Resonation.Distortion, Resonation.Scission }, --Pyrrhic Kleos
-    [30] = T{ Resonation.Scission, Resonation.Detonation, Resonation.Impaction }, --Aeolian Edge
+    [30] = T{ Resonation.Light, Resonation.Detonation, Resonation.Impaction }, --Aeolian Edge
     [31] = T{ Resonation.Darkness, Resonation.Distortion }, --Rudra's Storm
     [32] = T{ Resonation.Scission }, --Fast Blade
     [33] = T{ Resonation.Liquefaction }, --Burning Blade
     [34] = T{ Resonation.Liquefaction, Resonation.Detonation }, --Red Lotus Blade
-    [35] = T{ Resonation.Impaction }, --Flat Blade
+    [35] = T{ Resonation.Impaction, Resonation.Reverberation }, --Flat Blade
     [36] = T{ Resonation.Scission }, --Shining Blade
-    [37] = T{ Resonation.Scission }, --Seraph Blade
+    [37] = T{ Resonation.Scission, Resonation.Transfixion }, --Seraph Blade
     [38] = T{ Resonation.Reverberation, Resonation.Impaction }, --Circle Blade
     [40] = T{ Resonation.Scission, Resonation.Impaction }, --Vorpal Blade
     [41] = T{ Resonation.Gravitation }, --Swift Blade
@@ -251,6 +273,7 @@ local weaponskillResonationMap = {
     [44] = T{ Resonation.Fragmentation, Resonation.Distortion }, --Death Blossom
     [45] = T{ Resonation.Fusion, Resonation.Reverberation }, --Atonement
     [46] = T{ Resonation.Distortion, Resonation.Scission }, --Expiacion
+    [47] = T{ Resonation.Darkness, Resonation.Detonation, Resonation.Liquefaction }, --Sanguine Blade
     [48] = T{ Resonation.Scission }, --Hard Slash
     [49] = T{ Resonation.Transfixion }, --Power Slash
     [50] = T{ Resonation.Induration }, --Frostbite
@@ -261,10 +284,11 @@ local weaponskillResonationMap = {
     [55] = T{ Resonation.Fragmentation }, --Spinning Slash
     [56] = T{ Resonation.Fragmentation, Resonation.Distortion }, --Ground Strike
     [57] = T{ Resonation.Light, Resonation.Fusion }, --Scourge
-    [58] = T{ Resonation.Induration, Resonation.Detonation, Resonation.Impaction }, --Herculean Slash
+    [58] = T{ Resonation.Darkness, Resonation.Detonation, Resonation.Impaction }, --Herculean Slash
     [59] = T{ Resonation.Light, Resonation.Distortion }, --Torcleaver
     [60] = T{ Resonation.Fragmentation, Resonation.Scission }, --Resolution
     [61] = T{ Resonation.Light, Resonation.Fragmentation }, --Dimidiation
+    [62] = T{ Resonation.Detonation, Resonation.Compression, Resonation.Distortion }, --Fimbulvetr    
     [64] = T{ Resonation.Detonation, Resonation.Impaction }, --Raging Axe
     [65] = T{ Resonation.Induration, Resonation.Reverberation }, --Smash Axe
     [66] = T{ Resonation.Detonation }, --Gale Axe
@@ -276,23 +300,25 @@ local weaponskillResonationMap = {
     [72] = T{ Resonation.Fusion, Resonation.Reverberation }, --Decimation
     [73] = T{ Resonation.Darkness, Resonation.Gravitation }, --Onslaught
     [74] = T{ Resonation.Gravitation, Resonation.Reverberation }, --Primal Rend
-    [75] = T{ Resonation.Scission, Resonation.Detonation }, --Bora Axe
+    [75] = T{ Resonation.Darkness, Resonation.Detonation, Resonation.Liquefaction }, --Bora Axe
     [76] = T{ Resonation.Darkness, Resonation.Fragmentation }, --Cloudsplitter
     [77] = T{ Resonation.Distortion, Resonation.Detonation }, --Ruinator
-    [80] = T{ Resonation.Impaction }, --Shield Break
-    [81] = T{ Resonation.Scission }, --Iron Tempest
+    [78] = T{ Resonation.Liquefaction, Resonation.Impaction, Resonation.Fragmentation }, --Blitz
+    [80] = T{ Resonation.Impaction, Resonation.Compression }, --Shield Break
+    [81] = T{ Resonation.Scission, Resonation.Transfixion }, --Iron Tempest
     [82] = T{ Resonation.Reverberation, Resonation.Scission }, --Sturmwind
     [83] = T{ Resonation.Impaction }, --Armor Break
-    [84] = T{ Resonation.Compression }, --Keen Edge
+    [84] = T{ Resonation.Compression, Resonation.Detonation }, --Keen Edge
     [85] = T{ Resonation.Impaction }, --Weapon Break
     [86] = T{ Resonation.Induration, Resonation.Reverberation }, --Raging Rush
     [87] = T{ Resonation.Distortion }, --Full Break
     [88] = T{ Resonation.Distortion, Resonation.Detonation }, --Steel Cyclone
     [89] = T{ Resonation.Light, Resonation.Fusion }, --Metatron Torment
     [90] = T{ Resonation.Fragmentation, Resonation.Scission }, --King's Justice
-    [91] = T{ Resonation.Scission, Resonation.Detonation, Resonation.Impaction }, --Fell Cleave
+    [91] = T{ Resonation.Darkness, Resonation.Detonation, Resonation.Impaction }, --Fell Cleave
     [92] = T{ Resonation.Light, Resonation.Fragmentation }, --Ukko's Fury
     [93] = T{ Resonation.Fusion, Resonation.Compression }, --Upheaval
+    [94] = T{ Resonation.Transfixion, Resonation.Scission, Resonation.Gravitation }, --Disaster
     [96] = T{ Resonation.Scission }, --Slice
     [97] = T{ Resonation.Reverberation }, --Dark Harvest
     [98] = T{ Resonation.Induration, Resonation.Reverberation }, --Shadow of Death
@@ -301,26 +327,28 @@ local weaponskillResonationMap = {
     [101] = T{ Resonation.Transfixion, Resonation.Scission }, --Vorpal Scythe
     [102] = T{ Resonation.Induration }, --Guillotine
     [103] = T{ Resonation.Distortion }, --Cross Reaper
-    [104] = T{ Resonation.Distortion, Resonation.Scission }, --Spiral Hell
+    [104] = T{ Resonation.Gravitation, Resonation.Scission }, --Spiral Hell
     [105] = T{ Resonation.Darkness, Resonation.Gravitation }, --Catastrophe
     [106] = T{ Resonation.Fusion, Resonation.Compression }, --Insurgency
-    [107] = T{ Resonation.Compression, Resonation.Reverberation }, --Infernal Scythe
+    [107] = T{ Resonation.Light, Resonation.Reverberation, Resonation.Detonation }, --Infernal Scythe
     [108] = T{ Resonation.Darkness, Resonation.Distortion }, --Quietus
     [109] = T{ Resonation.Gravitation, Resonation.Reverberation }, --Entropy
+    [110] = T{ Resonation.Induration, Resonation.Reverberation, Resonation.Fusion }, --Origin
     [112] = T{ Resonation.Transfixion }, --Double Thrust
     [113] = T{ Resonation.Transfixion, Resonation.Impaction }, --Thunder Thrust
     [114] = T{ Resonation.Transfixion, Resonation.Impaction }, --Raiden Thrust
     [115] = T{ Resonation.Impaction }, --Leg Sweep
     [116] = T{ Resonation.Compression }, --Penta Thrust
     [117] = T{ Resonation.Reverberation, Resonation.Transfixion }, --Vorpal Thrust
-    [118] = T{ Resonation.Transfixion, Resonation.Impaction }, --Skewer
+    [118] = T{ Resonation.Darkness, Resonation.Impaction }, --Skewer
     [119] = T{ Resonation.Fusion }, --Wheeling Thrust
     [120] = T{ Resonation.Gravitation, Resonation.Induration }, --Impulse Drive
     [121] = T{ Resonation.Light, Resonation.Distortion }, --Geirskogul
     [122] = T{ Resonation.Fusion, Resonation.Transfixion }, --Drakesbane
-    [123] = T{ Resonation.Transfixion, Resonation.Scission }, --Sonic Thrust
+    [123] = T{ Resonation.Darkness, Resonation.Transfixion, Resonation.Scission }, --Sonic Thrust
     [124] = T{ Resonation.Light, Resonation.Fragmentation }, --Camlann's Torment
     [125] = T{ Resonation.Gravitation, Resonation.Transfixion }, --Stardiver
+    [126] = T{ Resonation.Transfixion, Resonation.Scission, Resonation.Gravitation }, --Diarmuid
     [128] = T{ Resonation.Transfixion }, --Blade: Rin
     [129] = T{ Resonation.Scission }, --Blade: Retsu
     [130] = T{ Resonation.Reverberation }, --Blade: Teki
@@ -329,12 +357,13 @@ local weaponskillResonationMap = {
     [133] = T{ Resonation.Compression }, --Blade: Ei
     [134] = T{ Resonation.Detonation, Resonation.Impaction }, --Blade: Jin
     [135] = T{ Resonation.Gravitation }, --Blade: Ten
-    [136] = T{ Resonation.Gravitation, Resonation.Transfixion }, --Blade: Ku
+    [136] = T{ Resonation.Distortion, Resonation.Transfixion }, --Blade: Ku
     [137] = T{ Resonation.Darkness, Resonation.Fragmentation }, --Blade: Metsu
     [138] = T{ Resonation.Fragmentation, Resonation.Compression }, --Blade: Kamu
-    [139] = T{ Resonation.Reverberation, Resonation.Scission }, --Blade: Yu
+    [139] = T{ Resonation.Light, Resonation.Scission, Resonation.Detonation }, --Blade: Yu
     [140] = T{ Resonation.Darkness, Resonation.Gravitation }, --Blade: Hi
     [141] = T{ Resonation.Fusion, Resonation.Impaction }, --Blade: Shun
+    [142] = T{ Resonation.Induration, Resonation.Reverberation, Resonation.Fusion }, --Zesho Meppo
     [144] = T{ Resonation.Transfixion, Resonation.Scission }, --Tachi: Enpi
     [145] = T{ Resonation.Induration }, --Tachi: Hobaku
     [146] = T{ Resonation.Transfixion, Resonation.Impaction }, --Tachi: Goten
@@ -346,10 +375,11 @@ local weaponskillResonationMap = {
     [152] = T{ Resonation.Fusion, Resonation.Compression }, --Tachi: Kasha
     [153] = T{ Resonation.Light, Resonation.Fragmentation }, --Tachi: Kaiten
     [154] = T{ Resonation.Gravitation, Resonation.Induration }, --Tachi: Rana
-    [155] = T{ Resonation.Compression, Resonation.Scission }, --Tachi: Ageha
+    [155] = T{ Resonation.Darkness, Resonation.Scission, Resonation.Liquefaction }, --Tachi: Ageha
     [156] = T{ Resonation.Light, Resonation.Distortion }, --Tachi: Fudo
     [157] = T{ Resonation.Fragmentation, Resonation.Compression }, --Tachi: Shoha
     [158] = T{ Resonation.Fusion }, --Tachi: Suikawari
+    [159] = T{ Resonation.Detonation, Resonation.Compression, Resonation.Distortion }, --Tachi: Mumei
     [160] = T{ Resonation.Impaction }, --Shining Strike
     [161] = T{ Resonation.Impaction }, --Seraph Strike
     [162] = T{ Resonation.Reverberation }, --Brainshaker
@@ -359,7 +389,7 @@ local weaponskillResonationMap = {
     [168] = T{ Resonation.Fusion }, --Hexa Strike
     [169] = T{ Resonation.Fragmentation, Resonation.Compression }, --Black Halo
     [170] = T{ Resonation.Light, Resonation.Fragmentation }, --Randgrith
-    [172] = T{ Resonation.Induration, Resonation.Reverberation }, --Flash Nova
+    [172] = T{ Resonation.Darkness, Resonation.Reverberation, Resonation.Transfixion }, --Flash Nova
     [174] = T{ Resonation.Fusion, Resonation.Impaction }, --Realmrazer
     [175] = T{ Resonation.Darkness, Resonation.Fragmentation }, --Exudation
     [176] = T{ Resonation.Impaction }, --Heavy Swing
@@ -374,22 +404,23 @@ local weaponskillResonationMap = {
     [186] = T{ Resonation.Fragmentation, Resonation.Distortion }, --Vidohunir
     [187] = T{ Resonation.Fusion, Resonation.Reverberation }, --Garland of Bliss
     [188] = T{ Resonation.Gravitation, Resonation.Transfixion }, --Omniscience
-    [189] = T{ Resonation.Compression, Resonation.Reverberation }, --Cataclysm
+    [189] = T{ Resonation.Light, Resonation.Reverberation }, --Cataclysm
     [191] = T{ Resonation.Gravitation, Resonation.Induration }, --Shattersoul
     [192] = T{ Resonation.Liquefaction, Resonation.Transfixion }, --Flaming Arrow
     [193] = T{ Resonation.Reverberation, Resonation.Transfixion }, --Piercing Arrow
-    [194] = T{ Resonation.Liquefaction, Resonation.Transfixion }, --Dulling Arrow
+    [194] = T{ Resonation.Impaction, Resonation.Transfixion }, --Dulling Arrow
     [196] = T{ Resonation.Reverberation, Resonation.Transfixion, Resonation.Detonation }, --Sidewinder
     [197] = T{ Resonation.Induration, Resonation.Transfixion }, --Blast Arrow
     [198] = T{ Resonation.Fusion }, --Arching Arrow
     [199] = T{ Resonation.Fusion, Resonation.Transfixion }, --Empyreal Arrow
     [200] = T{ Resonation.Light, Resonation.Distortion }, --Namas Arrow
-    [201] = T{ Resonation.Reverberation, Resonation.Transfixion }, --Refulgent Arrow
+    [201] = T{ Resonation.Darkness, Resonation.Transfixion }, --Refulgent Arrow
     [202] = T{ Resonation.Light, Resonation.Fusion }, --Jishnu's Radiance
     [203] = T{ Resonation.Fragmentation, Resonation.Transfixion }, --Apex Arrow
+    [204] = T{ Resonation.Transfixion, Resonation.Scission, Resonation.Gravitation }, --Sarv
     [208] = T{ Resonation.Liquefaction, Resonation.Transfixion }, --Hot Shot
     [209] = T{ Resonation.Reverberation, Resonation.Transfixion }, --Split Shot
-    [210] = T{ Resonation.Liquefaction, Resonation.Transfixion }, --Sniper Shot
+    [210] = T{ Resonation.Impaction, Resonation.Transfixion }, --Sniper Shot
     [212] = T{ Resonation.Reverberation, Resonation.Transfixion, Resonation.Detonation }, --Slug Shot
     [213] = T{ Resonation.Induration, Resonation.Transfixion }, --Blast Shot
     [214] = T{ Resonation.Fusion }, --Heavy Shot
@@ -397,19 +428,27 @@ local weaponskillResonationMap = {
     [216] = T{ Resonation.Darkness, Resonation.Fragmentation }, --Coronach
     [217] = T{ Resonation.Fragmentation, Resonation.Scission }, --Trueflight
     [218] = T{ Resonation.Gravitation, Resonation.Transfixion }, --Leaden Salute
-    [219] = T{ Resonation.Induration, Resonation.Detonation, Resonation.Impaction }, --Numbing Shot
+    [219] = T{ Resonation.Light, Resonation.Detonation, Resonation.Impaction }, --Numbing Shot
     [220] = T{ Resonation.Darkness, Resonation.Gravitation }, --Wildfire
     [221] = T{ Resonation.Fusion, Resonation.Reverberation }, --Last Stand
+    [222] = T{ Resonation.Induration, Resonation.Reverberation, Resonation.Fusion }, --Terminus
     [224] = T{ Resonation.Fragmentation, Resonation.Scission }, --Exenterator
     [225] = T{ Resonation.Light, Resonation.Distortion }, --Chant du Cygne
     [226] = T{ Resonation.Gravitation, Resonation.Scission }, --Requiescat
     [227] = T{ Resonation.Light }, --Knights of Rotund
     [228] = T{ Resonation.Light }, --Final Paradise
+    [229] = T{ Resonation.Fusion }, --Fast Blade II
+    [230] = T{ Resonation.Distortion }, --Dragon Blow
+    [231] = T{ Resonation.Detonation, Resonation.Compression, Resonation.Distortion }, --Maru Kala
+    [232] = T{ Resonation.Liquefaction, Resonation.Impaction, Resonation.Fragmentation }, --Ruthless Stroke
+    [233] = T{ Resonation.Detonation, Resonation.Compression, Resonation.Distortion }, --Imperator
+    [234] = T{ Resonation.Transfixion, Resonation.Scission, Resonation.Gravitation }, --Dagda
+    [235] = T{ Resonation.Induration, Resonation.Reverberation, Resonation.Fusion }, --Oshala
     [238] = T{ Resonation.Light, Resonation.Fragmentation }, --Uriel Blade
     [239] = T{ Resonation.Light, Resonation.Fusion } --Glory Slash
 };
 
-local resonationMap = {};
+local resonationMap = T{};
 
 local function GetIndexFromId(id)
     local entMgr = AshitaCore:GetMemoryManager():GetEntity();
@@ -436,6 +475,54 @@ local function GetIndexFromId(id)
 
 end
 
+local function GetBuffs(userId)
+    if (userId == AshitaCore:GetMemoryManager():GetParty():GetMemberServerId(0)) then
+        return playerBuffTable;
+    end
+    local partyBuffData = partyBuffTable[userId];
+    if partyBuffData then
+        return partyBuffData;
+    end
+    local outTable = T{};
+    local estimatedBuffData = estimatedBuffMap[userId];
+    if estimatedBuffData then
+        for buffId,timer in pairs(estimatedBuffData) do
+            if (timer > os.clock()) then
+                outTable:append(buffId);
+            end
+        end
+    end
+    return outTable;
+end
+
+local function GetSpellResonation(actionPacket)
+    local elements = immanenceResonationMap[actionPacket.Id];
+    if (elements) then
+        local buffs = GetBuffs(actionPacket.UserId);
+        if (buffs:contains(170)) then
+            local estimatedMap = estimatedBuffMap[actionPacket.UserId];
+            if estimatedMap then
+                estimatedMap[170] = os.clock() + 1;
+            end
+            return elements;
+        end
+    end
+    
+    elements = chainAffinityResonationMap[actionPacket.Id];
+    if elements then
+        local buffs = GetBuffs(actionPacket.UserId);
+        if (buffs:contains(163)) then
+            return elements;
+        elseif (buffs:contains(164)) then
+            local estimatedMap = estimatedBuffMap[actionPacket.UserId];
+            if estimatedMap then
+                estimatedMap[164] = os.clock() + 1;
+            end
+            return elements;
+        end
+    end
+end
+
 local function HandleActionPacket(actionPacket)
     --Weaponskill
     if (actionPacket.Type == 3) then
@@ -443,11 +530,14 @@ local function HandleActionPacket(actionPacket)
             local targetIndex = GetIndexFromId(target.Id);
             if (targetIndex ~= 0) then
                 for _,action in pairs(target.Actions) do
-                    local skillchain = skillchainMessageIds[action.Message];
+                    local skillchain;
+                    if (action.AdditionalEffect ~= nil) then
+                        skillchain = skillchainMessageIds[action.AdditionalEffect.Message];
+                    end
                     if skillchain == Resonation.None then
                         resonationMap[targetIndex] = nil;
                     elseif skillchain then
-                        local resonation = resonationMap[targetIndex];                        
+                        local resonation = resonationMap[targetIndex];
                         if resonation and ((os.clock() + 1) > resonation.WindowOpen) and ((os.clock() - 1) < resonation.WindowClose) then
                             resonation.Depth = resonation.Depth + 1;
                             if ((skillchain == Resonation.Light) and (resonation.Attributes:contains(Resonation.Light))) then
@@ -460,7 +550,7 @@ local function HandleActionPacket(actionPacket)
                             resonation.WindowOpen = os.clock() + 3.5;
                             resonation.WindowClose = os.clock() + (9.8 - resonation.Depth);
                         else
-                            resonation = {};
+                            resonation = T{};
                             resonation.Depth = 1;
                             resonation.Attributes = T{ skillchain };
                             resonation.WindowOpen = os.clock() + 3.5;
@@ -471,7 +561,7 @@ local function HandleActionPacket(actionPacket)
                     elseif weaponskillMessageIds:contains(action.Message) then
                         local attributes = weaponskillResonationMap[actionPacket.Id];
                         if attributes then
-                            local resonation = {};
+                            local resonation = T{};
                             resonation.Depth = 0;
                             resonation.Attributes = attributes;
                             resonation.WindowOpen = os.clock() + 3.5;
@@ -489,8 +579,13 @@ local function HandleActionPacket(actionPacket)
             local targetIndex = GetIndexFromId(target.Id);
             if (targetIndex ~= 0) then
                 for _,action in pairs(target.Actions) do
-                    local skillchain = skillchainMessageIds[action.Message];
-                    if skillchain then
+                    local skillchain;
+                    if (action.AdditionalEffect ~= nil) then
+                        skillchain = skillchainMessageIds[action.AdditionalEffect.Message];
+                    end
+                    if skillchain == Resonation.None then
+                        resonationMap[targetIndex] = nil;
+                    elseif skillchain then
                         local resonation = resonationMap[targetIndex];
                         if resonation and ((os.clock() + 1) > resonation.WindowOpen) and ((os.clock() - 1) < resonation.WindowClose) then
                             resonation.Depth = resonation.Depth + 1;
@@ -504,7 +599,7 @@ local function HandleActionPacket(actionPacket)
                             resonation.WindowOpen = os.clock() + 3.5;
                             resonation.WindowClose = os.clock() + (9.8 - resonation.Depth);
                         else
-                            resonation = {};
+                            resonation = T{};
                             resonation.Depth = 1;
                             resonation.Attributes = T{ skillchain };
                             resonation.WindowOpen = os.clock() + 3.5;
@@ -512,32 +607,14 @@ local function HandleActionPacket(actionPacket)
                             resonationMap[targetIndex] = resonation;
                         end
                     else
-                        local immanence = immanenceMap[actionPacket.UserId];
-                        if immanence and (os.clock() < immanence) then
-                            local elements = immanenceResonationMap[actionPacket.Id];
-                            if elements then
-                                local resonation = {};
-                                resonation.Depth = 1;
-                                resonation.Attributes = elements;
-                                resonation.WindowOpen = os.clock() + 3.5;
-                                resonation.WindowClose = os.clock() + (9.8 - resonation.Depth);
-                                resonationMap[targetIndex] = resonation;
-                                immanenceMap[actionPacket.UserId] = nil;
-                            end
-                        end
-
-                        local chainAffinity = chainAffinityMap[actionPacket.UserId];
-                        if chainAffinity and (os.clock() < chainAffinity) then
-                            local elements = chainAffinityResonationMap[actionPacket.Id];
-                            if elements then
-                                local resonation = {};
-                                resonation.Depth = 1;
-                                resonation.Attributes = elements;
-                                resonation.WindowOpen = os.clock() + 3.5;
-                                resonation.WindowClose = os.clock() + (9.8 - resonation.Depth);
-                                resonationMap[targetIndex] = resonation;
-                                chainAffinityMap[actionPacket.UserId] = nil;
-                            end
+                        local elements = GetSpellResonation(actionPacket);
+                        if elements then
+                            local resonation = T{};
+                            resonation.Depth = 1;
+                            resonation.Attributes = elements;
+                            resonation.WindowOpen = os.clock() + 3.5;
+                            resonation.WindowClose = os.clock() + (9.8 - resonation.Depth);
+                            resonationMap[targetIndex] = resonation;
                         end
                     end
                 end
@@ -546,17 +623,39 @@ local function HandleActionPacket(actionPacket)
 
     --JA
     elseif (actionPacket.Type == 6) then
-        if (actionPacket.Id == 94) then
-            chainAffinityMap[actionPacket.UserId] = os.clock() + 30;
+        --Azure Lore
+        if (actionPacket.Id == 93) then
+            local member = estimatedBuffMap[actionPacket.UserId];
+            if (member == nil) then
+                member = T{};
+                estimatedBuffMap[actionPacket.UserId] = member;
+            end
+            member[163] = os.clock() + 30;
+
+        --Chain Affinity
+        elseif (actionPacket.Id == 94) then
+            local member = estimatedBuffMap[actionPacket.UserId];
+            if (member == nil) then
+                member = T{};
+                estimatedBuffMap[actionPacket.UserId] = member;
+            end
+            member[164] = os.clock() + 30;
+
+        --Immanence
         elseif (actionPacket.Id == 317) then
-            immanenceMap[actionPacket.UserId] = os.clock() + 60;
+            local member = estimatedBuffMap[actionPacket.UserId];
+            if (member == nil) then
+                member = T{};
+                estimatedBuffMap[actionPacket.UserId] = member;
+            end
+            member[170] = os.clock() + 60;
         end
     end
 end
 
 ashita.events.register('packet_in', 'skillchain_handleincomingpacket', function (e)
     if (e.id == 0x00A) then
-        resonationMap = {};
+        resonationMap = T{};
     elseif (e.id == 0x28) then
         local bitData;
         local bitOffset;
@@ -588,7 +687,7 @@ ashita.events.register('packet_in', 'skillchain_handleincomingpacket', function 
             local actionCount = UnpackBits(4);
             target.Actions = T{};
             for j = 1,actionCount do
-                local action = {};
+                local action = T{};
                 action.Reaction = UnpackBits(5);
                 action.Animation = UnpackBits(12);
                 action.SpecialEffect = UnpackBits(7);
@@ -599,7 +698,7 @@ ashita.events.register('packet_in', 'skillchain_handleincomingpacket', function 
 
                 local hasAdditionalEffect = (UnpackBits(1) == 1);
                 if hasAdditionalEffect then
-                    local additionalEffect = {};
+                    local additionalEffect = T{};
                     additionalEffect.Damage = UnpackBits(10);
                     additionalEffect.Param = UnpackBits(17);
                     additionalEffect.Message = UnpackBits(10);
@@ -608,7 +707,7 @@ ashita.events.register('packet_in', 'skillchain_handleincomingpacket', function 
 
                 local hasSpikesEffect = (UnpackBits(1) == 1);
                 if hasSpikesEffect then
-                    local spikesEffect = {};
+                    local spikesEffect = T{};
                     spikesEffect.Damage = UnpackBits(10);
                     spikesEffect.Param = UnpackBits(14);
                     spikesEffect.Message = UnpackBits(10);
@@ -623,14 +722,52 @@ ashita.events.register('packet_in', 'skillchain_handleincomingpacket', function 
         if (#actionPacket.Targets > 0) then
             HandleActionPacket(actionPacket);
         end
+    elseif (e.id == 0x63) and (struct.unpack('B', e.data, 0x04 + 1) == 9) then
+        playerBuffTable = T{};
+        for i = 1,32 do
+            local buff = struct.unpack('H', e.data, 0x06 + (i * 2) + 1);
+            if buff ~= 0xFF then
+                playerBuffTable:append(buff);
+            end
+        end
+    elseif (e.id == 0x076) then
+        partyBuffTable = T{};
+        for i = 0,4 do
+            local memberOffset = 0x04 + (0x30 * i) + 1;
+            local memberId = struct.unpack('L', e.data, memberOffset);
+            if memberId > 0 then
+                local buffs = T{};
+                local empty = false;
+                for j = 0,31 do
+                    if empty then
+                        buffs[j + 1] = -1;
+                    else
+                        local highBits = bit.lshift(ashita.bits.unpack_be(e.data_raw, memberOffset + 7, j * 2, 2), 8);
+                        local lowBits = struct.unpack('B', e.data, memberOffset + 0x10 + j);
+                        local buff = highBits + lowBits;
+                        if (buff == 255) then
+                            buffs[j + 1] = -1;
+                            empty = true;
+                        else
+                            buffs[j + 1] = buff;
+                        end
+                    end
+                end
+                partyBuffTable[memberId] = buffs;
+            end
+        end
     end
 end);
 
-local exposed = {};
+local exposed = T{};
 
 function exposed:GetSkillchain(targetIndex, weaponskillId)
     local resonation = resonationMap[targetIndex];
     if not resonation then
+        return;
+    end
+    if (os.clock() > resonation.WindowClose) then
+        resonationMap[targetIndex] = nil;
         return;
     end
 
@@ -642,12 +779,57 @@ function exposed:GetSkillchain(targetIndex, weaponskillId)
     for _,sc in ipairs(possibleSkillchains) do
         if (resonation.Attributes:contains(sc[2])) then
             if wsAttributes:contains(sc[3]) then
-                return resonation, sc[1];
+                return resonation, names[sc[1]];
             end
         end
     end
 
     return;
+end
+
+function exposed:GetSkillchainBySpell(targetIndex, spellId)
+    local buffId;
+    local spellAttributes = immanenceResonationMap[spellId];
+    if spellAttributes then
+        buffId = T{470};
+    else
+        spellAttributes = chainAffinityResonationMap[spellId];
+        if spellAttributes then
+            buffId = T{ 163, 164 };
+        end
+    end
+    if not buffId then
+        return;
+    end
+    
+    local buffActive = false;
+    for _,buff in ipairs(playerBuffTable) do
+        if buffId:contains(buff) then
+            buffActive = true;
+            break;
+        end
+    end
+
+    if not buffActive then
+        return;
+    end
+
+    local resonation = resonationMap[targetIndex];
+    if not resonation then
+        return;
+    end
+    if (os.clock() > resonation.WindowClose) then
+        resonationMap[targetIndex] = nil;
+        return;
+    end
+
+    for _,sc in ipairs(possibleSkillchains) do
+        if (resonation.Attributes:contains(sc[2])) then
+            if spellAttributes:contains(sc[3]) then
+                return resonation, names[sc[1]];
+            end
+        end
+    end
 end
 
 return exposed;
