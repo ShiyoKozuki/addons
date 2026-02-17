@@ -236,7 +236,7 @@ statusTracker.GetStatusEffects = function(serverId)
         return FilterPlayerBuffs(AshitaCore:GetMemoryManager():GetPlayer():GetBuffs());
     end
 
-    -- If this is a trust, use my GetEntitiesBuffs() to get buffs via my custom packet 
+    -- Trusts
     if IsTrust(GetIndexFromId(serverId)) then
         local buffIds = {}
         local buffs = GetEntitiesBuffs(GetIndexFromId(serverId))
@@ -249,7 +249,7 @@ statusTracker.GetStatusEffects = function(serverId)
             end
         end
 
-        return buffIds;
+        return buffIds;  -- Return buffIds for Trusts
     end
 
     -- If this is a party member, return the party member's buffs
