@@ -1330,7 +1330,6 @@ local ElementalObiTable =
 function EquipElementalObi(element)
     local obi = ElementalObiTable[element]
     if (obi ~= nil) then
-        local action = gData.GetAction();
         local environment = gData.GetEnvironment()
         if (environment.WeatherElement == element) or (environment.DayElement == element) then
             if HasItemInEquippableInventory(GetItemByName(obi)) then
@@ -1346,6 +1345,8 @@ function ObiCheck()
     if (environment.WeatherElement == action.Element) or (environment.DayElement == action.Element) then
         if HasItemInEquippableInventory(GetItemByName('Hachirin-no-Obi')) then
             gFunc.Equip('Waist', 'Hachirin-no-Obi');
+        else
+            EquipElementalObi(action.Element)
         end
     end
 end
