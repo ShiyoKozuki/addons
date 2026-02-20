@@ -89,7 +89,14 @@ local function parseStat(value)
     if not value or value == "" then
         return nil
     end
-    return gradeMap[value] or tonumber(value)
+
+    value = value:lower():gsub("%s+", "")
+
+    if value == "varies" or value == "varie" then
+        return 3
+    end
+
+    return tonumber(value)
 end
 
 -- ==========================================================
@@ -246,13 +253,23 @@ local function updateMobPools(statById)
             local valuesStr = line:match("VALUES%s*%((.*)%)")
             if valuesStr then
                 local values = splitSQLValues(valuesStr)
+
                 local familyId = tonumber(values[4])
+                local mobType  = tonumber(values[15]) or 0
 
                 local stats = statById[familyId]
                 if stats then
-                    if stats[10] then values[6] = stats[10] end -- mJob
-                    if stats[11] then values[7] = stats[11] end -- sJob
-                    if stats[12] then values[9] = stats[12] end -- Delay
+
+                    -- Only update jobs if NORMAL mob
+                    if mobType == 0 then
+                        if stats[10] then values[6] = stats[10] end -- mJob
+                        if stats[11] then values[7] = stats[11] end -- sJob
+                    end
+
+                    -- Delay can still update regardless
+                    if stats[12] then
+                        values[9] = stats[12]
+                    end
 
                     lines[i] = "INSERT INTO `mob_pools` VALUES (" ..
                         table.concat(values, ",") .. ");"
