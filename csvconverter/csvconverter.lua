@@ -1,6 +1,6 @@
 addon.name      = 'csvconverter'
 addon.author    = 'Shiyo'
-addon.version   = '3.0'
+addon.version   = '1.1'
 
 require('common')
 require('logmanager')
