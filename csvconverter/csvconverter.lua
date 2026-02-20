@@ -1,162 +1,292 @@
 addon.name      = 'csvconverter'
 addon.author    = 'Shiyo'
-addon.version   = '1.0'
+addon.version   = '3.0'
 
 require('common')
 require('logmanager')
 gLogManager:SetDirectory('CSVConverter')
 
-local sqlPath = [[C:\Server and Notepad Files\FFXI\Topaz\Moos Pserver\sql\mob_family_system.sql]]
-local csvPath = [[C:\Ashita 4\addons\csvconverter\mob_stats.csv]]
+local familySqlPath = [[C:\Server and Notepad Files\FFXI\Topaz\Moos Pserver\sql\mob_family_system.sql]]
+local poolsSqlPath  = [[C:\Server and Notepad Files\FFXI\Topaz\Moos Pserver\sql\mob_pools.sql]]
+local csvPath       = [[C:\Ashita 4\addons\csvconverter\mob_stats.csv]]
 
--- Columns to modify
-local statIndexes = {
-    STR = 9,
-    DEX = 10,
-    VIT = 11,
-    AGI = 12,
-    INT = 13,
-    MND = 14,
-    CHR = 15,
-    DEF = 17,
-    EVA = 19
-}
-
-local function splitCSV(line)
-    local t = {}
-    for v in string.gmatch(line, '([^,]+)') do
-        v = v:gsub('^%s+', ''):gsub('%s+$', '')
-        table.insert(t, v)
-    end
-    return t
-end
-
-local function splitSQLValues(str)
-    local t = {}
-    for v in string.gmatch(str, "([^,]+)") do
-        table.insert(t, v)
-    end
-    return t
-end
+-- ==========================================================
+-- Maps
+-- ==========================================================
 
 local gradeMap = {
-    A = 1,
-    B = 2,
-    C = 3,
-    D = 4,
-    E = 5,
-    F = 6
+    A = 1, B = 2, C = 3, D = 4, E = 5, F = 6
 }
 
+local jobMap = {
+    WAR = 1, MNK = 2, WHM = 3, BLM = 4, RDM = 5,
+    THF = 6, PLD = 7, DRK = 8, BST = 9, BRD = 10,
+    RNG = 11, SAM = 12, NIN = 13, DRG = 14, SMN = 15,
+    BLU = 16, COR = 17, PUP = 18, DNC = 19, SCH = 20,
+    GEO = 21, RUN = 22
+}
+
+-- ==========================================================
+-- Utility Functions
+-- ==========================================================
+
 local function normalize(name)
-    -- Remove anything in parentheses
     name = name:gsub("%b()", "")
-
-    -- Lowercase
     name = name:lower()
-
-    -- Remove spaces only
     name = name:gsub("%s+", "")
-
-    -- Remove everything except letters, numbers, hyphen, apostrophe
     name = name:gsub("[^%w%-']", "")
-
     return name
 end
 
-local function convert()
+-- Proper CSV splitter (handles quotes)
+local function splitCSV(line)
+    local t = {}
+    local field = ""
+    local inQuotes = false
 
-    local statMap = {}
-    local csvFamilies = {}
-    local matchedFamilies = {}
-    local sqlFamilies = {}
+    for i = 1, #line do
+        local c = line:sub(i,i)
 
-    local csvFile = io.open(csvPath, 'r')
-    if not csvFile then
-        print('[csvconverter] Could not open CSV.')
-        return
-    end
-
-    for line in csvFile:lines() do
-        local d = splitCSV(line)
-
-        if d[1] and d[1] ~= "" and d[1] ~= "Mob Family" and not d[1]:find("PLEASE") then
-
-            local familyRaw = d[1]
-            local family = normalize(familyRaw)
-
-            csvFamilies[family] = familyRaw
-
-            statMap[family] = {
-                gradeMap[d[2]] or tonumber(d[2]) or 3,
-                gradeMap[d[3]] or tonumber(d[3]) or 3,
-                gradeMap[d[4]] or tonumber(d[4]) or 3,
-                gradeMap[d[5]] or tonumber(d[5]) or 3,
-                gradeMap[d[6]] or tonumber(d[6]) or 3,
-                gradeMap[d[7]] or tonumber(d[7]) or 3,
-                gradeMap[d[8]] or tonumber(d[8]) or 3,
-                tonumber(d[9])  or 3,
-                tonumber(d[10]) or 3
-            }
+        if c == '"' then
+            inQuotes = not inQuotes
+        elseif c == ',' and not inQuotes then
+            table.insert(t, field)
+            field = ""
+        else
+            field = field .. c
         end
     end
 
-    csvFile:close()
+    table.insert(t, field)
+    return t
+end
+
+-- Proper SQL VALUES splitter (respects quotes)
+local function splitSQLValues(str)
+    local t = {}
+    local field = ""
+    local inQuotes = false
+
+    for i = 1, #str do
+        local c = str:sub(i,i)
+
+        if c == "'" then
+            inQuotes = not inQuotes
+            field = field .. c
+        elseif c == "," and not inQuotes then
+            table.insert(t, field)
+            field = ""
+        else
+            field = field .. c
+        end
+    end
+
+    table.insert(t, field)
+    return t
+end
+
+local function parseStat(value)
+    if not value or value == "" then
+        return nil
+    end
+    return gradeMap[value] or tonumber(value)
+end
+
+-- ==========================================================
+-- Load Family IDs
+-- ==========================================================
+
+local function loadFamilyIds()
+    local nameToId = {}
+    local sqlFamilies = {}
+
+    for line in io.lines(familySqlPath) do
+        if line:find("INSERT INTO `mob_family_system`") then
+            local valuesStr = line:match("VALUES%s*%((.*)%)")
+            if valuesStr then
+                local values = splitSQLValues(valuesStr)
+                local familyId = tonumber(values[1])
+                local familyName = values[2]:gsub("'", "")
+                local key = normalize(familyName)
+
+                nameToId[key] = familyId
+                sqlFamilies[key] = familyName
+            end
+        end
+    end
+
+    return nameToId, sqlFamilies
+end
+
+-- ==========================================================
+-- Load CSV
+-- ==========================================================
+
+local function loadCSV(familyNameToId)
+
+    local statByName = {}
+    local statById   = {}
+    local csvFamilies = {}
+
+    local file = io.open(csvPath, 'r')
+    if not file then
+        print('[csvconverter] Could not open CSV file.')
+        return statByName, statById, csvFamilies
+    end
+
+    for line in file:lines() do
+        local d = splitCSV(line)
+
+        if d[1] and d[1] ~= "" and d[1] ~= "Family" then
+
+            local key = normalize(d[1])
+            csvFamilies[key] = d[1]
+
+            local stats = {
+                parseStat(d[2]),  -- STR
+                parseStat(d[3]),  -- DEX
+                parseStat(d[4]),  -- VIT
+                parseStat(d[5]),  -- AGI
+                parseStat(d[6]),  -- INT
+                parseStat(d[7]),  -- MND
+                parseStat(d[8]),  -- CHR
+
+                parseStat(d[9]),  -- DEF
+                parseStat(d[10]), -- EVA
+
+                jobMap[d[12]],    -- mJob
+                jobMap[d[13]],    -- sJob
+
+                tonumber(d[11])   -- Delay
+            }
+
+            statByName[key] = stats
+
+            if familyNameToId[key] then
+                statById[familyNameToId[key]] = stats
+            end
+        end
+    end
+
+    file:close()
+    return statByName, statById, csvFamilies
+end
+
+-- ==========================================================
+-- Update mob_family_system.sql
+-- ==========================================================
+
+local function updateFamilySystem(statByName)
+    local matchedFamilies = {}
 
     local lines = {}
-    for line in io.lines(sqlPath) do
+    for line in io.lines(familySqlPath) do
         table.insert(lines, line)
     end
 
     for i, line in ipairs(lines) do
         if line:find("INSERT INTO `mob_family_system`") then
 
-            -- Extract and strip comment first
-            local comment = line:match("%-%-.*") or ""
-            local cleanLine = line:gsub("%-%-.*$", "")
-
-            -- Now safely extract values
-            local valuesStr = cleanLine:match("VALUES%s*%((.*)%)")
-
+            local valuesStr = line:match("VALUES%s*%((.*)%)")
             if valuesStr then
                 local values = splitSQLValues(valuesStr)
+                local familyName = normalize(values[2]:gsub("'", ""))
 
-                local familyRaw = values[2]:gsub("'", "")
-                local key = normalize(familyRaw)
-
-                sqlFamilies[key] = familyRaw
-
-                local stats = statMap[key]
-
+                local stats = statByName[familyName]
                 if stats then
-                    matchedFamilies[key] = true
+                    matchedFamilies[familyName] = true
 
-                    values[9]  = stats[1]
-                    values[10] = stats[2]
-                    values[11] = stats[3]
-                    values[12] = stats[4]
-                    values[13] = stats[5]
-                    values[14] = stats[6]
-                    values[15] = stats[7]
-                    values[17] = stats[8]
-                    values[19] = stats[9]
+                    -- STR–CHR (9–15)
+                    for x = 1, 7 do
+                        if stats[x] then
+                            values[8 + x] = stats[x]
+                        end
+                    end
 
-                    local newValues = table.concat(values, ",")
+                    -- DEF → column 17
+                    if stats[8] then
+                        values[17] = stats[8]
+                    end
+
+                    -- EVA → column 19
+                    if stats[9] then
+                        values[19] = stats[9]
+                    end
+
                     lines[i] = "INSERT INTO `mob_family_system` VALUES (" ..
-                        newValues .. "); " .. comment
+                        table.concat(values, ",") .. ");"
                 end
             end
         end
     end
 
-    -- Write updated SQL
-    local out = io.open(sqlPath, 'w')
+    local out = io.open(familySqlPath, 'w')
     for _, l in ipairs(lines) do
         out:write(l .. "\n")
     end
     out:close()
 
-    -- Generate log using logmanager directory
+    return matchedFamilies
+end
+
+-- ==========================================================
+-- Update mob_pools.sql
+-- ==========================================================
+
+local function updateMobPools(statById)
+
+    local lines = {}
+    for line in io.lines(poolsSqlPath) do
+        table.insert(lines, line)
+    end
+
+    for i, line in ipairs(lines) do
+        if line:find("INSERT INTO `mob_pools`") then
+
+            local valuesStr = line:match("VALUES%s*%((.*)%)")
+            if valuesStr then
+                local values = splitSQLValues(valuesStr)
+                local familyId = tonumber(values[4])
+
+                local stats = statById[familyId]
+                if stats then
+                    if stats[10] then values[6] = stats[10] end -- mJob
+                    if stats[11] then values[7] = stats[11] end -- sJob
+                    if stats[12] then values[9] = stats[12] end -- Delay
+
+                    lines[i] = "INSERT INTO `mob_pools` VALUES (" ..
+                        table.concat(values, ",") .. ");"
+                end
+            end
+        end
+    end
+
+    local out = io.open(poolsSqlPath, 'w')
+    for _, l in ipairs(lines) do
+        out:write(l .. "\n")
+    end
+    out:close()
+end
+
+-- ==========================================================
+-- Convert
+-- ==========================================================
+
+local function convert()
+
+    gLogManager:Log(LogStyle.Message, 'CSVConverter', 'Starting conversion...')
+
+    local familyNameToId, sqlFamilies = loadFamilyIds()
+    local statByName, statById, csvFamilies = loadCSV(familyNameToId)
+
+    local matchedFamilies = updateFamilySystem(statByName)
+    updateMobPools(statById)
+
+    -- ==========================================
+    -- Logging Missing Families
+    -- ==========================================
+
+    gLogManager:Log(LogStyle.Message, 'CSVConverter', '')
     gLogManager:Log(LogStyle.Message, 'CSVConverter', '=== CSV Families Not Found In SQL ===')
     gLogManager:Log(LogStyle.Message, 'CSVConverter', '')
 
@@ -177,7 +307,7 @@ local function convert()
     end
 
     gLogManager:Log(LogStyle.Message, 'CSVConverter', '')
-    gLogManager:Log(LogStyle.Message, 'CSVConverter', 'CSV conversion complete.')
+    gLogManager:Log(LogStyle.Message, 'CSVConverter', 'Conversion complete.')
 end
 
 ashita.events.register('load', 'load_cb', function()
