@@ -2216,8 +2216,25 @@ local hideMenus = T{
     ['menu    scoption'] = true,
     ['menu    party3  '] = true,
     ['menu    partywin'] = true,
-    -- TODO: Region menus
-    -- TODO: Config menus
+    ['menu    fulllog' ] = true,
+    ['menu    cnqframe'] = true,
+    ['menu    configwi'] = true,
+    ['menu    conf2win'] = true,
+    ['menu    cfilter'] = true,
+    ['menu    conftxtc'] = true,
+    ['menu    cconf5m'] = true,
+    ['menu    conf3win'] = true,
+    ['menu    conf6win'] = true,
+    ['menu    conf12wi'] = true,
+    ['menu    conf13wi'] = true,
+    ['menu    fxfilter'] = true,
+    ['menu    conf7'   ] = true,
+    ['menu    conf4'   ] = true,
+    ['menu    merit1'  ] = true,
+    ['menu    merit2'  ] = true,
+    ['menu    meritcat'] = true,
+    ['menu    merit2ca'] = true,
+    ['menu    jbpcat'  ] = true,
 };
 
 isZoning = (AshitaCore:GetMemoryManager():GetParty():GetMemberTargetIndex(0) == 0);
