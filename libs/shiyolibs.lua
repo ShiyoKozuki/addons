@@ -2235,6 +2235,7 @@ local hideMenus = T{
     ['menu    meritcat'] = true,
     ['menu    merit2ca'] = true,
     ['menu    jbpcat'  ] = true,
+    ['menu    inline'  ] = true,
 };
 
 isZoning = (AshitaCore:GetMemoryManager():GetParty():GetMemberTargetIndex(0) == 0);

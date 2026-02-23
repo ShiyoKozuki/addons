@@ -14,8 +14,9 @@ local csvPath       = [[C:\Ashita 4\addons\csvconverter\mob_stats.csv]]
 -- Maps
 -- ==========================================================
 
+-- mobutils.cpp - > uint16 GetBase(CMobEntity* PMob, uint8 rank)
 local gradeMap = {
-    A = 1, B = 2, C = 3, D = 4, E = 5, F = 6
+    A = 1, B = 2, C = 3, D = 4, E = 5, F = 6, G = 7
 }
 
 local jobMap = {
@@ -194,7 +195,13 @@ local function updateFamilySystem(statByName)
     for i, line in ipairs(lines) do
         if line:find("INSERT INTO `mob_family_system`") then
 
-            local valuesStr = line:match("VALUES%s*%((.*)%)")
+            local sqlPart, comment = line:match("^(.-)%s*(%-%-.*)$")
+            if not sqlPart then
+                sqlPart = line
+                comment = ""
+            end
+
+            local valuesStr = sqlPart:match("VALUES%s*%((.*)%)")
             if valuesStr then
                 local values = splitSQLValues(valuesStr)
                 local familyName = normalize(values[2]:gsub("'", ""))
@@ -220,8 +227,14 @@ local function updateFamilySystem(statByName)
                         values[19] = stats[9]
                     end
 
-                    lines[i] = "INSERT INTO `mob_family_system` VALUES (" ..
+                    local newLine = "INSERT INTO `mob_family_system` VALUES (" ..
                         table.concat(values, ",") .. ");"
+
+                    if comment and comment ~= "" then
+                        newLine = newLine .. " " .. comment
+                    end
+
+                    lines[i] = newLine
                 end
             end
         end
@@ -250,7 +263,14 @@ local function updateMobPools(statById)
     for i, line in ipairs(lines) do
         if line:find("INSERT INTO `mob_pools`") then
 
-            local valuesStr = line:match("VALUES%s*%((.*)%)")
+            -- Split SQL from trailing comment
+            local sqlPart, comment = line:match("^(.-)%s*(%-%-.*)$")
+            if not sqlPart then
+                sqlPart = line
+                comment = ""
+            end
+
+            local valuesStr = sqlPart:match("VALUES%s*%((.+)%)")
             if valuesStr then
                 local values = splitSQLValues(valuesStr)
 
@@ -260,19 +280,21 @@ local function updateMobPools(statById)
                 local stats = statById[familyId]
                 if stats then
 
-                    -- Only update jobs if NORMAL mob
+                    -- Only update jobs and delay if NORMAL mob
                     if mobType == 0 then
                         if stats[10] then values[6] = stats[10] end -- mJob
                         if stats[11] then values[7] = stats[11] end -- sJob
+                        if stats[12] then values[9] = stats[12] end -- Delay
                     end
 
-                    -- Delay can still update regardless
-                    if stats[12] then
-                        values[9] = stats[12]
-                    end
-
-                    lines[i] = "INSERT INTO `mob_pools` VALUES (" ..
+                    local newLine = "INSERT INTO `mob_pools` VALUES (" ..
                         table.concat(values, ",") .. ");"
+
+                    if comment ~= "" then
+                        newLine = newLine .. " " .. comment
+                    end
+
+                    lines[i] = newLine
                 end
             end
         end

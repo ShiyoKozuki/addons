@@ -1,166 +1,325 @@
 Mob Family,STR,DEX,VIT,AGI ,INT,MND,CHR,DEF,EVA,DELAY,MAIN JOB,SUB JOB,D MULTI,Job deviation / Misc Info (Please read row 2)
 ,"PLEASE READ ANY NOTES OR COMMENT, DESIGNATED BY A TRIANGLE IN THE TOP RIGHT CORNER OF A CELL",,,,,,,,,,,,,
 Behemoth,C,C,C,C,C,C,C,3,3,,WAR,THF,,
+Skormoth,C,C,C,C,C,C,C,3,3,,WAR,THF,,
 King_Behemoth,C,C,C,C,C,C,C,3,3,,WAR,THF,,
 Buffalo,D,D,D,D,D,D,D,3,3,,PLD,PLD,,20% defense bonus. Does not exist post-CoP
 Cehuetzi,,,,,,,,,,,WAR,RDM,,
+Kumhau,,,,,,,,,,,WAR,RDM,,
 Cerberus,A,A,C,A,A,A,B,3,3,,WAR,WAR,,Bonus 20% Attack
+Sarameya,A,A,C,A,A,A,B,3,3,,WAR,WAR,,Bonus 20% Attack
 Coeurl,D,C,E,D,C,E,D,3,3,,WAR,WHM,,
+Jug-Coeurl,D,C,E,D,C,E,D,3,3,,WAR,WHM,,
+Jug-Lynx,D,C,E,D,C,E,D,3,3,,WAR,WHM,,
+Chesma,D,C,E,D,C,E,D,3,3,,WAR,WHM,,
+Iqi-Balam,D,C,E,D,C,E,D,3,3,,WAR,WHM,
+Anhur,,C,B,D,C,B,D,C,1,1,,WAR,WHM,
 Dhalmel,C,D,D,E,D,D,D,3,3,,WAR,WAR,,
 Gnole,,,,,,,,,,,MNK,MNK,,
+Anubis,,,,,,,,,,,MNK,MNK,,
+Zmag_Ognjeni_Vuk,,,,,,,,,,,MNK,MNK,,
 Manticore,B,E,B,E,D,D,F,3,3,360,WAR,WAR,,10% attack bonus.
+Kirin,B,E,B,E,D,D,F,3,3,360,WAR,WAR,,10% attack bonus.
 Marid,C,E,A,F,C,C,D,3,3,,WAR,WAR,,-10 Evasion racial penalty
+IrizIma,C,E,A,F,C,C,D,3,3,,WAR,WAR,,-10 Evasion racial penalty
 Opo-Opo,E,B,E,B,F,F,B,3,3,,WAR,WAR,, +25 Evasion Bonus for every family EXCEPT Bibiki Opo-Opos
+Bubbly,E,B,E,B,F,F,B,3,3,,WAR,WAR,, +25 Evasion Bonus for every family EXCEPT Bibiki Opo-Opos
+Aegyptopithecus,B,A,C,A,D,D,B,1,1,,WAR,WAR,, +25 Evasion Bonus for every family EXCEPT Bibiki Opo-Opos
 Rabbit,D,C,D,D,D,D,D,3,3,,WAR,WAR,,
 CureRabbit,D,C,D,D,D,D,D,3,3,,WAR,WAR,,
+Jug-Rabbit,D,C,D,D,D,D,D,3,3,,WAR,WAR,,
+VariableHare,D,C,D,D,D,D,D,3,3,,WAR,WAR,,
 Ram,C,D,C,D,D,D,D,3,3,280,WAR,WAR,x 1.5,10% attack bonus.
+Tammuz,C,D,C,D,D,D,D,3,3,280,WAR,WAR,x 1.5,10% attack bonus.
+Khnum,B,C,B,C,C,C,C,1,1,280,WAR,WAR,x 1.5,10% attack bonus.
 Raaz,C,D,,D,F,E,E,3,3,,MNK,MNK,,
+Jug-Raaz,C,D,,D,F,E,E,3,3,180,MNK,MNK,,
 Sheep,C,D,D,D,E,D,D,3,3,,WAR,WAR,,
+Jug-Sheep,C,D,D,D,E,D,D,3,3,,WAR,WAR,,
 Karakul,C,D,D,D,E,D,D,3,3,,WAR,WAR,,
+Slumbering_Samwell,C,D,D,D,E,D,D,3,3,,WAR,WAR,,
 Tiger,D,C,D,D,F,D,D,3,3,,WAR,WAR,,10% attack bonus.
+Smilodon,D,C,D,D,F,D,D,3,3,,WAR,WAR,,10% attack bonus.
+Jug-Tiger,D,C,D,D,F,D,D,3,3,,WAR,WAR,,10% attack bonus.
+Jug-SaberSiravarde,D,C,D,D,E,D,D,3,3,,WAR,WAR,,10% attack bonus.
+Byakko,D,C,D,D,F,D,D,3,3,,WAR,WAR,,10% attack bonus.
+Dawon,A,A,B,B,C,B,B,2,1,,WAR,WAR,,10% attack bonus.
+PetByakko,D,C,D,D,F,D,D,3,3,,WAR,WAR,,10% attack bonus.
+Amunet,C,B,C,C,D,C,C,1,1,,WAR,WAR,,10% attack bonus.
 Yztarg,,,,,,,,,,,WAR,WAR,,
 Adamantoise,B,D,A,D,A,A,A,2,3,,PLD,PLD,,20% defense bonus
 MiniAdamantoise,B,D,A,D,A,A,A,2,3,,PLD,PLD,,20% defense bonus
+Jug-Adamantoise,B,D,A,D,A,A,A,2,3,,PLD,PLD,,20% defense bonus
+Millenary_Mossback,B,D,A,D,A,A,A,2,3,,PLD,PLD,,20% defense bonus
 Genbu,B,D,A,D,A,A,A,2,3,,PLD,PLD,,20% defense bonus
+PetGenbu,B,D,A,D,A,A,A,2,3,,PLD,PLD,,20% defense bonus
+Aspidochelone,B,D,A,D,A,A,A,2,3,,PLD,PLD,,20% defense bonus
 Bugard,D,D,D,D,D,D,D,3,3,305,WAR,WAR,x 1.5," 20% Defense bonus. 10% attack bonus. Post-CoP Bugards have no Defense or D value bonu, but retain attack bonus."
+Shedyet,B,B,B,B,B,B,B,2,2,240,WAR,WAR,x 1.5," 20% Defense bonus. 10% attack bonus. Post-CoP Shedyet have no Defense or D value bonu, but retain attack bonus."
 Eft,D,D,D,D,D,D,D,3,3,,WAR,WAR,,
+Jug-Eft,D,D,D,D,D,D,D,3,3,,WAR,WAR,,
 Gabbrath,,,,,,,,,,,DRK,BLM,,
+Achuka,,,,,,,,,,,DRK,BLM,,
 Lizard,D,C,E,D,D,D,D,3,3,,WAR,WAR,,
 IceLizard,D,C,E,D,D,D,D,3,3,,WAR,WAR,,
+Highlander_Lizard,D,C,E,D,D,D,D,3,3,,WAR,WAR,,
+Jug-Lizard,D,C,E,D,D,D,D,3,3,,WAR,WAR,,
+Jug-ColdbloodCamo,D,C,E,D,D,D,D,3,3,,WAR,WAR,,
 Matamata,,,,,,,,,,,PLD,PLD,,
 Peiste,,,,,,,,,,,WAR,WAR,,
+Groot_Slang,,,,,,,,,,,WAR,WAR,,
 Raptor,D,D,E,C,D,D,D,3,3,,WAR,WAR,,Blue Raptors
+Jug-Raptor,D,D,E,C,D,D,D,3,3,,WAR,WAR,,Blue Raptors
 Raptor ToAU,D,D,E,C,D,D,D,3,1,,THF,THF,,Green Raptors
 Wivre,A,E,A,F,E,E,D,3,3,,WAR,WAR,,
+Salamander,A,E,A,F,E,E,D,3,3,,WAR,WAR,,
+Dea,A,E,A,F,E,E,D,3,3,,WAR,WAR,,
 Antlion,D,D,D,D,D,D,D,3,3,,WAR,WAR,,20% bonus defense. 10% attack bonus.
+Jug-Antlion,D,D,D,D,D,D,D,3,3,,WAR,WAR,,20% bonus defense. 10% attack bonus.
 Ambush_Antlion,D,D,D,D,D,D,D,3,3,,WAR,WAR,,20% bonus defense. 10% attack bonus.
+Orcus,A,A,A,A,A,A,A,1,1,,WAR,WAR,,20% bonus defense. 10% attack bonus.
 Bee,E,D,D,C,D,D,D,3,3,,WAR,WAR,,
 Beetle,C,C,B,E,E,E,E,3,3,,PLD,PLD,,
 Gouger_Beetle,C,C,B,E,E,E,E,3,3,,PLD,PLD,,
+Jug-Beetle,C,C,B,E,E,E,E,3,3,,PLD,PLD,,
+Jug-Beetle_Yellow,A,A,B,E,E,E,E,3,3,180,WAR,WAR,,
 Bztavian,,,,,,,,,,,THF,BLM,,
+Colkhab,,,,,,,,,,,THF,BLM,,
 Chapuli,D,C,D,B,D,D,E,3,3,,WAR,WAR,,
+Jug-Chapuli,D,C,D,B,D,D,E,3,3,,WAR,WAR,,
 Chigoe,G,A,G,A,A,G,G,3,3,,THF,THF,,
+Chigre,G,A,G,A,A,G,G,3,3,,THF,THF,,
 Crawler,D,D,C,E,D,D,D,5,3,,WAR,WAR,,"Eruca (red crawlers) have Regain of 150 tp/tick on Firesday, along with auto-regen of an unknown value and auto-haste of an unknown value."
+Champion_Crawler,D,D,C,E,D,D,D,5,3,,WAR,WAR,,"Eruca (red crawlers) have Regain of 150 tp/tick on Firesday, along with auto-regen of an unknown value and auto-haste of an unknown value."
 Eruca,D,D,C,E,D,D,D,5,3,,WAR,WAR,,"Eruca (red crawlers) have Regain of 150 tp/tick on Firesday, along with auto-regen of an unknown value and auto-haste of an unknown value."
 Diremite,D,D,D,D,D,D,D,3,3,215,DRK,DRK,,
+Jug-Diremite,D,D,D,D,D,D,D,3,3,215,DRK,DRK,,
 Fly,E,D,D,C,D,D,D,3,3,,WAR,WAR,,
+Jug-Fly,E,D,D,C,D,D,D,3,3,,WAR,WAR,,
 Farruca_Fly,E,D,D,C,D,D,D,3,3,,WAR,WAR,,
 FlyDark,E,D,D,C,D,D,D,3,3,,WAR,WAR,,
 Gnat,,,,,,,,,,,,,,
+Brummbar,,,,,,,,,,,,,,
+Bloodlapper,,,,,,,,,,,,,,
 Giant Gnat,,,,,,,,,,,,,,"Subspecies of Gnat. Also referred to as ""Kulox"" or ""Apian Beasts""."
 Ladybug,,,G,,E,E,E,,,,THF,THF,,
+Jug-Ladybug,,,G,,E,E,E,,,,THF,THF,,
+Coccineus,,,G,,E,E,E,,,,THF,THF,,
+Queenbug,,,G,,E,E,E,,,,THF,THF,,
 Lucani,,,,,,,,,,,,,,
 Mantid,,,,,,,,,,,DRK,DRK,,
 Mosquito,,,,,,,,,,,DRK,DRK,,
+Jug-Mosquito,,,,,,,,,,,DRK,DRK,,
+Jug-Weevil,,,,,,,,,,,DRK,DRK,,
 Scorpion,C,E,D,D,D,D,D,3,3,,WAR,WAR,,bonus 20% attack
+Scolopendrid,C,E,D,D,D,D,D,3,3,,WAR,WAR,,bonus 20% attack
 Serket,C,E,D,D,D,D,D,3,3,,WAR,WAR,,bonus 20% attack
+Serket-Past,C,E,D,D,D,D,D,3,3,,WAR,WAR,,bonus 20% attack
+Khadem_Quemquoma,C,E,D,D,D,D,D,3,3,,WAR,WAR,,bonus 20% attack
+Aqrabuamelu,C,E,D,D,D,D,D,3,3,,WAR,WAR,,bonus 20% attack
+Jyeshtha,C,E,D,D,D,D,D,3,3,,WAR,WAR,,bonus 20% attack
 KingV,C,E,D,D,D,D,D,3,3,,WAR,WAR,,bonus 20% attack
 Spider,E,B,E,D,C,C,F,3,3,,WAR,WAR,,
+Aht_Urhgan_Attercop,E,B,E,D,C,C,F,3,3,,WAR,WAR,,
+Jug-Spider,E,B,E,D,C,C,F,3,3,,WAR,WAR,,
 Twitherym,F,D,E,B,D,D,D,3,4,,RDM,RDM,,
-Twitherym (Fluturini),,,,,,,,,,,,,,Considered a subspecies of Twitherym despite a completely different model.
+Fluturini,F,D,E,B,D,D,D,3,4,,RDM,RDM,,
 Wamoura,E,E,A,E,E,E,E,3,3,,WAR,PLD,, +12% Defense racial.
+Achamoth,E,E,A,E,E,E,E,3,3,,WAR,PLD,, +12% Defense racial.
 Wamouracampa,E,E,A,E,E,E,E,3,3,,PLD,PLD,,
+BrassBorer,E,E,A,E,E,E,E,3,3,,PLD,PLD,,
 Belladonna,,,,,,,,,,,DRK,WAR,,
+Amaranth,,,,,,,,,,,DRK,WAR,,
 Flytrap,D,D,D,D,D,D,D,3,3,200,WAR,WAR,,
+Jug-Flytrap,D,D,D,D,D,D,D,3,3,200,WAR,WAR,,
+Gnoletrap,D,D,D,D,D,D,D,3,3,200,WAR,WAR,,
 Funguar,C,D,D,D,E,D,D,3,3,,WAR,WAR,,"Funguar use Queasy, Numb, and Shakeshroom in that order. They lose a mushroom on their head per tp move, and can only use each tp move once."
+Jug-Funguar,C,D,D,D,E,D,D,3,3,,WAR,WAR,,"Funguar use Queasy, Numb, and Shakeshroom in that order. They lose a mushroom on their head per tp move, and can only use each tp move once."
 Funguar-ElectrumCap,C,D,D,D,E,D,D,3,3,,WAR,WAR,,"Funguar use Queasy, Numb, and Shakeshroom in that order. They lose a mushroom on their head per tp move, and can only use each tp move once."
+Goldcap,C,D,D,D,E,D,D,3,3,,WAR,WAR,,"Goldcaps use Sleepga, then Sleepga II at 50% hp. They lose a mushroom on their head per tp move, and can only use each tp move once."
 Goobbue,C,D,B,D,D,D,D,3,3,315,WAR,WAR,x 1.5,10% attack bonus.
 Leafkin,,,,,,,,,,,DRK,WAR,,
 Mandragora,E,C,D,D,D,D,D,3,2,,MNK,MNK,x 1*,KORRIGANS ONLY: Base damage is multiplied by * 1.667 before the hand-to-hand calculation.
+Korrigan,E,C,D,D,D,D,D,3,2,,MNK,MNK,x 1*,KORRIGANS ONLY: Base damage is multiplied by * 1.667 before the hand-to-hand calculation.
+Jug-Mandragora,E,C,D,D,D,D,D,3,2,,MNK,MNK,x 1*,KORRIGANS ONLY: Base damage is multiplied by * 1.667 before the hand-to-hand calculation.
+ChanequeMandragora,E,C,D,D,D,D,D,3,2,,MNK,MNK,x 1*,KORRIGANS ONLY: Base damage is multiplied by * 1.667 before the hand-to-hand calculation.
+Cosmos_Cocora,E,C,D,D,D,D,D,3,2,,MNK,MNK,x 1*,KORRIGANS ONLY: Base damage is multiplied by * 1.667 before the hand-to-hand calculation.
 Morbol,D,B,D,D,D,E,D,3,3,205,WAR,WAR,x 1.5,"Ameretats drain 1/6th of damage dealt per hit, capping at 14. Vampiric Lash from Ameretats absorb buffs."
 Morbol-nm,D,B,D,D,D,E,D,3,3,205,WAR,WAR,x 1.5,"Ameretats drain 1/6th of damage dealt per hit, capping at 14. Vampiric Lash from Ameretats absorb buffs."
 Ameretat,D,B,D,D,D,E,D,3,3,205,WAR,WAR,x 1.5,"Ameretats drain 1/6th of damage dealt per hit, capping at 14. Vampiric Lash from Ameretats absorb buffs."
-
+LividrootAmoo,D,B,D,D,D,E,D,3,3,205,WAR,WAR,x 1.5,"Ameretats drain 1/6th of damage dealt per hit, capping at 14. Vampiric Lash from Ameretats absorb buffs."
 Panopt,,,,,,,,,,,BLM,BLM,,
 Rafflesia,,,,,,,,,,,DRK,WAR,,Floral Bouquet charms all bees within range. Charmed Bees are then targeted by Bloody Caress.
 Sabotender,B,E,E,C,E,E,C,3,3,,WAR,WAR,,
+Jug-Sabotender,B,E,E,C,E,E,C,3,3,,WAR,WAR,,
+Sabotender-Cactrot,B,E,E,C,E,E,C,3,3,,WAR,WAR,,
+SabotenderFlorido,B,E,E,C,E,E,C,3,3,,WAR,WAR,,
 Sapling,D,D,C,D,D,D,E,3,3,,WAR,WAR,,
+Ghillie_Dhu,D,D,C,D,D,D,E,3,3,,WAR,WAR,,
 Snapweed,,,,,,,,,,,WAR,WAR,,
+Jug-Snapweed,,,,,,,,,,,WAR,WAR,,
 Treant,D,D,C,D,D,D,E,3,3,,WAR,WAR,,
 Treants (ToAU),D,D,C,D,D,D,E,3,3,,WAR,WAR,,racial defense modifier of calculated defense *.75 (apparently this modifier depends on whether the Treant has leaves or not)
 Yggdreant,,,,,,,,,,,PLD,DRK,,
+Yumcax,,,,,,,,,,,PLD,DRK,,
 Crab,D,D,C,E,D,D,D,3,3,,PLD,PLD,,
+Crab_Barnacle,D,D,C,E,D,D,D,3,3,,PLD,PLD,,
+Jug-Crab,D,D,C,E,D,D,D,3,3,,PLD,PLD,,
+Jug-Courier_Carrie,D,D,C,E,D,D,D,3,3,,PLD,PLD,,
+Jug-Porter_Crab,D,D,C,E,D,D,D,3,3,,PLD,PLD,,
+Krabkatoa,A,A,A,A,A,A,A,1,2,,PLD,PLD,,
 Cracklaw,,,,,,,,,,,WAR,WAR,,
 Orobon,A,D,B,D,D,D,D,3,3,,WAR,WAR,,
+Orobon_Large,A,D,B,D,D,D,D,3,3,,WAR,WAR,,
+Nuhn,A,D,B,D,D,D,D,3,3,,WAR,WAR,,
 Pteraketos,,,,,,,,,,,,,,
 Pugil,D,D,D,C,D,D,E,3,3,,WAR,WAR,,
+Jug-Pugil,D,D,D,C,D,D,E,3,4,,WAR,WAR,,
 Jagil,C,D,D,C,D,D,E,3,4,,COR,COR,,Pre-ToAU Jagil use the normal Pugil jobs and stat ranks. According to Eiyuu wiki Jagil in post-TOAU areas revert to WAR/WAR
+Capricornus,C,D,D,C,D,D,E,3,4,,COR,COR,,Pre-ToAU Jagil use the normal Pugil jobs and stat ranks. According to Eiyuu wiki Jagil in post-TOAU areas revert to WAR/WAR
 Rockfin,,,A,,C,C,,,,,WAR,BLM,," Supposedly hitting them with water damage generates an ""Ice spikes"" effect."
+Tchakka,,,A,,C,C,,,,,WAR,BLM,," Supposedly hitting them with water damage generates an ""Ice spikes"" effect."
 Ruszor,,,,,,,,,,,WAR,WAR,,
 Sea Monk,C,E,D,D,D,D,D,3,3,,WAR,WAR,,
 LordOfOnzozo,C,E,D,D,D,D,D,3,3,,WAR,WAR,,
 SeaMonk-Blue,C,E,D,D,D,D,D,3,3,,WAR,WAR,,
+Yacumama,C,E,D,D,D,D,D,3,3,,WAR,WAR,,
 Toad,E,E,E,A,A,F,C,1,5,150,BLM,BLM,,10% bonus evasion. noncaster.
+Jug-Toad,E,E,E,A,A,F,C,1,5,150,BLM,BLM,,10% bonus evasion. noncaster.
 Uragnite,D,D,D,D,D,D,D,3,3,290,PLD,PLD,,See Monster ftps tab for extensive notes on shell mechanic
+Ammonoidea,C,C,C,C,C,C,C,1,1,290,PLD,PLD,,See Monster ftps tab for extensive notes on shell mechanic
 Acuex,,,,,,,,,,,,,,
+Jug-Acuex,,,,,,,,,,,,,,
 Botulus,,,,,,,,,,,,,,
 Flan,E,D,D,D,C,E,C,3,3,,BLM,WAR,,
 Hecteyes,E,D,D,D,C,D,D,3,3,,BLM,WAR,,
 Vanguards_Hecteyes,E,D,D,D,C,D,D,3,3,,BLM,WAR,,
+Shoggoth,E,D,D,D,C,D,D,3,3,,BLM,WAR,,
 Leech,D,D,E,D,C,D,D,3,3,,WAR,WAR,,"Bloodsuckers in Toraimarai Canal had a very low (14/583 at 54 vs 75 macc, cap apparently 30%) chance of inflicting plague on auto attack hit, and level+5 base D."
+Lamprey_Lord,D,D,E,D,C,D,D,3,3,,WAR,WAR,,"Bloodsuckers in Toraimarai Canal had a very low (14/583 at 54 vs 75 macc, cap apparently 30%) chance of inflicting plague on auto attack hit, and level+5 base D."
+Jug-Leech,D,D,E,D,C,D,D,3,3,,WAR,WAR,,"Bloodsuckers in Toraimarai Canal had a very low (14/583 at 54 vs 75 macc, cap apparently 30%) chance of inflicting plague on auto attack hit, and level+5 base D."
 Plovid,,,D,D,D,D,,,,,WAR,BLM,,
 Sandworm,,,,,,,,,,,WAR,WAR,,
 Slime,D,D,D,E,D,C,D,3,3,,WAR,WAR,,
+Clot,D,D,D,E,D,C,D,3,3,,WAR,WAR,,
+Jug-Slime,D,D,D,E,D,C,D,3,3,,WAR,WAR,,
 Slime_NM,D,D,D,E,D,C,D,3,3,,WAR,WAR,,
 Ruins_Oil,D,D,D,E,D,C,D,3,3,,WAR,WAR,,
+Claret,D,D,D,E,D,C,D,3,3,,WAR,WAR,,
+Blobdingnag,A,A,A,A,A,A,A,1,1,,WAR,WAR,,
+GlutinousClot,D,D,D,E,D,C,D,3,3,,WAR,WAR,,
 Slug,,,,,,,,,,,WAR,WAR,,12hp/tick Regen during rain. Absorbs water damage.
+Jug-Slug,,,,,,,,,,,WAR,WAR,,12hp/tick Regen during rain. Absorbs water damage.
+Gummy_Guillaume,,,,,,,,,,,WAR,WAR,,12hp/tick Regen during rain. Absorbs water damage.
 Worm ,D,,E,D,C,D,E,3,5,,BLM,BLM,,
 Worm RotZ,D,,E,D,C,D,E,3,5,,BLM,RDM,,
-Worm (ToAU),D,,E,D,C,D,E,3,5,,BLM,BLM,, 20% bonus defense. 20 Magic Defense Bonus.
+Worm ToAU,D,,E,D,C,D,E,3,5,,BLM,BLM,, 20% bonus defense. 20 Magic Defense Bonus.
+BigWorm,D,,E,D,C,D,E,3,5,,BLM,BLM,,
+Bedrock_Barry,D,,E,D,C,D,E,3,5,,BLM,BLM,, 20% bonus defense. 20 Magic Defense Bonus.
 Amphiptere,,,,,,,,,,,WAR,BLM,,
 Apkallu,D,C,E,D,D,D,D,3,2,,MNK,MNK,,
+Jug-Apkallu,D,C,E,D,D,D,D,3,2,,MNK,MNK,,
+LilApkallu,D,C,E,D,D,D,D,3,2,,MNK,MNK,,
 Bat,D,D,E,C,D,D,D,3,3,,WAR,WAR,,
+Alucard,D,D,E,C,D,D,D,3,3,,WAR,WAR,,
 Cockatrice,D,E,C,D,D,D,D,3,3,,WAR,WAR,,
 Cockatrice Kuzotz,D,E,C,D,D,D,D,3,3,,WAR,RDM,,
 Ziz,E,E,C,D,D,D,D,3,5,265,COR,COR,,racial defense penalty of -10 defense -10 mdb.
+Ahmet,D,D,B,C,C,C,C,1,3,265,COR,COR,,racial defense penalty of -10 defense -10 mdb.
 Colibri,E,E,E,E,A,A,A,3,4,,RDM,RDM,, +20 racial evasion bonus. Reflect properties are described  here
+Jug-Colibri,E,E,E,E,A,A,A,3,4,,RDM,RDM,, +20 racial evasion bonus. Reflect properties are described  here
+Chamrosh,E,E,E,E,A,A,A,3,4,,RDM,RDM,, +20 racial evasion bonus. Reflect properties are described  here
 Flock Bat,D,D,E,C,D,D,D,3,3,,WAR,WAR,,
 Greater Bird,C,C,C,C,C,C,C,2,3,,WAR,WAR,,
 GreaterBird-nm,C,C,C,C,C,C,C,2,3,,WAR,WAR,,
 Greater Bird COP,C,C,C,C,C,C,C,2,3,,WAR,WHM,,
+Suzaku,C,C,C,C,C,C,C,2,3,,WAR,WAR,,
+PetSuzaku,C,C,C,C,C,C,C,2,3,,WAR,WAR,,
 Harpeia,,,,,,,,,,,WAR,BLM,,
 Hippogryph,D,D,D,D,D,D,D,3,1,,THF,BLM,,noncaster. Possible minor Def/Eva bonus racial.
+Jug-Hippogryph,D,D,D,D,D,D,D,3,1,,THF,BLM,,noncaster. Possible minor Def/Eva bonus racial.
 Lesser Bird,D,D,E,C,D,D,D,3,3,,WAR,WAR,,
 Lesser Bird ToAU,D,D,E,C,D,D,D,4,3,,COR,COR,,
 Tulfaire,,,,,,,,,,,WAR,WAR,,
+Jug-Tulfaire,,,,,,,,,,,WAR,WAR,,
 Waktza,,,C,,C,C,,3,3,,WAR,BLM,,
+Hurkan,,,C,,C,C,,3,3,,WAR,BLM,,
 Corpselight,D,,D,B,D,A,G,4,5,,BLM,BLM,,
+DvergrSkull,D,,D,B,D,A,G,4,5,,BLM,BLM,,
+Klagmuhme,C,,C,A,C,A,F,2,3,,BLM,BLM,,
 Corse,D,,D,C,D,D,F,3,3,,DRK,DRK,x 1.5,20% bonus defense.
+Tezcatli,C,,C,B,C,C,D,1,1,,DRK,DRK,x 1.5,20% bonus defense.
+Velfegor,D,,D,C,D,D,F,3,3,,DRK,DRK,x 1.5,20% bonus defense.
 Defiant,,,,,,,,,,,DRK,BLM,,
+Balamor,,,,,,,,,,,DRK,BLM,,
 Doomed,D,,C,D,D,E,C,3,3,,WAR,WAR,,
+Feuerunke,D,,C,D,D,E,C,3,3,,WAR,WAR,,Supposed 12.5% weakness to Slashing
 Jnun,D,,C,D,D,E,C,3,3,,WAR,WAR,,Supposed 12.5% weakness to Slashing
+Verrottendes_Fleisch,D,,C,D,D,E,C,3,3,,WAR,WAR,,Supposed 12.5% weakness to Slashing
 Dullahan,,,,B,D,C,F,,,,DRK,WAR,,
 Fomor,D,,D,D,D,D,C,3,varies,,JOB,JOB,,"Eva based on job. Job/job combo (MNK/MNK, etc). CoP fomor have a shared ""fomor"" hate gained by killing at least 5 Fomor in the area. They also link"
+Elatha,D,,D,D,D,D,C,3,varies,,JOB,JOB,,"Eva based on job. Job/job combo (MNK/MNK, etc). CoP fomor have a shared ""fomor"" hate gained by killing at least 5 Fomor in the area. They also link"
+Ethniu,D,,D,D,D,D,C,3,varies,,JOB,JOB,,"Eva based on job. Job/job combo (MNK/MNK, etc). CoP fomor have a shared ""fomor"" hate gained by killing at least 5 Fomor in the area. They also link"
+Tethra,D,,D,D,D,D,C,3,varies,,JOB,JOB,,"Eva based on job. Job/job combo (MNK/MNK, etc). CoP fomor have a shared ""fomor"" hate gained by killing at least 5 Fomor in the area. They also link"
+Buarainech,D,,D,D,D,D,C,3,varies,,JOB,JOB,,"Eva based on job. Job/job combo (MNK/MNK, etc). CoP fomor have a shared ""fomor"" hate gained by killing at least 5 Fomor in the area. They also link"
+Lugh,D,,D,D,D,D,C,3,varies,,JOB,JOB,,"Eva based on job. Job/job combo (MNK/MNK, etc). CoP fomor have a shared ""fomor"" hate gained by killing at least 5 Fomor in the area. They also link"
+Fomor-Hydra,A,A,A,A,A,A,A,1,1,,JOB,JOB,,"Eva based on job. Job/job combo (MNK/MNK, etc). CoP fomor have a shared ""fomor"" hate gained by killing at least 5 Fomor in the area. They also link"
 Shadow,D,,C,C,D,D,C,3,3,,DRK,DRK,,
 Fomor_Ephramadian_Shade,D,,D,E,D,D,C,3,varies,215*,JOB,JOB,,"Eva based on job. Job/job combo (MNK/MNK, etc). ToAU fomor do not have shared ""fomor hate"" and do not link, but can give and receive buffs to other Fomor."
 Fomor_Fallen,D,,D,E,D,D,C,3,varies,215*,JOB,JOB,,"Eva based on job. Job/job combo (MNK/MNK, etc). ToAU fomor do not have shared ""fomor hate"" and do not link, but can give and receive buffs to other Fomor."
 Ephramadian_Shade,D,,D,E,D,D,C,3,varies,215*,JOB,JOB,,"Eva based on job. Job/job combo (MNK/MNK, etc). ToAU fomor do not have shared ""fomor hate"" and do not link, but can give and receive buffs to other Fomor."
 Ghost,D,,D,D,C,E,C,3,3,,WAR,BLM,,
 Bhoot,D,,D,D,C,E,C,3,3,,DRK,BLM,, + 20 magic defense bonus racial trait and -25% mdt
+Medjeds_Head,D,,D,D,C,E,C,3,3,,DRK,BLM,, + 20 magic defense bonus racial trait and -25% mdt
+Medjeds_Body,D,,D,D,C,E,C,3,3,,DRK,BLM,, + 20 magic defense bonus racial trait and -25% mdt
 Hound,D,,D,D,D,E,C,4,4,,WAR,WAR,,12.5% increased slashing damage taken
+Hound_of_Balthazar,B,B,B,B,B,D,B,2,2,,WAR,WAR,,12.5% increased slashing damage taken
+Hound_Boreal,B,B,G,B,B,D,B,5,2,,WAR,WAR,,12.5% increased slashing damage taken
 Naraka,,,,,,,,,,,WAR,BLM,,
 Qutrub Melee,C,,C,E,D,E,F,3,3,260,DRK,WAR,,
 Qutrub Caster,C,,C,E,D,E,F,3,1,260,BLM,THF,,
+ZareehklTheJu,C,,C,E,D,E,F,3,1,260,BLM,THF,,
+Qutrub,C,,C,E,D,E,F,3,1,260,BLM,THF,,
 Skeleton Caster,D,,D,D,D,E,D,3,5,,BLM,BLM,,
+Velionis,D,,D,D,D,E,D,3,5,,BLM,BLM,,
+Erebus,D,,D,D,D,E,D,3,5,,BLM,BLM,,
 Skeleton Melee,D,,D,D,D,E,D,3,3,,DRK,DRK,,
 Skeletons (Club)(CoP),D,,D,D,D,E,D,3,3,,WAR,DRK,,
 Draugar,C,,D,D,D,E,D,3,1,240*,JOB,JOB,, +10 racial evasion.
 Vampyr,D,,B,D,B,E,G,1,3,,DRK,WAR,x 1.5,Links with nearby bats. Some vampyr have innate MAB. D multiplier is permanent even in post-CoP zones.
+Nosferatu,D,,B,D,B,E,G,1,3,,DRK,WAR,x 1.5,Links with nearby bats. Some vampyr have innate MAB. D multiplier is permanent even in post-CoP zones.
+Alucard_Vampyr,D,,B,D,B,E,G,1,3,,DRK,WAR,x 1.5,Links with nearby bats. Some vampyr have innate MAB. D multiplier is permanent even in post-CoP zones.
+Lord_Ruthven,A,A,A,A,A,C,D,1,1,,DRK,WAR,x 1.5,Links with nearby bats. Some vampyr have innate MAB. D multiplier is permanent even in post-CoP zones.
 Acrolith,C,,C,D,B,F,D,3,3,200,WAR,WAR,, -25% final defense modifier
+Wulgaru,C,,C,D,B,F,D,3,3,200,WAR,WAR,, -25% final defense modifier
 Bomb,B,,D,D,E,D,C,3,3,,WAR,WAR,x 1.5,
+Snoll,B,,D,D,E,D,C,3,3,,WAR,WAR,x 1.5,
 Djinn,B,,D,D,E,D,C,3,3,,WAR,WAR,x 1.5,
+Magma,B,,D,D,E,D,C,3,3,,WAR,WAR,x 1.5,
+Ellylldan,B,,D,D,E,D,C,3,3,,WAR,WAR,x 1.5,
+Barqan,A,,C,C,D,C,B,1,1,,WAR,WAR,x 1.5,
 Bomb ToAU,E,,D,C,E,D,C,3,3,,WAR,RDM,,WAR/RDM: the bombs exhibit same EEM/SDT behavior as other post-toau counterparts (non-weak elements are 60% not 50)
+Reacton,E,,D,C,E,D,C,3,3,,WAR,RDM,,WAR/RDM: the bombs exhibit same EEM/SDT behavior as other post-toau counterparts (non-weak elements are 60% not 50)
 Cardian,D,,D,E,D,D,C,3,5,210,JOB,JOB,," -25% MDT confirmed for every member of Cardian family. Cups = WHM, Coins = RDM, Batons = BLM, Swords = PLD"
 Caturae,,,,,,,,,,,WAR,BLM,,"Any default stats here will probably not reflect the indivudal member being surveyed, as they are highly custom monsters"
 Cluster,D,, ,D,D,D,C,3,3,,WAR,WAR,,they do not lose base damage from losing a member of the cluster
 Doll,D,,C,E,D,D,C,3,3,,WAR,WAR,,
+Calcabrina,D,,C,E,D,D,C,3,3,,WAR,WAR,,
+Despot,D,,C,E,D,D,C,3,3,,WAR,WAR,,
+Faust,D,,C,E,D,D,C,3,3,,WAR,WAR,,
+Autarch,D,,C,E,D,D,C,3,3,,WAR,WAR,,
+Martinet,D,,C,E,D,D,C,3,3,,WAR,WAR,,
 Evil Weapon Caster,F,,D,C,A,D,B,3,3,,WAR,RDM,,
 Evil Weapon Melee,F,,E,D,A,D,B,3,3,,WAR,WAR,,
+Shikigami_Weapon,F,,D,C,A,D,B,3,3,,WAR,RDM,,
 Golem,A,,C,E,C,C,C,3,3,325,WAR,WAR,x 1.5,20% Attack bonus
+Mokkurkalfi,A,,C,E,C,C,C,3,3,325,WAR,WAR,x 1.5,20% Attack bonus
 Grimoire,,,,,,,,,,,,,,
 Iron Giant,,,,,,,,,,,WAR,WAR,,
 Khimaira,D,C,C,,D,,,varies,varies,,WAR,WAR,,
+Tyger,D,C,C,,D,,,varies,varies,,WAR,WAR,,
 Magic Pot,D,,D,E,B,C,C,3,3,,WAR,RDM,,
+MagicPot_SightAggro,D,,D,E,B,C,C,3,3,,WAR,RDM,,
 Mammet,A,,D,,D,D,D,3,4,240*,RDM,RDM,1*,"Unarmed normal, Staff are Attack * .5, Sword are D * 1.4, Polearm is D * 1.4 + Attack * 2"
 Marolith,,,,,,,,,,,WAR,WAR,,
 Mimic,D,,B,B,B,B,F,3,3,240*,WAR,WAR,,25% bonus attack. 
@@ -169,9 +328,12 @@ Dragon,A,,C,C,C,C,D,3,3,,WAR,BLM,,Shadow Dragon takes 2.5x magic damage. 20% Att
 Dahak,A,,C,C,C,C,D,3,3,,WAR,BLM,,Lose 300 tp per water element damage inflicted on them (for example each hit of enwater). Gain 150 tp/tick while silenced. 20% Attack bonus
 Anantaboga,A,,C,C,C,C,D,3,3,,WAR,BLM,,Lose 300 tp per water element damage inflicted on them (for example each hit of enwater). Gain 150 tp/tick while silenced. 20% Attack bonus
 Hydra,B,,A,B,A,E,C,3,3,,WAR,WAR,,
+Tinnin,B,,A,B,A,E,C,3,3,,WAR,WAR,,
 Pet Wyvern,D,,D,D,D,D,D,3,,,DRG,DRG,,
 Kindreds-Wyvern,D,,D,D,D,D,D,3,,,DRG,DRG,,
 Puk,F,,E,B,B,C,E,3,4,200,BRD,BRD,,
+Snaggletooth-Peapuk,F,,E,B,B,C,E,3,4,200,BRD,BRD,,
+Vulpangue,F,,E,B,B,C,E,3,4,200,BRD,BRD,,
 Wyrm,B,A,C,B,A,F,B,3,3,,DRK,WAR,,"Grand Wyrms have their own job combo, refer to the HNM stats tab"
 TiamatWyrm,B,A,C,B,A,F,B,3,3,,DRK,WAR,,"Grand Wyrms have their own job combo, refer to the HNM stats tab"
 VrtraWyrm,B,A,C,B,A,F,B,3,3,,DRK,WAR,,"Grand Wyrms have their own job combo, refer to the HNM stats tab"
@@ -180,37 +342,63 @@ NidhoggWyrm,B,A,C,B,A,F,B,3,3,,DRK,WAR,,"Grand Wyrms have their own job combo, r
 OuryuWyrm,B,A,C,B,A,F,B,3,3,,DRK,WAR,,"Grand Wyrms have their own job combo, refer to the HNM stats tab"
 FafnirWyrm,B,A,C,B,A,F,B,3,3,,DRK,WAR,,"Grand Wyrms have their own job combo, refer to the HNM stats tab"
 JormungandWyrm,B,A,C,B,A,F,B,3,3,,DRK,WAR,,"Grand Wyrms have their own job combo, refer to the HNM stats tab"
+Bahamut,A,A,A,A,A,A,A,1,1,,DRK,WAR,,"Grand Wyrms have their own job combo, refer to the HNM stats tab"
+Provenance_watcher,A,A,A,A,A,A,A,1,1,,DRK,WAR,,"Grand Wyrms have their own job combo, refer to the HNM stats tab"
 Wyvern,D,,C,D,B,E,E,3,3,,WAR,WAR,,
+Seiryu,D,,C,D,B,E,E,3,3,,WAR,WAR,,
+PetSeiryu,D,,C,D,B,E,E,3,3,,WAR,WAR,,
 Cyranuce,D,,C,D,B,E,E,3,3,,WAR,WAR,,
 GuivreWyvern,D,,C,D,B,E,E,3,3,,WAR,WAR,,
 GuivreWyvern-Past,D,,C,D,B,E,E,3,3,,WAR,WAR,,
+SimorgWyvern,D,,C,D,B,E,E,3,3,,WAR,WAR,,
 Zilant,,,,,,,,,,,WAR,BLM,,
+Yilbegan,,,,,,,,,,,WAR,BLM,,
 Ahriman,D,,D,D,E,E,C,3,3,,WAR,BLM,,
+Angra_Mainyu,A,A,A,A,A,A,A,1,1,,WAR,BLM,,
 Vanguard-Eye,D,,D,D,E,E,C,3,3,,WAR,BLM,,
-Kindred,D,,D,D,C,F,C,3,variess,,JOB,JOB,x 1.5,"Eva based on job. Job/job combo (MNK/MNK, etc)."
+Kindred,D,,D,D,C,F,C,3,varies,,JOB,JOB,x 1.5,"Eva based on job. Job/job combo (MNK/MNK, etc)."
+Duke_Focalor,D,,D,D,C,F,C,3,varies,,JOB,JOB,x 1.5,"Eva based on job. Job/job combo (MNK/MNK, etc)."
+Duke_Xavier,D,,D,D,C,F,C,3,varies,,JOB,JOB,x 1.5,"Eva based on job. Job/job combo (MNK/MNK, etc)."
 Dvergr,,,,,,,,,,,BLM,BLM,,
+Knecht,,,,,,,,,,,BLM,BLM,,
+Pandemonium,,,,,,,,,,,BLM,BLM,,
 Gallu,,,,,,,,,,,DRK,WAR,,
 Gargouille,,,,,,,,,,,WAR,WAR,,
+Gargoyle,,,,,,,,,,,WAR,WAR,,
+Kernunnos,,,,,,,,,,,WAR,WAR,,
 Imp,E,,D,C,C,G,C,3,5,,BLM ,BLM,,Supposedly regain while slept
+Imp_Exp_Camp,E,,D,C,C,G,C,3,5,,BLM ,BLM,,Supposedly regain while slept
+Verdelet,E,,D,C,C,G,C,3,5,,BLM ,BLM,,Supposedly regain while slept
 Soulflayer,E,,E,F,A,A,E,3,5,,BLM,BLM,,20% defense bonus. Family bonus of +30 MAB.
+MahjlaefThePai,E,,E,F,A,A,E,3,5,,BLM,BLM,,20% defense bonus. Family bonus of +30 MAB.
 Tauri,A,,E,E,E,C,C,3,2,,MNK,WAR,x 1.667,"-20% Defense penalty, -10 Evasion penalty."
-Aern,B,B,C,C,A,A,A,3,variess ,240*,JOB,JOB,,"Eva based on job. Job/job combo (MNK/MNK, etc)."
+Velfegor,A,,D,D,D,B,B,1,1,,MNK,WAR,x 1.667,"-20% Defense penalty, -10 Evasion penalty."
+Aern,B,B,C,C,A,A,A,3,varies ,240*,JOB,JOB,,"Eva based on job. Job/job combo (MNK/MNK, etc)."
+AbsoluteVirtue,A,A,A,A,A,A,A,1,1,240*,JOB,JOB,,"Eva based on job. Job/job combo (MNK/MNK, etc)."
 Euvhi,D,,D,D,D,D,A,3,3,,WAR,WAR,x 1*,Base damage is x 1.5 when the flower is open
+Jailer_of_Faith,D,,D,D,D,D,A,3,3,,WAR,WAR,x 1*,Base damage is x 1.5 when the flower is open
 Hpemde,G,,D,D,D,D,E,3,3,,DRG,DRG,x 1*,Base damage is x 2 when the mouth is open
+Jailer_of_Prudence,G,,D,D,D,D,E,3,3,,DRG,DRG,x 1*,Base damage is x 2 when the mouth is open
 Phuabo,A,,D,A,A,C,C,3,3,,PLD,PLD,,
+Jailer_of_Hope,A,,D,A,A,C,C,3,3,,PLD,PLD,,
 Xzomit,D,,E,F,C,E,D,3,3,170,PLD,WAR,,
 Xzomit-Baby,D,,E,F,C,E,D,3,3,170,PLD,WAR,,
+Jailer_of_Justice,D,,E,F,C,E,D,3,3,170,PLD,WAR,,
 Yovra,B,,D,F,F,F,F,3,3,,BLM,DRK,x 2, +50% defense bonus
+Jailer_of_Love,B,,D,F,F,F,F,3,3,,BLM,DRK,x 2, +50% defense bonus
 Ghrah,D,,C,C,D,D,D,3,3,,BLM,WAR,,"All Ghrah are BLM/WAR with an additional +20 MAB (52 total, 32 from BLM), but the forms are different. Bird form grants evasion and triple attack equal to appropriate level thief,"
 Ghrah,D,,C,C,D,D,D,3,3,,BLM,WAR,,human form gives defense bonus equal to the defense bonus traits of a paladin of that level AND a bonus 100% total defense. 
 Ghrah,D,,C,C,D,D,D,3,3,,BLM,WAR,x 1*,"spider form gives attack bonus and defense equal to warrior of that level. (Since Ghrah are already BLM/WAR, this basically means their trait bonuses are doubled). Spider form is Base damage x 2."
+Jailer_of_Fortitude,D,,C,C,D,D,D,3,3,,BLM,WAR,,human form gives defense bonus equal to the defense bonus traits of a paladin of that level AND a bonus 100% total defense. 
 Zdei,F,,D,D,D,D,C,3,3,,PLD,PLD,,20% defense bonus; rings and bars out is some kind of damage taken modifier
+Jailer_of_Temperance,F,,D,D,D,D,C,3,3,,PLD,PLD,,20% defense bonus; rings and bars out is some kind of damage taken modifier
 Craver,E,,A,C,D,D,D,3,3,215,WAR,RDM,,10% bonus defense. noncaster.
 Gorger,D,,B,C,D,D,D,3,3,,WAR,RDM,,10% bonus defense.  noncaster
 Receptacle,D,D,D,D,D,D,D,3,3,,WAR,WAR,,Receptacles have a custom 54 vit at level 30.
 Seether,B,,B,D,D,D,D,3,3,,WAR,RDM,,10% bonus defense.  noncaster. 30% bonus attack.
 Thinker,D,,B,D,D,D,D,3,3,,WAR,RDM,,10% bonus defense.  noncaster
 Wanderer,D,,E,E,D,D,D,3,3,205,WAR,RDM,,-10% defense. +40 flat evasion bonus. non-caster. 25% attack reduction from predicted.
+Stray,D,,E,E,D,D,D,3,3,205,WAR,RDM,,-10% defense. +40 flat evasion bonus. non-caster. 25% attack reduction from predicted.
 Weeper,D,,E,E,D,D,D,3,3,,WAR,RDM,,-10% defense.  noncaster
 Amoeban,,,,,,,,,,,,,,
 Clionid,,,,,,,,,,,,,,
@@ -219,43 +407,77 @@ Murex,,,,,,,,,,,,,,
 Chariot,A,,,,C,E,D,3,3,,WAR,WAR,x 1.5,
 Gear,B,,D,E,C,E,E,3,5,,RNG,RNG,,
 Gears,B,,D,E,C,E,E,3,5,,RNG,RNG,,
+ArmedGears,B,,D,E,C,E,E,3,5,,RNG,RNG,,
 Rampart,C,,,,C,E,E,3,3,280,BST,BST,,
 Antica,A,,E,D,D,F,D,3,varies,,JOB,JOB,,
+Antica-Legatus,A,,E,D,D,F,D,3,varies,,JOB,JOB,,
 Bugbear,G,,E,B,D,D,D,3,2,,MNK,MNK,x 1.667,-10 Evasion penalty. 
 Gigas,A,B,A,E,F,D,C,3,varies,,JOB,JOB,,
+Procrustes,A,B,A,E,F,D,C,3,varies,,JOB,JOB,,
+Gigas-WOTG,A,B,A,E,F,D,C,1,1,,JOB,JOB,,
 Alkyoneus,A,B,A,E,F,D,C,3,varies,,JOB,JOB,,
 Goblin,D,,E,C,D,D,D,3,varies,,JOB,JOB,,
 Goblin-Lightning,D,,E,C,D,D,D,3,varies,,JOB,JOB,,
 Goblin_Armored,D,,E,C,D,D,D,3,varies,,JOB,JOB,,
+Goblin-WOTG,D,,E,C,D,D,D,1,1,,JOB,JOB,,
+Goblin_ExcavationDuty,D,,E,C,D,D,D,3,varies,,JOB,JOB,,
+Goblin_Tomb_Raider,D,,E,C,D,D,D,3,varies,,JOB,JOB,,
 Moblin,D,,E,C,D,D,D,3,varies,,JOB,JOB,,
 Lamiae,E,,B,D,B,B,B,3,varies,240*,JOB,JOB,, +25 Defense bonus racial
+Merrow,E,,B,D,B,B,B,3,varies,240*,JOB,JOB,, +25 Defense bonus racial
+ExperimentalLa,E,,B,D,B,B,B,3,varies,240*,JOB,JOB,, +25 Defense bonus racial
+Medusa,A,A,A,A,A,A,A,1,1,240*,JOB,JOB,, +25 Defense bonus racial
+Medusa_Arrapago_Remnants,A,A,A,A,A,A,A,1,1,240*,JOB,JOB,, +25 Defense bonus racial
 Mamool Ja,D,,D,C,D,D,D,3,varies,240*,JOB,JOB,,"Merrow have +10 MAB innate, and Lamia have -12.5% mdt innate."
 MamoolJaKnight,D,,D,C,D,D,D,3,varies,240*,JOB,JOB,,"Merrow have +10 MAB innate, and Lamia have -12.5% mdt innate."
 MamoolJa-Sword,D,,D,C,D,D,D,3,varies,240*,JOB,JOB,,"Merrow have +10 MAB innate, and Lamia have -12.5% mdt innate."
+GotohZhaTheRe,D,,D,C,D,D,D,3,varies,240*,JOB,JOB,,"Merrow have +10 MAB innate, and Lamia have -12.5% mdt innate."
+Gulool_Ja_Ja,A,A,A,A,A,A,A,1,1,480*,JOB,JOB,,"Merrow have +10 MAB innate, and Lamia have -12.5% mdt innate."
 Meeble,,,C,B,D,B,,,,,MNK,MNK,," +10 Evasion racial. BLU Mamools seem to benefit from available job traits. Delay variess by weapon, base damage for non-sword also variess (see monster tp moves tab)"
 Moogle,,,,,,,,,,,RDM,WAR,,
 Orc,B,,D,D,F,E,C,3,varies,,JOB,WAR*,,"JOB/WAR; non-war Orcs only gain Double Attack after 50. In Shadowreign area, they are /JOB"
 Orcnm,B,,D,D,F,E,C,3,varies,,JOB,WAR*,,"JOB/WAR; non-war Orcs only gain Double Attack after 50. In Shadowreign area, they are /JOB"
+Orc-WOTG,A,,D,D,F,E,C,1,1,,JOB,WAR*,,"JOB/WAR; non-war Orcs only gain Double Attack after 50. In Shadowreign area, they are /JOB"
+Orc-SH,A,,D,D,F,E,C,1,1,,JOB,WAR*,,"JOB/WAR; non-war Orcs only gain Double Attack after 50. In Shadowreign area, they are /JOB"
+Overlord_Bakgodek,A,A,A,A,C,B,A,1,1,,JOB,WAR*,,"JOB/WAR; non-war Orcs only gain Double Attack after 50. In Shadowreign area, they are /JOB"
+Bloodcrown_Brradhod,A,A,A,A,C,B,A,1,1,,JOB,WAR*,,"JOB/WAR; non-war Orcs only gain Double Attack after 50. In Shadowreign area, they are /JOB"
+Purpleflash_Brukdok,B,,D,D,F,E,C,3,varies,,JOB,WAR*,,"JOB/WAR; non-war Orcs only gain Double Attack after 50. In Shadowreign area, they are /JOB"
 Orcish Warmachine,B,,D,C,F,E,D,3,3,,WAR,WAR,,
-Orcish Warmachine-WOTG,B,,D,C,F,E,D,3,3,,WAR,WAR,,
+Orcish Warmachine-WOTG,A,,D,C,F,E,D,1,1,,WAR,WAR,,
 Poroggo,E,E,E,A,A,E,C,3,4,,BLM,BRD,,"Mamook Poroggo have -25% mdt, +20 MAB racial generally"
+IririSamariri,E,E,E,A,A
 Qiqirn,E,,E,C,E,D,D,3,varies,200,JOB,JOB,,"Only THF use Qiqirn Mine, seem to drop one when their AI chooses to flee."
+CheeseHoarder,E,,E,C,E,D,D,3,varies,200,JOB,JOB,,"Only THF use Qiqirn Mine, seem to drop one when their AI chooses to flee."
 Quadav,B,,D,D,E,D,D,3,varies,,JOB,JOB*,,"Tier 5 and below are Job/Job. Tier 6 and above use a /WAR Sub (THF/RDM Quadavs gain Defense Bonus 1). In Shadowreign area, they are the same main/sub job."
 Quadavnm,B,,D,D,E,D,D,3,varies,,JOB,JOB*,,"Tier 5 and below are Job/Job. Tier 6 and above use a /WAR Sub (THF/RDM Quadavs gain Defense Bonus 1). In Shadowreign area, they are the same main/sub job."
+Quadav-WOTG,B,,A,D,E,D,D,1,1,,JOB,JOB*,,"Tier 5 and below are Job/Job. Tier 6 and above use a /WAR Sub (THF/RDM Quadavs gain Defense Bonus 1). In Shadowreign area, they are the same main/sub job."
+Quadav-CS,B,,A,D,E,D,D,1,1,,JOB,JOB*,,"Tier 5 and below are Job/Job. Tier 6 and above use a /WAR Sub (THF/RDM Quadavs gain Defense Bonus 1). In Shadowreign area, they are the same main/sub job."
+Qu_Vho_Deathhurler,D,,D,D,E,D,C,3,varies,,JOB,JOB,,"Eva based on job. Job/job combo (MNK/MNK, etc)."
+ZaDha_Adamantking_QD,A,A,A,A,B,A,A,1,2,,JOB,JOB,,"Eva based on job. Job/job combo (MNK/MNK, etc)."
+ZaDha_Adamantking_BuriedGod,A,A,A,A,B,A,A,1,2,,JOB,JOB,,"Eva based on job. Job/job combo (MNK/MNK, etc)."
 Sahagin,D,B,D,B,D,D,C,3,variess  ,,JOB,JOB,,[deleted previous -20 attack penalty]
 Shadow Lord,A,A,A,A,A,A,A,3,3,,DRK,DRK,,
 Dynamis Lord,A,A,A,A,A,A,A,3,3,,DRK,DRK,,
 Siege Turret,,,,,,,,,,,,,,
 Tonberry,D,,E,B,E,E,D,3,varies,,JOB,JOB,,Eva based on job.
 ZM4-Tonberry,D,,E,B,E,E,D,3,varies,,JOB,JOB,,Eva based on job.
+Grav_iton,D,,E,B,E,E,D,3,varies,,JOB,JOB,,Eva based on job.
 Troll,A,,B,E,E,C,D,3,varies,240,JOB,JOB,,"Eva based on job. Job/job combo (MNK/MNK, etc). Twohanded weapon wielding trolls get a 20% attack bonus"
+Troll_ExcavationDuty,A,,B,E,E,C,D,3,varies,,JOB,JOB,,"Eva based on job. Job/job combo (MNK/MNK, etc). Twohanded weapon wielding trolls get a 20% attack bonus"
+TrollGurfurlur,A,A,A,A,A,A,A,1,1,240,JOB,JOB,,"Eva based on job. Job/job combo (MNK/MNK, etc). Twohanded weapon wielding trolls get a 20% attack bonus"
+Khromasoul,A,,B,E,E,C,D,3,varies,240,JOB,JOB,,"Eva based on job. Job/job combo (MNK/MNK, etc). Twohanded weapon wielding trolls get a 20% attack bonus"
 Velkk,,,,,,,,,,,JOB,JOB,,
 Yagudo,D,,C,C,D,E,C,3,varies,,JOB,JOB*,,"Eva rank based on job. Level 50+ Yagudo families use WAR subjob. In Shadowreign area, they are the same main/sub job."
 Yagudonm,D,,C,C,D,E,C,3,varies,,JOB,JOB*,,"Eva rank based on job. Level 50+ Yagudo families use WAR subjob. In Shadowreign area, they are the same main/sub job."
+Yagudo-WOTG,D,,C,A,D,E,C,1,1,,JOB,JOB*,,"Eva rank based on job. Level 50+ Yagudo families use WAR subjob. In Shadowreign area, they are the same main/sub job."
+Yagudo-PW,D,,C,A,D,E,C,1,1,,JOB,JOB*,,"Eva rank based on job. Level 50+ Yagudo families use WAR subjob. In Shadowreign area, they are the same main/sub job."
+Tzee_Xicu_the_Manifest,A,A,B,A,A,A,A,2,1,,JOB,JOB*,,"Eva rank based on job. Level 50+ Yagudo families use WAR subjob. In Shadowreign area, they are the same main/sub job."
+Tzee_Xicu_the_Manifest_SCNM,A,A,B,A,A,A,A,2,1,,JOB,JOB*,,"Eva rank based on job. Level 50+ Yagudo families use WAR subjob. In Shadowreign area, they are the same main/sub job."
 Avatar-Siren,D,D,D,D,D,D,D,3,3,,DRK*,BLM,,"Generally speaking they are DRK/BLM, except for Carbuncle (WHM/BLM) and Alexander (PLD/BLM(?) needs investigation)"
 Avatar-Atomos,D,D,D,D,D,D,D,3,3,,DRK*,BLM,,"Generally speaking they are DRK/BLM, except for Carbuncle (WHM/BLM) and Alexander (PLD/BLM(?) needs investigation)"
-Avatar-Alexander,D,D,D,D,D,D,D,3,3,,DRK*,BLM,,"Generally speaking they are DRK/BLM, except for Carbuncle (WHM/BLM) and Alexander (PLD/BLM(?) needs investigation)"
-Avatar-Carbuncle,D,D,D,D,D,D,D,3,3,,DRK*,BLM,,"Generally speaking they are DRK/BLM, except for Carbuncle (WHM/BLM) and Alexander (PLD/BLM(?) needs investigation)"
+Avatar-Alexander,D,D,D,D,D,D,D,3,3,,PLD*,BLM,,"Generally speaking they are DRK/BLM, except for Carbuncle (WHM/BLM) and Alexander (PLD/BLM(?) needs investigation)"
+Avatar-Carbuncle,D,D,D,D,D,D,D,3,3,,WHM*,BLM,,"Generally speaking they are DRK/BLM, except for Carbuncle (WHM/BLM) and Alexander (PLD/BLM(?) needs investigation)"
+Avatar-CaitSith,D,D,D,D,D,D,D,3,3,,WHM*,BLM,,"Generally speaking they are DRK/BLM, except for Carbuncle (WHM/BLM) and Alexander (PLD/BLM(?) needs investigation)"
 Avatar-Diabolos,D,D,D,D,D,D,D,3,3,,DRK*,BLM,,"Generally speaking they are DRK/BLM, except for Carbuncle (WHM/BLM) and Alexander (PLD/BLM(?) needs investigation)"
 Avatar-Fenrir,D,D,D,D,D,D,D,3,3,,DRK*,BLM,,"Generally speaking they are DRK/BLM, except for Carbuncle (WHM/BLM) and Alexander (PLD/BLM(?) needs investigation)"
 Avatar-Garuda,D,D,D,D,D,D,D,3,3,,DRK*,BLM,,"Generally speaking they are DRK/BLM, except for Carbuncle (WHM/BLM) and Alexander (PLD/BLM(?) needs investigation)"
@@ -265,9 +487,11 @@ Avatar-Odin,D,D,D,D,D,D,D,3,3,,DRK*,BLM,,"Generally speaking they are DRK/BLM, e
 Avatar-Ramuh,D,D,D,D,D,D,D,3,3,,DRK*,BLM,,"Generally speaking they are DRK/BLM, except for Carbuncle (WHM/BLM) and Alexander (PLD/BLM(?) needs investigation)"
 Avatar-Shiva,D,D,D,D,D,D,D,3,3,,DRK*,BLM,,"Generally speaking they are DRK/BLM, except for Carbuncle (WHM/BLM) and Alexander (PLD/BLM(?) needs investigation)"
 Avatar-Titan,D,D,D,D,D,D,D,3,3,,DRK*,BLM,,"Generally speaking they are DRK/BLM, except for Carbuncle (WHM/BLM) and Alexander (PLD/BLM(?) needs investigation)"
+Astral_Flow_Pet,D,D,D,D,D,D,D,3,3,,DRK*,BLM,,"Generally speaking they are DRK/BLM, except for Carbuncle (WHM/BLM) and Alexander (PLD/BLM(?) needs investigation)"
 Pet-Siren,D,D,D,D,D,D,D,3,3,,DRK*,BLM,,"Generally speaking they are DRK/BLM, except for Carbuncle (WHM/BLM) and Alexander (PLD/BLM(?) needs investigation)"
-Pet-Alexander,D,D,D,D,D,D,D,3,3,,DRK*,BLM,,"Generally speaking they are DRK/BLM, except for Carbuncle (WHM/BLM) and Alexander (PLD/BLM(?) needs investigation)"
-Pet-Carbuncle,D,D,D,D,D,D,D,3,3,,DRK*,BLM,,"Generally speaking they are DRK/BLM, except for Carbuncle (WHM/BLM) and Alexander (PLD/BLM(?) needs investigation)"
+Pet-Alexander,D,D,D,D,D,D,D,3,3,,PLD*,BLM,,"Generally speaking they are DRK/BLM, except for Carbuncle (WHM/BLM) and Alexander (PLD/BLM(?) needs investigation)"
+Pet-Carbuncle,D,D,D,D,D,D,D,3,3,,WHM*,BLM,,"Generally speaking they are DRK/BLM, except for Carbuncle (WHM/BLM) and Alexander (PLD/BLM(?) needs investigation)"
+Pet-CaitSith,D,D,D,D,D,D,D,3,3,,WHM*,BLM,,"Generally speaking they are DRK/BLM, except for Carbuncle (WHM/BLM) and Alexander (PLD/BLM(?) needs investigation)"
 Pet-Diabolos,D,D,D,D,D,D,D,3,3,,DRK*,BLM,,"Generally speaking they are DRK/BLM, except for Carbuncle (WHM/BLM) and Alexander (PLD/BLM(?) needs investigation)"
 Pet-Fenrir,D,D,D,D,D,D,D,3,3,,DRK*,BLM,,"Generally speaking they are DRK/BLM, except for Carbuncle (WHM/BLM) and Alexander (PLD/BLM(?) needs investigation)"
 Pet-Garuda,D,D,D,D,D,D,D,3,3,,DRK*,BLM,,"Generally speaking they are DRK/BLM, except for Carbuncle (WHM/BLM) and Alexander (PLD/BLM(?) needs investigation)"
@@ -276,6 +500,8 @@ Pet-Leviathan,D,D,D,D,D,D,D,3,3,,DRK*,BLM,,"Generally speaking they are DRK/BLM,
 Pet-Odin,D,D,D,D,D,D,D,3,3,,DRK*,BLM,,"Generally speaking they are DRK/BLM, except for Carbuncle (WHM/BLM) and Alexander (PLD/BLM(?) needs investigation)"
 Pet-Ramuh,D,D,D,D,D,D,D,3,3,,DRK*,BLM,,"Generally speaking they are DRK/BLM, except for Carbuncle (WHM/BLM) and Alexander (PLD/BLM(?) needs investigation)"
 Pet-Shiva,D,D,D,D,D,D,D,3,3,,DRK*,BLM,,"Generally speaking they are DRK/BLM, except for Carbuncle (WHM/BLM) and Alexander (PLD/BLM(?) needs investigation)"
+Pet-Titan,D,D,D,D,D,D,D,3,3,,DRK*,BLM,,"Generally speaking they are DRK/BLM, except for Carbuncle (WHM/BLM) and Alexander (PLD/BLM(?) needs investigation)"
+
 
 
 
@@ -299,9 +525,15 @@ HybridElemental-Lightning,D,D,D,D,D,D,D,3,5,,BLM,BLM,, +30 meva bonus
 HybridElemental-Water,D,D,D,D,D,D,D,3,5,,BLM,BLM,, +30 meva bonus
 Heartwing,,,,,,,,,,,WHM,WHM,,
 Macuil,,,,,,,,,,,MNK,BLM,,
+Ashrakk,,,,,,,,,,,MNK,BLM,,
+Hadesv2,,,,,,,,,,,MNK,BLM,,
 Monoceros-Dark,,,D,A,B,,D,,,,THF,BLM,,
 Monoceros-Light,,,D,A,B,,D,,,,THF,BLM,,
 Pixie,,,,,,,,,,,BLM,BLM,,
+Urd,,,,,,,,,,,BLM,BLM,,
+Skuld,,,,,,,,,,,BLM,BLM,,
+Verthandi,,,,,,,,,,,BLM,BLM,,
+Feeorin,,,,,,,,,,,BLM,BLM,,
 Sidhe,,,,,,,,,,,BLM,BLM,,
 Porxie,,,,,,,,,,,RDM,RDM,,
 Umbril,,,,,,,,,,,DRK,DRK,,
@@ -309,44 +541,59 @@ Gyve,,,,,,,,,,,,,,
 Structure,,,A,,C,C,C,3,3,,WAR,WAR,,They do not attack or engage in general with the exception of exoplates. Archaic Mirror in Mamook is level 30.
 Structure-Mirror,,,A,,C,C,C,3,3,,WAR,WAR,,They do not attack or engage in general with the exception of exoplates. Archaic Mirror in Mamook is level 30.
 Exoplates,,,A,,C,C,C,3,3,,WAR,WAR,,They do not attack or engage in general with the exception of exoplates. Archaic Mirror in Mamook is level 30.
-Automaton-Harlequin,D,D,D,D,D,D,D,3,varies,240,JOB,JOB,,"Valoredge is PLD/WAR, Stormwaker is RDM/WHM, and Sharpshot is RNG/NIN"
-Automaton-Sharpshot,D,D,D,D,D,D,D,3,varies,240,JOB,JOB,,"Valoredge is PLD/WAR, Stormwaker is RDM/WHM, and Sharpshot is RNG/NIN"
-Automaton-Stormwaker,D,D,D,D,D,D,D,3,varies,240,JOB,JOB,,"Valoredge is PLD/WAR, Stormwaker is RDM/WHM, and Sharpshot is RNG/NIN"
-Automaton-Valoredge,D,D,D,D,D,D,D,3,varies,240,JOB,JOB,,"Valoredge is PLD/WAR, Stormwaker is RDM/WHM, and Sharpshot is RNG/NIN"
-Automaton_Harlequin,D,D,D,D,D,D,D,3,varies,240,JOB,JOB,,"Valoredge is PLD/WAR, Stormwaker is RDM/WHM, and Sharpshot is RNG/NIN"
-Automaton_Valoredge,D,D,D,D,D,D,D,3,varies,240,JOB,JOB,,"Valoredge is PLD/WAR, Stormwaker is RDM/WHM, and Sharpshot is RNG/NIN"
-Automaton_Sharpshot,D,D,D,D,D,D,D,3,varies,240,JOB,JOB,,"Valoredge is PLD/WAR, Stormwaker is RDM/WHM, and Sharpshot is RNG/NIN"
-Automaton_Stormwaker,D,D,D,D,D,D,D,3,varies,240,JOB,JOB,,"Valoredge is PLD/WAR, Stormwaker is RDM/WHM, and Sharpshot is RNG/NIN"
-Omega,A,,,,,,,,,,JOB,JOB,,"Omega is tentatively a MNK/RDM, Ultima is a ???/???"
-Proto_Omega,A,,,,,,,,,,JOB,JOB,,"Omega is tentatively a MNK/RDM, Ultima is a ???/???"
+Automaton-Harlequin,D,D,D,D,D,D,D,3,varies,240,RDM,RDM,,"Valoredge is PLD/WAR, Stormwaker is RDM/WHM, and Sharpshot is RNG/NIN"
+Automaton-Sharpshot,D,D,D,D,D,D,D,3,varies,240,RNG,NIN,,"Valoredge is PLD/WAR, Stormwaker is RDM/WHM, and Sharpshot is RNG/NIN"
+Automaton-Stormwaker,D,D,D,D,D,D,D,3,varies,240,RDM,WHM,,"Valoredge is PLD/WAR, Stormwaker is RDM/WHM, and Sharpshot is RNG/NIN"
+Automaton-Valoredge,D,D,D,D,D,D,D,3,varies,240,PLD,WAR,,"Valoredge is PLD/WAR, Stormwaker is RDM/WHM, and Sharpshot is RNG/NIN"
+Automaton_Harlequin,D,D,D,D,D,D,D,3,varies,240,RDM,RDM,,"Valoredge is PLD/WAR, Stormwaker is RDM/WHM, and Sharpshot is RNG/NIN"
+Automaton_Valoredge,D,D,D,D,D,D,D,3,varies,240,PLD,WAR,,"Valoredge is PLD/WAR, Stormwaker is RDM/WHM, and Sharpshot is RNG/NIN"
+Automaton_Sharpshot,D,D,D,D,D,D,D,3,varies,240,RNG,NIN,,"Valoredge is PLD/WAR, Stormwaker is RDM/WHM, and Sharpshot is RNG/NIN"
+Automaton_Stormwaker,D,D,D,D,D,D,D,3,varies,240,RDM,WHM,,"Valoredge is PLD/WAR, Stormwaker is RDM/WHM, and Sharpshot is RNG/NIN"
+Ob,B,B,B,B,B,B,B,3,3,240,PLD,WAR,,"Valoredge is PLD/WAR, Stormwaker is RDM/WHM, and Sharpshot is RNG/NIN"
+Omega,A,,,,,,,,,,MNK,RDM,,"Omega is tentatively a MNK/RDM, Ultima is a ???/???"
+Proto_Omega,A,,,,,,,,,,MNK,RDM,,"Omega is tentatively a MNK/RDM, Ultima is a ???/???"
 Ultima,A,,,,,,,,,,JOB,JOB,,"Omega is tentatively a MNK/RDM, Ultima is a ???/???"
-AnimatedWeapon-Archery,A,A,A,A,A,A,A,1,3,varies,JOB,SPECIAL,Lv + 256,"Tentatively these weapons each have a main job (GAxe WAR and so forth), rank A family stat, and a subjob + bonus stat combination that totals +30. Gaxe/Gsword apear to have +256 D value offset instead of + 2."
-AnimatedWeapon-Axe,A,A,A,A,A,A,A,1,3,varies,JOB,SPECIAL,Lv + 256,"Tentatively these weapons each have a main job (GAxe WAR and so forth), rank A family stat, and a subjob + bonus stat combination that totals +30. Gaxe/Gsword apear to have +256 D value offset instead of + 2."
-AnimatedWeapon-Club,A,A,A,A,A,A,A,1,3,varies,JOB,SPECIAL,Lv + 256,"Tentatively these weapons each have a main job (GAxe WAR and so forth), rank A family stat, and a subjob + bonus stat combination that totals +30. Gaxe/Gsword apear to have +256 D value offset instead of + 2."
-AnimatedWeapon-Dagger,A,A,A,A,A,A,A,1,3,varies,JOB,SPECIAL,Lv + 256,"Tentatively these weapons each have a main job (GAxe WAR and so forth), rank A family stat, and a subjob + bonus stat combination that totals +30. Gaxe/Gsword apear to have +256 D value offset instead of + 2."
-AnimatedWeapon-GreatAXe,A,A,A,A,A,A,A,1,3,varies,JOB,SPECIAL,Lv + 256,"Tentatively these weapons each have a main job (GAxe WAR and so forth), rank A family stat, and a subjob + bonus stat combination that totals +30. Gaxe/Gsword apear to have +256 D value offset instead of + 2."
-AnimatedWeapon-GreatKatana,A,A,A,A,A,A,A,1,3,varies,JOB,SPECIAL,Lv + 256,"Tentatively these weapons each have a main job (GAxe WAR and so forth), rank A family stat, and a subjob + bonus stat combination that totals +30. Gaxe/Gsword apear to have +256 D value offset instead of + 2."
-AnimatedWeapon-Greatsword,A,A,A,A,A,A,A,1,3,varies,JOB,SPECIAL,Lv + 256,"Tentatively these weapons each have a main job (GAxe WAR and so forth), rank A family stat, and a subjob + bonus stat combination that totals +30. Gaxe/Gsword apear to have +256 D value offset instead of + 2."
-AnimatedWeapon-handtohand,A,A,A,A,A,A,A,1,3,varies,JOB,SPECIAL,Lv + 256,"Tentatively these weapons each have a main job (GAxe WAR and so forth), rank A family stat, and a subjob + bonus stat combination that totals +30. Gaxe/Gsword apear to have +256 D value offset instead of + 2."
-AnimatedWeapon-instrument,A,A,A,A,A,A,A,1,3,varies,JOB,SPECIAL,Lv + 256,"Tentatively these weapons each have a main job (GAxe WAR and so forth), rank A family stat, and a subjob + bonus stat combination that totals +30. Gaxe/Gsword apear to have +256 D value offset instead of + 2."
-AnimatedWeapon-katana,A,A,A,A,A,A,A,1,3,varies,JOB,SPECIAL,Lv + 256,"Tentatively these weapons each have a main job (GAxe WAR and so forth), rank A family stat, and a subjob + bonus stat combination that totals +30. Gaxe/Gsword apear to have +256 D value offset instead of + 2."
-AnimatedWeapon-marksmanship,A,A,A,A,A,A,A,1,3,varies,JOB,SPECIAL,Lv + 256,"Tentatively these weapons each have a main job (GAxe WAR and so forth), rank A family stat, and a subjob + bonus stat combination that totals +30. Gaxe/Gsword apear to have +256 D value offset instead of + 2."
-AnimatedWeapon-polearm,A,A,A,A,A,A,A,1,3,varies,JOB,SPECIAL,Lv + 256,"Tentatively these weapons each have a main job (GAxe WAR and so forth), rank A family stat, and a subjob + bonus stat combination that totals +30. Gaxe/Gsword apear to have +256 D value offset instead of + 2."
-AnimatedWeapon-scythe,A,A,A,A,A,A,A,1,3,varies,JOB,SPECIAL,Lv + 256,"Tentatively these weapons each have a main job (GAxe WAR and so forth), rank A family stat, and a subjob + bonus stat combination that totals +30. Gaxe/Gsword apear to have +256 D value offset instead of + 2."
-AnimatedWeapon-shield,A,A,A,A,A,A,A,1,3,varies,JOB,SPECIAL,Lv + 256,"Tentatively these weapons each have a main job (GAxe WAR and so forth), rank A family stat, and a subjob + bonus stat combination that totals +30. Gaxe/Gsword apear to have +256 D value offset instead of + 2."
-AnimatedWeapon-staff,A,A,A,A,A,A,A,1,3,varies,JOB,SPECIAL,Lv + 256,"Tentatively these weapons each have a main job (GAxe WAR and so forth), rank A family stat, and a subjob + bonus stat combination that totals +30. Gaxe/Gsword apear to have +256 D value offset instead of + 2."
-AnimatedWeapon-sword,A,A,A,A,A,A,A,1,3,varies,JOB,SPECIAL,Lv + 256,"Tentatively these weapons each have a main job (GAxe WAR and so forth), rank A family stat, and a subjob + bonus stat combination that totals +30. Gaxe/Gsword apear to have +256 D value offset instead of + 2."
+AnimatedWeapon-Archery,A,A,A,A,A,A,A,1,3,varies,RNG,RNG,Lv + 256,"Tentatively these weapons each have a main job (GAxe WAR and so forth), rank A family stat, and a subjob + bonus stat combination that totals +30. Gaxe/Gsword apear to have +256 D value offset instead of + 2."
+AnimatedWeapon-Axe,A,A,A,A,A,A,A,1,3,varies,BST,BST,Lv + 256,"Tentatively these weapons each have a main job (GAxe WAR and so forth), rank A family stat, and a subjob + bonus stat combination that totals +30. Gaxe/Gsword apear to have +256 D value offset instead of + 2."
+AnimatedWeapon-Club,A,A,A,A,A,A,A,1,3,varies,WHM,WHM,Lv + 256,"Tentatively these weapons each have a main job (GAxe WAR and so forth), rank A family stat, and a subjob + bonus stat combination that totals +30. Gaxe/Gsword apear to have +256 D value offset instead of + 2."
+AnimatedWeapon-Dagger,A,A,A,A,A,A,A,1,3,varies,THF,THF,Lv + 256,"Tentatively these weapons each have a main job (GAxe WAR and so forth), rank A family stat, and a subjob + bonus stat combination that totals +30. Gaxe/Gsword apear to have +256 D value offset instead of + 2."
+AnimatedWeapon-GreatAXe,A,A,A,A,A,A,A,1,3,varies,WAR,WAR,Lv + 256,"Tentatively these weapons each have a main job (GAxe WAR and so forth), rank A family stat, and a subjob + bonus stat combination that totals +30. Gaxe/Gsword apear to have +256 D value offset instead of + 2."
+AnimatedWeapon-GreatKatana,A,A,A,A,A,A,A,1,3,varies,SAM,SAM,Lv + 256,"Tentatively these weapons each have a main job (GAxe WAR and so forth), rank A family stat, and a subjob + bonus stat combination that totals +30. Gaxe/Gsword apear to have +256 D value offset instead of + 2."
+AnimatedWeapon-Greatsword,A,A,A,A,A,A,A,1,3,varies,PLD,PLD,Lv + 256,"Tentatively these weapons each have a main job (GAxe WAR and so forth), rank A family stat, and a subjob + bonus stat combination that totals +30. Gaxe/Gsword apear to have +256 D value offset instead of + 2."
+AnimatedWeapon-handtohand,A,A,A,A,A,A,A,1,3,varies,MNK,MNK,Lv + 256,"Tentatively these weapons each have a main job (GAxe WAR and so forth), rank A family stat, and a subjob + bonus stat combination that totals +30. Gaxe/Gsword apear to have +256 D value offset instead of + 2."
+AnimatedWeapon-instrument,A,A,A,A,A,A,A,1,3,varies,BRD,BRD,Lv + 256,"Tentatively these weapons each have a main job (GAxe WAR and so forth), rank A family stat, and a subjob + bonus stat combination that totals +30. Gaxe/Gsword apear to have +256 D value offset instead of + 2."
+AnimatedWeapon-katana,A,A,A,A,A,A,A,1,3,varies,NIN,NIN,Lv + 256,"Tentatively these weapons each have a main job (GAxe WAR and so forth), rank A family stat, and a subjob + bonus stat combination that totals +30. Gaxe/Gsword apear to have +256 D value offset instead of + 2."
+AnimatedWeapon-marksmanship,A,A,A,A,A,A,A,1,3,varies,RNG,RNG,Lv + 256,"Tentatively these weapons each have a main job (GAxe WAR and so forth), rank A family stat, and a subjob + bonus stat combination that totals +30. Gaxe/Gsword apear to have +256 D value offset instead of + 2."
+AnimatedWeapon-polearm,A,A,A,A,A,A,A,1,3,varies,DRG,DRG,Lv + 256,"Tentatively these weapons each have a main job (GAxe WAR and so forth), rank A family stat, and a subjob + bonus stat combination that totals +30. Gaxe/Gsword apear to have +256 D value offset instead of + 2."
+AnimatedWeapon-scythe,A,A,A,A,A,A,A,1,3,varies,DRK,DRK,Lv + 256,"Tentatively these weapons each have a main job (GAxe WAR and so forth), rank A family stat, and a subjob + bonus stat combination that totals +30. Gaxe/Gsword apear to have +256 D value offset instead of + 2."
+AnimatedWeapon-shield,A,A,A,A,A,A,A,1,3,varies,PLD,PLD,Lv + 256,"Tentatively these weapons each have a main job (GAxe WAR and so forth), rank A family stat, and a subjob + bonus stat combination that totals +30. Gaxe/Gsword apear to have +256 D value offset instead of + 2."
+AnimatedWeapon-staff,A,A,A,A,A,A,A,1,3,varies,BLM,BLM,Lv + 256,"Tentatively these weapons each have a main job (GAxe WAR and so forth), rank A family stat, and a subjob + bonus stat combination that totals +30. Gaxe/Gsword apear to have +256 D value offset instead of + 2."
+AnimatedWeapon-sword,A,A,A,A,A,A,A,1,3,varies,PLD,PLD,Lv + 256,"Tentatively these weapons each have a main job (GAxe WAR and so forth), rank A family stat, and a subjob + bonus stat combination that totals +30. Gaxe/Gsword apear to have +256 D value offset instead of + 2."
 
 
 
 
-DynamisStatue-Goblin,C,,,,B,B,C,3,3,,JOB,JOB,Lv + 220,"Sub seems to vary by type of beastmen. WAR/WAR Orc, WAR/WHM Goblin, RDM/PLD quadav, WAR/BLM Yagudo. Statues gain +25 base stats on retail, and +220 D value"
-DynamisStatue-Orc,C,,,,B,B,C,3,3,,JOB,JOB,Lv + 220,"Sub seems to vary by type of beastmen. WAR/WAR Orc, WAR/WHM Goblin, RDM/PLD quadav, WAR/BLM Yagudo. Statues gain +25 base stats on retail, and +220 D value"
-DynamisStatue-Quadav,C,,,,B,B,C,3,3,,JOB,JOB,Lv + 220,"Sub seems to vary by type of beastmen. WAR/WAR Orc, WAR/WHM Goblin, RDM/PLD quadav, WAR/BLM Yagudo. Statues gain +25 base stats on retail, and +220 D value"
-DynamisStatue-Yagudo,C,,,,B,B,C,3,3,,JOB,JOB,Lv + 220,"Sub seems to vary by type of beastmen. WAR/WAR Orc, WAR/WHM Goblin, RDM/PLD quadav, WAR/BLM Yagudo. Statues gain +25 base stats on retail, and +220 D value"
-DynamisStatue-Goblin-NM,C,,,,B,B,C,3,3,,JOB,JOB,Lv + 220,"Sub seems to vary by type of beastmen. WAR/WAR Orc, WAR/WHM Goblin, RDM/PLD quadav, WAR/BLM Yagudo. Statues gain +25 base stats on retail, and +220 D value"
-DynamisStatue-Orc-NM,C,,,,B,B,C,3,3,,JOB,JOB,Lv + 220,"Sub seems to vary by type of beastmen. WAR/WAR Orc, WAR/WHM Goblin, RDM/PLD quadav, WAR/BLM Yagudo. Statues gain +25 base stats on retail, and +220 D value"
-DynamisStatue-Quadav-NM,C,,,,B,B,C,3,3,,JOB,JOB,Lv + 220,"Sub seems to vary by type of beastmen. WAR/WAR Orc, WAR/WHM Goblin, RDM/PLD quadav, WAR/BLM Yagudo. Statues gain +25 base stats on retail, and +220 D value"
-DynamisStatue-Yagudo-NM,C,,,,B,B,C,3,3,,JOB,JOB,Lv + 220,"Sub seems to vary by type of beastmen. WAR/WAR Orc, WAR/WHM Goblin, RDM/PLD quadav, WAR/BLM Yagudo. Statues gain +25 base stats on retail, and +220 D value"
+DynamisStatue-Goblin,C,,,,B,B,C,3,3,,WAR,WHM,Lv + 220,"Sub seems to vary by type of beastmen. WAR/WAR Orc, WAR/WHM Goblin, RDM/PLD quadav, WAR/BLM Yagudo. Statues gain +25 base stats on retail, and +220 D value"
+DynamisStatue-Orc,C,,,,B,B,C,3,3,,WAR,WAR,Lv + 220,"Sub seems to vary by type of beastmen. WAR/WAR Orc, WAR/WHM Goblin, RDM/PLD quadav, WAR/BLM Yagudo. Statues gain +25 base stats on retail, and +220 D value"
+DynamisStatue-Quadav,C,,,,B,B,C,3,3,,RDM,PLD,Lv + 220,"Sub seems to vary by type of beastmen. WAR/WAR Orc, WAR/WHM Goblin, RDM/PLD quadav, WAR/BLM Yagudo. Statues gain +25 base stats on retail, and +220 D value"
+DynamisStatue-Yagudo,C,,,,B,B,C,3,3,,WAR,BLM,Lv + 220,"Sub seems to vary by type of beastmen. WAR/WAR Orc, WAR/WHM Goblin, RDM/PLD quadav, WAR/BLM Yagudo. Statues gain +25 base stats on retail, and +220 D value"
+DynamisStatue-Goblin-NM,C,,,,B,B,C,3,3,,WAR,WHM,Lv + 220,"Sub seems to vary by type of beastmen. WAR/WAR Orc, WAR/WHM Goblin, RDM/PLD quadav, WAR/BLM Yagudo. Statues gain +25 base stats on retail, and +220 D value"
+DynamisStatue-Orc-NM,C,,,,B,B,C,3,3,,WAR,WAR,Lv + 220,"Sub seems to vary by type of beastmen. WAR/WAR Orc, WAR/WHM Goblin, RDM/PLD quadav, WAR/BLM Yagudo. Statues gain +25 base stats on retail, and +220 D value"
+DynamisStatue-Quadav-NM,C,,,,B,B,C,3,3,,RDM,PLD,Lv + 220,"Sub seems to vary by type of beastmen. WAR/WAR Orc, WAR/WHM Goblin, RDM/PLD quadav, WAR/BLM Yagudo. Statues gain +25 base stats on retail, and +220 D value"
+DynamisStatue-Yagudo-NM,C,,,,B,B,C,3,3,,WAR,BLM,Lv + 220,"Sub seems to vary by type of beastmen. WAR/WAR Orc, WAR/WHM Goblin, RDM/PLD quadav, WAR/BLM Yagudo. Statues gain +25 base stats on retail, and +220 D value"
 
-Supreme Being,These are all unique and thus handled elsewhere,,,,,,,,,,,,,
+God,A,A,A,A,A,A,A,1,1,,,,,
+Supreme Being,A,A,A,A,A,A,A,1,1,,,,,
+Maat,A,A,A,A,A,A,A,1,1,,,,,
+ArkAngel-HM,B,B,B,B,B,B,B,1,1,,,,,
+ArkAngel-GK,A,A,A,A,F,F,C,1,1,,,,,
+ArkAngel-EV,A,F,A,F,A,A,A,1,1,,,,,
+ArkAngel-TT,D,A,F,A,A,A,A,1,1,,,,,
+ArkAngel-MR,C,A,C,A,A,A,F,1,1,,,,,
+Zilart,A,A,A,A,A,A,A,1,1,,,,,
+Zilart-Ealdnarche,A,A,A,A,A,A,A,1,1,,,,,
+Shinryu,A,A,A,A,A,A,A,1,1,,,,,
+Hadesv1,D,D,D,D,D,D,D,3,3,,,,,
+Cloud_of_Darkness,A,A,A,A,A,A,A,1,1,,,,,
+Lilisette,D,D,D,D,D,D,D,2,2,,,,,
+Lilith_Ascendant,A,A,A,A,A,A,A,1,1,,,,,
