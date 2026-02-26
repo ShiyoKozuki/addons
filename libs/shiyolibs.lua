@@ -1224,13 +1224,9 @@ T{
         'Tachi: Shoha', 'Trueflight', 'Vorpal Thrust', 'Wheeling Thrust' }
     },
     [8] = T{ Gorget = 'Shadow Gorget', Weaponskills = T{
-        'Aeolian Edge', 'Arching Arrow', 'Ascetic\'s Fury', 'Atonement', 'Blade: Chi', 'Blade: Ei', 'Blade: Ku', 'Blade: Jin', 'Blade: Metsu', 
-        'Blast Arrow', 'Blast Shot', 'Brainshaker', 'Circle Blade', 'Cross Reaper', 'Dark Harvest', 'Decimation', 'Detonator', 'Double Thrust', 
-        'Drakesbane', 'Dulling Arrow', 'Empyreal Arrow', 'Entropy', 'Evisceration', 'Exenterator', 'Fast Blade', 'Final Heaven', 'Flaming Arrow', 
-        'Full Swing', 'Garland of Bliss', 'Gust Slash', 'Heavy Shot', 'Hexa Strike', 'Hot Shot', 'Howling Fist', 'Insurgency', 'Ken\'s Edge', 
-        'Leaden Salute', 'Last Stand', 'Mandalic Stab', 'Mercy Stroke', 'Requiescat', 'Resolution', 'Seraph Blade', 'Shadow of Death', 
-        'Shark Bite', 'Shattersoul', 'Sidewinder', 'Sniper Shot', 'Spiral Hell', 'Spinning Slash', 'Spinning Scythe', 'Swift Blade', 
-        'Tachi: Enpi', 'Tachi: Jinpu', 'Tachi: Kasha', 'Tachi: Rana', 'Tachi: Shoha', 'Upheaval' }
+    'Asuran Fists', 'Black Halo', 'Blade: Ei', 'Blade: Hi', 'Blade: Kamu', 'Blade: Ku', 'Blade: Ten', 'Catastrophe', 'Quietus', 'Entropy', 'Evisceration', 'Impulse Drive', 'Insurgency', 'Keen Edge',
+    'Leaden Salute', 'Mandalic Stab', 'Mercy Stroke', 'Requiescat', 'Rudra\'s Storm', 'Nightmare Scythe', 'Omniscience', 'One Inch Punch', 'Penta Thrust', 'Primal Rend', 'Retribution', 'Shattersoul',
+    'Starburst', 'Stardiver', 'Stringing Pummel', 'Sunburst', 'Swift Blade', 'Tachi: Kasha', 'Tachi: Rana', 'Tachi: Shoha', 'Upheaval'}
     }
 }
 
