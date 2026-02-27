@@ -19,7 +19,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 --]]
-
+require('shiyolibs');
 local d3d = require('d3d8');
 local ffi = require('ffi');
 local config        = require('config');
@@ -42,6 +42,11 @@ end
 
 ashita.events.register('d3d_present', 'd3d_present_cb', function ()
     config:Render();
+
+    if ShouldHideUI() then
+        return
+    end
+    
     if (sprite == nil) or ((gSettings.HideWithPrimitives == true) and (AshitaCore:GetPrimitiveManager():GetVisible() == false)) then
         return;
     end
