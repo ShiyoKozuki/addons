@@ -2272,6 +2272,8 @@ function ShouldHideUI()
     return false;
 end
 
+-- TODO: Needs to be run twice to work properly...
+-- TODO: Add a delay before running 2nd loop?
 function getConsumables(inputTable)
 -- trackedMeds -> all items you want to move, ever. T { "Remedy", "Panacea", "Shihei", "idk" }
 -- inputTable -> meds this job wants. T{ "Cream Puff", "Melon Pie +1" }
@@ -2305,17 +2307,36 @@ function getConsumables(inputTable)
         ['Shikanofuda']     = { quantity = 99,  container = 'sack' },
     }
 
+    getConsumablesSubjob(inputTable)
+
+    coroutine.wrap(function()
+
     -- Put all meds into the specified container first
     for med, data in pairs(trackedMeds) do
         -- Put all meds into the specified container first
         AshitaCore:GetChatManager():QueueCommand(-1, string.format('/putall "%s" %s', med, data.container));
     end
 
+    -- wait 5 seconds BEFORE taking items back out
+    coroutine.sleep(5)
+
     -- Sort them out so the amount in inventory is equal to the trackedmeds table (i.e. 12 antidote)
     for med, data in pairs(trackedMeds) do
         if inputTable[med] then
             AshitaCore:GetChatManager():QueueCommand(-1, string.format('/get%s "%s"', data.quantity, med));
         end
+    end
+
+    end)()
+end
+
+function getConsumablesSubjob(inputTable)
+    local sJob = AshitaCore:GetMemoryManager():GetPlayer():GetSubJob()
+    local NIN = 13
+    if sJob == NIN then
+        inputTable['Shihei'] = { quantity = 99,  container = 'sack' }
+        inputTable['Shinobi-Tabi'] = { quantity = 99,  container = 'sack' }
+        inputTable['Sanjaku-Tenugui'] = { quantity = 99,  container = 'sack' }
     end
 end
 
