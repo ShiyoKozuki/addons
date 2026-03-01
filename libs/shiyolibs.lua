@@ -2141,7 +2141,9 @@ local hideMenus = T{
     ['menu    mapframe'] = true,
     ['menu    scanlist'] = true,
     ['menu    maplist '] = true,
+    ['menu    pupequip'] = true,
     ['menu    equip   '] = true,
+    ['menu    automato'] = true,
     ['menu    inventor'] = true,
     ['menu    itemctrl'] = true,
     ['menu    magic   '] = true,
@@ -2224,14 +2226,15 @@ local hideMenus = T{
     ['menu    conf12wi'] = true,
     ['menu    conf13wi'] = true,
     ['menu    fxfilter'] = true,
-    ['menu    conf7'   ] = true,
-    ['menu    conf4'   ] = true,
-    ['menu    merit1'  ] = true,
-    ['menu    merit2'  ] = true,
+    ['menu    conf7   '] = true,
+    ['menu    conf4   '] = true,
+    ['menu    merit1  '] = true,
+    ['menu    merit2  '] = true,
     ['menu    meritcat'] = true,
     ['menu    merit2ca'] = true,
-    ['menu    jbpcat'  ] = true,
-    ['menu    inline'  ] = true,
+    ['menu    jbpcat  '] = true,
+    ['menu    inline  '] = true,
+    -- Spaces after name then before ] where the ' is is intended. PAY ATTENTION! i.e. ['menu    inline  ']
 };
 
 isZoning = (AshitaCore:GetMemoryManager():GetParty():GetMemberTargetIndex(0) == 0);
@@ -2267,6 +2270,53 @@ function ShouldHideUI()
     end
 
     return false;
+end
+
+function getConsumables(inputTable)
+-- trackedMeds -> all items you want to move, ever. T { "Remedy", "Panacea", "Shihei", "idk" }
+-- inputTable -> meds this job wants. T{ "Cream Puff", "Melon Pie +1" }
+-- the function puts away everything in trackedMeds that's not in inputTable and takes out everything in trackedMeds that is.
+    local trackedMeds =
+    T{
+        ['X-Potion']        = { quantity = 1,  container = 'satchel' },
+        ['Antidote']        = { quantity = 12, container = 'satchel' },
+        ['Antacid']         = { quantity = 12, container = 'satchel' },
+        ['Holy Water']      = { quantity = 12, container = 'satchel' },
+        ['Remedy']          = { quantity = 12, container = 'satchel' },
+        ['Vile Elixir']     = { quantity = 1,  container = 'satchel' },
+        ['Reraiser']        = { quantity = 1,  container = 'satchel' },
+        ['Hi-Reraiser']     = { quantity = 1,  container = 'satchel' },
+        ['Vile Elixir +1']  = { quantity = 1,  container = 'satchel' },
+        ['Instant Warp']    = { quantity = 1,  container = 'satchel' },
+        ['Instant Reraise'] = { quantity = 1,  container = 'satchel' },
+
+        ['Eye Drops']       = { quantity = 12, container = 'satchel' },
+
+        ['Echo Drops']      = { quantity = 12, container = 'satchel' },
+        ['Pro-Ether']       = { quantity = 1,  container = 'satchel' },
+
+        ['Shihei']          = { quantity = 99,  container = 'sack' },
+        ['Shinobi-Tabi']    = { quantity = 99,  container = 'sack' },
+        ['Sanjaku-Tenugui'] = { quantity = 99,  container = 'sack' },
+
+        ['Kaginawa']        = { quantity = 99,  container = 'sack' },
+        ['Inoshishinofuda'] = { quantity = 99,  container = 'sack' },
+        ['Chonofuda']       = { quantity = 99,  container = 'sack' },
+        ['Shikanofuda']     = { quantity = 99,  container = 'sack' },
+    }
+
+    -- Put all meds into the specified container first
+    for med, data in pairs(trackedMeds) do
+        -- Put all meds into the specified container first
+        AshitaCore:GetChatManager():QueueCommand(-1, string.format('/putall "%s" %s', med, data.container));
+    end
+
+    -- Sort them out so the amount in inventory is equal to the trackedmeds table (i.e. 12 antidote)
+    for med, data in pairs(trackedMeds) do
+        if inputTable[med] then
+            AshitaCore:GetChatManager():QueueCommand(-1, string.format('/get%s "%s"', data.quantity, med));
+        end
+    end
 end
 
 -- Moves items around inventory, unused, untested
