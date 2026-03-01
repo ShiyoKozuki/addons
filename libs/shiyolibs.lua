@@ -2272,71 +2272,14 @@ function ShouldHideUI()
     return false;
 end
 
--- TODO: Needs to be run twice to work properly...
--- TODO: Add a delay before running 2nd loop?
-function getConsumables(inputTable)
--- trackedMeds -> all items you want to move, ever. T { "Remedy", "Panacea", "Shihei", "idk" }
--- inputTable -> meds this job wants. T{ "Cream Puff", "Melon Pie +1" }
--- the function puts away everything in trackedMeds that's not in inputTable and takes out everything in trackedMeds that is.
-    local trackedMeds =
-    T{
-        ['X-Potion']        = { quantity = 1,  container = 'satchel' },
-        ['Antidote']        = { quantity = 12, container = 'satchel' },
-        ['Antacid']         = { quantity = 12, container = 'satchel' },
-        ['Holy Water']      = { quantity = 12, container = 'satchel' },
-        ['Remedy']          = { quantity = 12, container = 'satchel' },
-        ['Vile Elixir']     = { quantity = 1,  container = 'satchel' },
-        ['Reraiser']        = { quantity = 1,  container = 'satchel' },
-        ['Hi-Reraiser']     = { quantity = 1,  container = 'satchel' },
-        ['Vile Elixir +1']  = { quantity = 1,  container = 'satchel' },
-        ['Instant Warp']    = { quantity = 1,  container = 'satchel' },
-        ['Instant Reraise'] = { quantity = 1,  container = 'satchel' },
-
-        ['Eye Drops']       = { quantity = 12, container = 'satchel' },
-
-        ['Echo Drops']      = { quantity = 12, container = 'satchel' },
-        ['Pro-Ether']       = { quantity = 1,  container = 'satchel' },
-
-        ['Shihei']          = { quantity = 99,  container = 'sack' },
-        ['Shinobi-Tabi']    = { quantity = 99,  container = 'sack' },
-        ['Sanjaku-Tenugui'] = { quantity = 99,  container = 'sack' },
-
-        ['Kaginawa']        = { quantity = 99,  container = 'sack' },
-        ['Inoshishinofuda'] = { quantity = 99,  container = 'sack' },
-        ['Chonofuda']       = { quantity = 99,  container = 'sack' },
-        ['Shikanofuda']     = { quantity = 99,  container = 'sack' },
-    }
-
-    getConsumablesSubjob(inputTable)
-
-    coroutine.wrap(function()
-
-    -- Put all meds into the specified container first
-    for med, data in pairs(trackedMeds) do
-        -- Put all meds into the specified container first
-        AshitaCore:GetChatManager():QueueCommand(-1, string.format('/putall "%s" %s', med, data.container));
-    end
-
-    -- wait 5 seconds BEFORE taking items back out
-    coroutine.sleep(5)
-
-    -- Sort them out so the amount in inventory is equal to the trackedmeds table (i.e. 12 antidote)
-    for med, data in pairs(trackedMeds) do
-        if inputTable[med] then
-            AshitaCore:GetChatManager():QueueCommand(-1, string.format('/get%s "%s"', data.quantity, med));
-        end
-    end
-
-    end)()
-end
-
-function getConsumablesSubjob(inputTable)
+function validatePackerTable(inputTable)
     local sJob = AshitaCore:GetMemoryManager():GetPlayer():GetSubJob()
     local NIN = 13
+
     if sJob == NIN then
-        inputTable['Shihei'] = { quantity = 99,  container = 'sack' }
-        inputTable['Shinobi-Tabi'] = { quantity = 99,  container = 'sack' }
-        inputTable['Sanjaku-Tenugui'] = { quantity = 99,  container = 'sack' }
+        table.insert(inputTable, { Name='Shihei', Quantity=99 })
+        table.insert(inputTable, { Name='Sanjaku-Tenugui', Quantity=99 })
+        table.insert(inputTable, { Name='Shinobi-Tabi', Quantity=99 })
     end
 end
 
