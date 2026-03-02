@@ -2277,9 +2277,10 @@ function validatePackerTable(inputTable)
     local NIN = 13
 
     if sJob == NIN then
-        table.insert(inputTable, { Name='Shihei', Quantity=99 })
-        table.insert(inputTable, { Name='Sanjaku-Tenugui', Quantity=99 })
-        table.insert(inputTable, { Name='Shinobi-Tabi', Quantity=99 })
+        table.insert(inputTable, { Name='Shihei', Quantity = 99 })
+        table.insert(inputTable, { Name='Sanjaku-Tenugui', Quantity = 99 })
+        table.insert(inputTable, { Name='Shinobi-Tabi', Quantity = 99 })
+        table.insert(inputTable, { Name='Echo Drops', Quantity = 12 })
     end
 end
 
