@@ -2247,7 +2247,13 @@ ashita.events.register('packet_in', 'zoning_packet_cb', function (e)
    end
 end);
 
-function ShouldHideUI()
+function ShouldHideUI(cutsceneOnly)
+
+    -- Only hide during Cutscenes
+    if cutsceneOnly then
+        return ShouldHideUICutscene()
+    end
+
     -- Not logged in
     if (AshitaCore:GetMemoryManager():GetParty():GetMemberTargetIndex(0) == 0) then
         return true;
@@ -2258,6 +2264,27 @@ function ShouldHideUI()
     end
 
     if hideMenus[GetMenuName()] then
+        return true;
+    end
+
+    if (GetInterfaceHidden()) then
+        return true;
+    end
+
+    if (isZoning) then
+        return true
+    end
+
+    return false;
+end
+
+function ShouldHideUICutscene()
+        -- Not logged in
+    if (AshitaCore:GetMemoryManager():GetParty():GetMemberTargetIndex(0) == 0) then
+        return true;
+    end
+
+    if (GetEventSystemActive()) then
         return true;
     end
 
