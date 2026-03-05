@@ -2272,7 +2272,12 @@ function ShouldHideUI()
     return false;
 end
 
-function validatePackerTable(inputTable)
+function RegisterPacker(inputTable)
+    ValidatePackerTable(inputTable)
+    AshitaCore:GetChatManager():QueueCommand(1, '/lac gear');
+end
+
+function ValidatePackerTable(inputTable)
     local sJob = AshitaCore:GetMemoryManager():GetPlayer():GetSubJob()
     local NIN = 13
 
@@ -2283,6 +2288,43 @@ function validatePackerTable(inputTable)
         table.insert(inputTable, { Name='Echo Drops', Quantity = 12 })
     end
 end
+
+-- Draw Status icons. Unused, untested
+-- local statusCache = {};
+-- local function GetStatusIcon(id)
+--     local status = statusCache[id];
+--     if status then
+--         return status;
+--     end
+
+--     status = AshitaCore:GetResourceManager():GetStatusIconByIndex(statusId);
+--     if (status == nil) then
+--         return;
+--     end
+
+
+--     local dx_texture_ptr = ffi.new('IDirect3DTexture8*[1]');
+--     local size = -1;
+--     if (ashita.interface_version == nil) then
+--         size = status.ImageSize;
+--     end
+--     if (ffi.C.D3DXCreateTextureFromFileInMemoryEx(d3d8_device, status.Bitmap, size, 0xFFFFFFFF, 0xFFFFFFFF, 1, 0, ffi.C.D3DFMT_A8R8G8B8, ffi.C.D3DPOOL_MANAGED, ffi.C.D3DX_DEFAULT, ffi.C.D3DX_DEFAULT, 0xFF000000, nil, nil, dx_texture_ptr) == ffi.C.S_OK) then
+--         local texture = d3d8.gc_safe_release(ffi.cast('IDirect3DTexture8*', dx_texture_ptr[0]));
+--         local result, desc = texture:GetLevelDesc(0);
+--         if result == 0 then
+--             statusCache[id] = texture;
+--             return texture;
+--         end
+--     end
+-- end
+
+-- local function DrawStatusIcon(id, size)
+--     texture = GetStatusIcon(id);
+--     imgui.Image(tonumber(ffi.cast("uint32_t", texture)),
+--             { size, size }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 }, { 0, 0, 0, 0 });
+-- end
+
+-- DrawStatusIcon(4, 20)
 
 -- Moves items around inventory, unused, untested
 local function MoveItem(originContainer, originIndex, destinationContainer, count, destinationIndex)
