@@ -411,7 +411,7 @@ ashita.events.register("d3d_present", "present_cb", function ()
     if ShouldHideUI() then
         return
     end
-    
+
     if (not points.loaded and GetPlayerEntity() ~= nil) then
         InitPointsBar();
         return;
@@ -835,7 +835,7 @@ function UpdateTokenList(zoneId, reset, jobId)
         tokenType = "assault";
         if (reset) then
             tValues.assault.objective = "-";
-            tValues.eventTimer = 1800;
+            tValues.eventTimer = 7200;
         end
     elseif (NyzulMapping[zoneId] ~= nil and points.settings.token_enabled_nyzul[1]) then
         currTokens = ashita.regex.split(points.settings.token_order_nyzul, " ");
