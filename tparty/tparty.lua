@@ -231,9 +231,9 @@ ashita.events.register('d3d_present', 'present_cb', function ()
     if (tparty.font_target ~= nil) then
         local target = GetEntity(AshitaCore:GetMemoryManager():GetTarget():GetTargetIndex(0));
         if (target ~= nil) then
-                if ShouldHideUI() then
+                if ShouldHideUI(true) then
                     tparty.font_target.visible = false
-                    return
+                    tparty.font_target.text = '';
                 else
                     tparty.font_target.visible = true
                 end
@@ -251,15 +251,18 @@ ashita.events.register('d3d_present', 'present_cb', function ()
     local zone = party:GetMemberZone(0);
 
     -- Update the party TP fonts..
-    for x = 1, 18 do
+    if ShouldHideUI(true) then
+        for x = 1, 18 do
+            tparty.font_party[x].visible = false
+            tparty.font_party[x].text = ''
+        end
+        return
+    end
+
+    for x = 1, 18 do    
         if (party:GetMemberIsActive(x - 1) == 0 or party:GetMemberZone(x - 1) ~= zone) then
             tparty.font_party[x].visible = false;
         else
-            if ShouldHideUI() then
-                tparty.font_party[x].visible = false
-                return
-            end
-
             local tp = party:GetMemberTP(x - 1);
             tparty.font_party[x].visible = true;
             tparty.font_party[x].color = tp >= 1000 and 0xFF00FF00 or 0xFFFFFFFF;
