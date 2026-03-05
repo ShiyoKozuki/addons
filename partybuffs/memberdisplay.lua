@@ -106,7 +106,7 @@ function member:Destroy()
 end
 
 function member:Render()
-    if ShouldHideUI() then
+    if ShouldHideUI(true) then
         self.FontObject.visible = true;
         return
     end

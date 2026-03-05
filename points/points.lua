@@ -408,7 +408,7 @@ end);
 -- desc: Event called when the Direct3D device is presenting a scene.
 ----------------------------------------------------------------------------------------------------
 ashita.events.register("d3d_present", "present_cb", function ()
-    if ShouldHideUI() then
+    if ShouldHideUI(true) then
         return
     end
 

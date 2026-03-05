@@ -123,7 +123,7 @@ ashita.events.register('unload', 'statustimers_unload', function ()
 end)
 
 ashita.events.register('d3d_present', 'statustimers_present', function()
-    if ShouldHideUI() then
+    if ShouldHideUI(true) then
         return
     end
     main_ui.render_main_ui(st.settings, try_cancel, toggle_settings);
