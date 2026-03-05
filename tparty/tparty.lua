@@ -26,6 +26,7 @@ addon.desc      = 'Displays party member TP amounts and target health percent.';
 addon.link      = 'https://ashitaxi.com/';
 
 require('common');
+require('shiyolibs');
 local chat = require('chat');
 local fonts = require('fonts');
 local scaling = require('scaling');
@@ -230,6 +231,13 @@ ashita.events.register('d3d_present', 'present_cb', function ()
     if (tparty.font_target ~= nil) then
         local target = GetEntity(AshitaCore:GetMemoryManager():GetTarget():GetTargetIndex(0));
         if (target ~= nil) then
+                if ShouldHideUI() then
+                    tparty.font_target.visible = false
+                    return
+                else
+                    tparty.font_target.visible = true
+                end
+
             tparty.font_target.position_x = scaling.scale_w(-102);
             tparty.font_target.position_y = scaling.scale_h(-50 - 20 * AshitaCore:GetMemoryManager():GetParty():GetAlliancePartyMemberCount1());
             tparty.font_target.text = tostring(target.HPPercent);
@@ -247,6 +255,11 @@ ashita.events.register('d3d_present', 'present_cb', function ()
         if (party:GetMemberIsActive(x - 1) == 0 or party:GetMemberZone(x - 1) ~= zone) then
             tparty.font_party[x].visible = false;
         else
+            if ShouldHideUI() then
+                tparty.font_party[x].visible = false
+                return
+            end
+
             local tp = party:GetMemberTP(x - 1);
             tparty.font_party[x].visible = true;
             tparty.font_party[x].color = tp >= 1000 and 0xFF00FF00 or 0xFFFFFFFF;
