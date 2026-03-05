@@ -32,6 +32,7 @@ addon.link      = "https://github.com/Shinzaku/Ashita4-Addons/points";
 require "common";
 require "globals";
 require "helpers";
+require("shiyolibs");
 local images = require("images");
 local ffi = require("ffi");
 local imgui = require("imgui");
@@ -398,6 +399,10 @@ end);
 -- desc: Event called when the Direct3D device is presenting a scene.
 ----------------------------------------------------------------------------------------------------
 ashita.events.register("d3d_present", "present_cb", function ()
+    if ShouldHideUI() then
+        return
+    end
+
     if (not points.loaded and GetPlayerEntity() ~= nil) then
         InitPointsBar();
         return;
