@@ -1,5 +1,5 @@
 --[[
-* statustimers - Copyright (c) 2022-2026 Heals
+* statustimers - Copyright (c) 2022 Heals
 *
 * This file is part of statustimers for Ashita.
 *
@@ -19,7 +19,7 @@
 
 addon.name    = 'statustimers';
 addon.author  = 'heals';
-addon.version = '4.3.0202';
+addon.version = '4.1.502';
 addon.desc    = 'Replacement for the default status timer display';
 addon.link    = 'https://github.com/HealsCodes/statustimers';
 
@@ -27,11 +27,11 @@ addon.link    = 'https://github.com/HealsCodes/statustimers';
 -- imports
 -------------------------------------------------------------------------------
 require('common');
+require('shiyolibs');
 local settings = require('settings');
 local chat = require('chat');
 -- local modules
 require('block_native');
-require('shiyolibs');
 local helpers = require('helpers');
 local main_ui = require('main_ui');
 local conf_ui = require('conf_ui');
@@ -45,6 +45,10 @@ local default_settings = T{
             target = 16,
         },
         theme = '-default-',
+    },
+
+    menu_target = T{
+        enabled = true,
     },
 
     font = T{
@@ -122,7 +126,6 @@ ashita.events.register('d3d_present', 'statustimers_present', function()
     if ShouldHideUI() then
         return
     end
-    
     main_ui.render_main_ui(st.settings, try_cancel, toggle_settings);
     conf_ui.render_config_ui(st.settings, st.toggle_settings);
 

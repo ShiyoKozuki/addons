@@ -54,7 +54,6 @@ DefaultSettings = T{
     use_job_icon = { true, },
     use_pbar_ascii = { false, },
     show_lphr = { true, },
-    hide_on_event = { false, },
 }
 WrapperSettings = T{
     visible = true,
@@ -123,7 +122,6 @@ AvailableTokens = T{
     { key="[Merits]", desc="Current job's merit points" },
     { key="[XPHour]", desc="Estimated EXP or merit points per hour" },
     { key="[XPChain]", desc="Current EXP or Limit chain with estimated timer" },
-    { key="[XPBar]", desc="Progress bar display for current XP" },
     { key="[CP]", desc="Current job's Capacity Points" },
     { key="[JP]", desc="Current job's Job Points" },
     { key="[JPHour]", desc="Estimated Job Points per hour" },

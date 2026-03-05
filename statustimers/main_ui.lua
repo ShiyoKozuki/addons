@@ -1,5 +1,5 @@
 --[[
-* statustimers - Copyright (c) 2022-2026 Heals
+* statustimers - Copyright (c) 2022 Heals
 *
 * This file is part of statustimers for Ashita.
 *
@@ -76,7 +76,7 @@ local function item_spacing()
 end
 
 -- return a imgui.CalcTextSize(text) applying UI scaling if needed
----@return table { text_dim.x, text_dim.y }
+---@return table { text_dim.x, text_dim.y } 
 local function calc_text_size(text)
     local text_dim = { imgui.CalcTextSize(text) };
     if(ui.im_window == false) then
@@ -101,7 +101,7 @@ end
 ---@return table sizes { item_width_main, item_width_target, { text_dim.x, text_dim.y } }
 local function get_base_sizes()
     local text_dim = calc_text_size('WWW');
-    return T{
+    return T{ 
         math.max(text_dim[1], icon_size_main()),
         math.max(text_dim[1], icon_size_target()),
         text_dim
@@ -202,9 +202,9 @@ local function draw_rect(top_left, bot_right, color, radius, fill, flags)
     };
 
     if (fill == nil or fill) then
-        imgui.GetWindowDrawList():AddRectFilled(abs_rect[1], abs_rect[2], color_u32, radius or 0.0, flags or ImDrawFlags_RoundCornersAll);
+        imgui.GetWindowDrawList():AddRectFilled(abs_rect[1], abs_rect[2], color_u32, radius or 0.0, flags or ImDrawCornerFlags_All);
     else
-        imgui.GetWindowDrawList():AddRect(abs_rect[1], abs_rect[2], color_u32, radius or 0.0, flags or ImDrawFlags_RoundCornersAll);
+        imgui.GetWindowDrawList():AddRect(abs_rect[1], abs_rect[2], color_u32, radius or 0.0, flags or ImDrawCornerFlags_All);
     end
 end
 
@@ -256,14 +256,10 @@ local function render_tooltip(status, is_target)
 
     local info = AshitaCore:GetResourceManager():GetStatusIconByIndex(status);
     local name = resources.get_status_name(status);
-    local tip_name = ('%s (#%d)'):fmt(name, status);
-    local tip_desc = info.Description[1] or '???';
-
     if (name ~= nil and info ~= nil) then
-        -- render a regular ImGUI tooltip attached to the mouse
         imgui.BeginTooltip();
-            imgui.Text(tip_name);
-            imgui.Text(tip_desc);
+            imgui.Text(('%s (#%d)'):fmt(name, status));
+            imgui.Text(info.Description[1] or '???');
             if (not is_target and resources.status_can_be_cancelled(status)) then
                 imgui.TextDisabled('(right click to cancel)');
             end
@@ -283,7 +279,7 @@ local function render_target_status(name, status_list, is_locked)
     imgui.Dummy({ 0, 0 });
 
     local bg = { { 0, 0 }, target_status_size(name, status_list) };
-    local corner_flags = bit.bor(ImDrawFlags_RoundCornersBottomLeft, ImDrawFlags_RoundCornersTopRight);
+    local corner_flags = bit.bor(ImDrawCornerFlags_BotLeft, ImDrawCornerFlags_TopRight);
 
     draw_rect(bg[1], bg[2], ui.color.label_bg, 7.0, true, corner_flags);
     if (is_locked) then
@@ -393,32 +389,17 @@ local function render_split_bar(split_bar_id, name, status_list, is_locked)
 
     if (imgui.Begin('st_' + split_bar_id, ui.is_open, ui.split_bars[split_bar_id])) then
         ui.im_window = true;
-        imgui.PushFont(nil, imgui.GetFontSize()*settings.ui_scale);
+        imgui.SetWindowFontScale(settings.ui_scale);
         render_target_status(name, status_list, is_locked);
         -- update the window state for the next draw
         ui.split_bars[split_bar_id] = imgui.IsWindowHovered() and ui.window_flags.active or ui.window_flags.inactive;
-        imgui.PopFont();
     end
+    imgui.SetWindowFontScale(1.0);
     imgui.End();
     imgui.PopStyleVar(1);
     ui.im_window = false;
 end
 
--- check if the UI should be hidden
-local function should_hide_ui()
-    local player = AshitaCore:GetMemoryManager():GetPlayer();
-    if (player ~= nil and party.is_player_valid()) then
-        -- hide if we're in a cutscene, the map is open, log is fullscreen or the game ui is hidden
-        return (
-            resources.get_event_system_active()
-            or resources.get_menu_is_map()
-            or resources.get_log_maximized()
-            or resources.get_interface_hidden()
-        );
-    end
-    -- also hide if we can't query the player
-    return true;
-end
 -------------------------------------------------------------------------------
 -- exported functions
 -------------------------------------------------------------------------------
@@ -442,10 +423,6 @@ module.render_main_ui = function(s, status_clicked, settings_clicked)
     ui.color.va._50   = helpers.color_u32_to_v4(settings.visual_aid.color50);
     ui.color.va._25   = helpers.color_u32_to_v4(settings.visual_aid.color25);
 
-    if (should_hide_ui()) then
-        return;
-    end
-
     ui.im_window = false;
     imgui.PushStyleVar(ImGuiStyleVar_ItemSpacing, {item_spacing(), item_spacing()});
 
@@ -453,12 +430,13 @@ module.render_main_ui = function(s, status_clicked, settings_clicked)
     imgui.SetNextWindowContentSize(get_window_size());
 
     if (imgui.Begin('st_ui', ui.is_open, ui.window_flags.current)) then
-        imgui.PushFont(nil, imgui.GetFontSize() * settings.ui_scale);
+        imgui.SetWindowFontScale(settings.ui_scale);
 
         ui.im_window = true;
         local item_width, _, text_dim = get_base_sizes():unpack();
         local player_status = party.get_player_status();
         local is_targeting_buff_menu = resources.get_menu_is_buff_menu();
+        local menu_target_index = resources.get_menu_target_index();
 
         -- render the player status
         if (player_status ~= nil) then
@@ -482,7 +460,12 @@ module.render_main_ui = function(s, status_clicked, settings_clicked)
                 --imgui.PushItemWidth(16);
                 imgui.BeginGroup();
                     local icon_tint = { 1.0, 1.0, 1.0, ui.id_states[player_status[i].id].alpha }
+
                     imgui.SetCursorPosX(imgui.GetCursorPosX() + ((item_width - icon_size_main()) * 0.5));
+                    if (settings.menu_target.enabled and is_targeting_buff_menu and i == menu_target_index) then
+                        -- draw a border around the icon if it is targetted in the game menu
+                        draw_rect({ -item_spacing() * 1.0, -item_spacing() * 1.0 }, { icon_size_main() + (item_spacing() * 1.0), icon_size_main() + (item_spacing() * 1.0) }, ui.color.locked_border, 7.0, false);
+                    end
                     imgui.Image(icon, { icon_size_main(), icon_size_main() }, { 0, 0 }, { 1, 1 }, icon_tint, { 0, 0, 0, 0});
 
                     if (imgui.IsItemHovered()) then
@@ -546,7 +529,7 @@ module.render_main_ui = function(s, status_clicked, settings_clicked)
         -- add the settings button if the window is being hovered
         if (imgui.IsWindowHovered() and settings_clicked ~= nil) then
             if get_window_size()[1] ~= 0 then
-                imgui.SetCursorPos({ imgui.GetWindowWidth() - 25 * settings.ui_scale,
+                imgui.SetCursorPos({ imgui.GetWindowWidth() - 25 * settings.ui_scale, 
                                      imgui.GetWindowHeight() - 25 * settings.ui_scale });
             end
             imgui.Button('\xef\x82\xad', { 20 * settings.ui_scale, 20 * settings.ui_scale });
@@ -558,7 +541,7 @@ module.render_main_ui = function(s, status_clicked, settings_clicked)
         -- update the window state for the next draw
         ui.window_flags.current = imgui.IsWindowHovered() and ui.window_flags.active or ui.window_flags.inactive;
     end
-    imgui.PopFont();
+    imgui.SetWindowFontScale(1.0);
     imgui.End();
     imgui.PopStyleVar(1);
     ui.im_window = false;

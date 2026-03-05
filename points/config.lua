@@ -60,7 +60,7 @@ config.renderTokenTab = function(settings)
                 imgui.PopStyleColor(1);
                 imgui.NewLine();
 
-                local tempBool = T{ true };
+                local tempBool = { true };
                 config.renderTokens(settings, "token_order_default", tempBool);
             imgui.EndChild();
         end
@@ -261,11 +261,6 @@ config.renderStylesTab = function(settings)
             imgui.Text("Misc");
             imgui.BeginChild("conf_misc", { 0, 100 }, true);
                 local sep = { settings.num_separator, };
-                if (imgui.Checkbox("Hide on events", settings.hide_on_event)) then
-                    config.uiSettings.changed = true;
-                end
-                imgui.ShowHelp("Toggles the bar displaying during cutscenes and NPC menu dialogues", true);
-
                 if (imgui.Checkbox("Use Job Icon", settings.use_job_icon)) then
                     config.uiSettings.changed = true;
                 end
