@@ -138,12 +138,15 @@ local function ApplyComposureModifiers(duration, targetId)
         return duration;
     end
 
-    if (targetId == dataTracker:GetPlayerId()) then
-        return duration * 3;
-    else
-        --return duration * GetComposureMod();
-        return duration;
-    end
+    -- if (targetId == dataTracker:GetPlayerId()) then
+    --     return duration * 3;
+    -- else
+    --     --return duration * GetComposureMod();
+    --     return duration;
+    -- end
+    
+    -- Custom edit for our server (Composure also works on buffs cast onto other players):
+    return duration * 3;
 end
 
 local function ApplyPerpetuanceModifiers(duration)
