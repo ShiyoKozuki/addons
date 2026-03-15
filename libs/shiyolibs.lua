@@ -392,6 +392,16 @@ function GetPartyMemberIndex(partyIndex)
     return 0;
 end
 
+function GetJobByTargetIndex(index)
+    local partyMgr = AshitaCore:GetMemoryManager():GetParty();
+    for i = 0,17 do
+        if (gPartyManager:GetMemberTargetIndex(i) == index) then
+            return partyMgr:GetMemberMainJob(i)
+        end
+    end
+    return nil
+end
+
 local idMap = T{};
 function GetNameFromId(id)
     local name = idMap[id];
@@ -1298,7 +1308,7 @@ function BatEarringsCheck()
 end
 
 function TempestBeltCheck()
-        local environment = gData.GetEnvironment()
+    local environment = gData.GetEnvironment()
     if (environment.WeatherElement == 'Wind') and HasItemInEquippableInventory(GetItemByName('Tempest Belt')) then
         gFunc.Equip('Waist', 'Tempest Belt')
     end
@@ -1309,7 +1319,6 @@ function FatalityBeltCheck()
         gFunc.Equip('Waist', 'Tempest Belt')
     end
 end
-
 
 local ElementalObiTable = 
 {
@@ -1494,6 +1503,19 @@ function StormRingCheck(ring)
     end
     if IsInAssault() then
         gFunc.Equip(ring, 'Storm Ring');
+    end
+end
+
+function MinuetEarringCheck()
+    if GetBuffActive(statusEffect.MINUET) then
+        gFunc.Equip('Ear1', 'Minuet Earring')
+    end
+end
+
+function DiabolosEarringCheck()
+    local environment = gData.GetEnvironment()
+    if (environment.WeatherElement ~= 'Dark') and HasItemInEquippableInventory(GetItemByName('Diabolos\'s Earring')) then
+        gFunc.Equip('Ear2', 'Diabolos\'s Earring')
     end
 end
 
