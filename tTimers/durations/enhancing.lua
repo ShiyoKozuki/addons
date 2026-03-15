@@ -200,21 +200,37 @@ local function CalculateEnhancingDuration(baseDuration, targetId)
     return duration;
 end
 
+-- local function CalculateBarelementDuration(targetId)
+--     local duration = 480;
+--     local enhancingSkill = AshitaCore:GetMemoryManager():GetPlayer():GetCombatSkill(34):GetSkill();
+--     if (enhancingSkill < 240) then
+--         duration = enhancingSkill * 2;
+--     end    
+--     return CalculateEnhancingDuration(duration, targetId);
+-- end
+
+-- Custom Synced to my server
 local function CalculateBarelementDuration(targetId)
-    local duration = 480;
+    local duration = 150;
     local enhancingSkill = AshitaCore:GetMemoryManager():GetPlayer():GetCombatSkill(34):GetSkill();
-    if (enhancingSkill < 240) then
-        duration = enhancingSkill * 2;
-    end    
+    duration = enhancingSkill / 2;
     return CalculateEnhancingDuration(duration, targetId);
 end
 
+-- local function CalculateBarstatusDuration(targetId)
+--     local duration = 480;
+--     local enhancingSkill = AshitaCore:GetMemoryManager():GetPlayer():GetCombatSkill(34):GetSkill();
+--     if (enhancingSkill < 240) then
+--         duration = enhancingSkill * 2;
+--     end
+--     return CalculateEnhancingDuration(duration, targetId);
+-- end
+
+-- Custom synced to my server
 local function CalculateBarstatusDuration(targetId)
-    local duration = 480;
+    local duration = 150;
     local enhancingSkill = AshitaCore:GetMemoryManager():GetPlayer():GetCombatSkill(34):GetSkill();
-    if (enhancingSkill < 240) then
-        duration = enhancingSkill * 2;
-    end
+    duration = enhancingSkill / 2;
     return CalculateEnhancingDuration(duration, targetId);
 end
 
