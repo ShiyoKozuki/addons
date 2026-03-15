@@ -204,7 +204,7 @@ T{
 		nameYOffset = 9,
 		iconSize = 22,
 		arrowSize = 30,
-		maxIconColumns = 12,
+		maxIconColumns = 20,
 		topTextYOffset = 0,
 		topTextXOffset = 5,
 		bottomTextYOffset = -3,
