@@ -395,7 +395,7 @@ end
 function GetJobByTargetIndex(index)
     local partyMgr = AshitaCore:GetMemoryManager():GetParty();
     for i = 0,17 do
-        if (gPartyManager:GetMemberTargetIndex(i) == index) then
+        if (partyMgr:GetMemberTargetIndex(i) == index) then
             return partyMgr:GetMemberMainJob(i)
         end
     end
