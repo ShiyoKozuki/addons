@@ -41,7 +41,7 @@ return {
     [38] = 'ITEM:16555', --Circle Blade
     [39] = 'ITEM:16555', --Spirits Within
     [40] = 'ITEM:16555', --Vorpal Blade
-    [41] = 'ITEM:16555', --Swift Blade
+    [41] = 'ITEM:16556', --Swift Blade
     [42] = 'ITEM:21621', --Savage Blade
     [43] = 'ITEM:18276', --Knights of Round
     [44] = 'ITEM:18975', --Death Blossom
@@ -73,7 +73,7 @@ return {
     [72] = 'ITEM:21722', --Decimation
     [73] = 'ITEM:18288', --Onslaught
     [74] = 'ITEM:18999', --Primal Rend
-    [75] = 'ITEM:17932/', --Bora Axe
+    [75] = 'ITEM:17932', --Bora Axe
     [76] = 'ITEM:19401', --Cloudsplitter
     [77] = 'ITEM:21753', --Ruinator
     [80] = 'ITEM:18206', --Shield Break
