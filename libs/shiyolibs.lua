@@ -2078,8 +2078,8 @@ function CheckGlobalCommands(args)
     end
 
 	if (args[1] == 'tp') then
-		varhelper.AdvanceCycle('TPVariant')
-		gFunc.Message('TP Set: ' .. varhelper.GetCycle('TPVariant'))
+		varhelper.AdvanceCycle('TP')
+		gFunc.Message('TP Set: ' .. varhelper.GetCycle('TP'))
 	end
 
 	if (args[1] == 'idle') then
@@ -2167,6 +2167,7 @@ local hideMenus = T{
     ['menu    equip   '] = true,
     ['menu    automato'] = true,
     ['menu    inventor'] = true,
+    ['menu    mnstorag'] = true,
     ['menu    itemctrl'] = true,
     ['menu    magic   '] = true,
     ['menu    magselec'] = true,
@@ -2234,6 +2235,7 @@ local hideMenus = T{
     ['menu    sortyn  '] = true,
     ['menu    scresult'] = true,
     ['menu    scoption'] = true,
+    ['menu    party2  '] = true,
     ['menu    party3  '] = true,
     ['menu    partywin'] = true,
     ['menu    fulllog' ] = true,
@@ -2252,6 +2254,8 @@ local hideMenus = T{
     ['menu    conf4   '] = true,
     ['menu    merit1  '] = true,
     ['menu    merit2  '] = true,
+    ['menu    merit3  '] = true,
+    ['menu    merityn '] = true,
     ['menu    meritcat'] = true,
     ['menu    merit2ca'] = true,
     ['menu    jbpcat  '] = true,
@@ -2374,6 +2378,21 @@ end
 -- end
 
 -- DrawStatusIcon(4, 20)
+
+-- Item bitmap icon. Untested, unused
+    -- local item = AshitaCore:GetResourceManager():GetItemById(itemId);
+    -- if (item == nil) then
+    --     return;
+    -- end
+
+    -- local dx_texture_ptr = ffi.new('IDirect3DTexture8*[1]');
+    -- local size = -1;
+    -- if (ashita.interface_version == nil) then
+    --     size = item.ImageSize;
+    -- end
+    -- if (ffi.C.D3DXCreateTextureFromFileInMemoryEx(d3d8_device, item.Bitmap, size, 0xFFFFFFFF, 0xFFFFFFFF, 1, 0, ffi.C.D3DFMT_A8R8G8B8, ffi.C.D3DPOOL_MANAGED, ffi.C.D3DX_DEFAULT, ffi.C.D3DX_DEFAULT, 0xFF000000, nil, nil, dx_texture_ptr) == ffi.C.S_OK) then
+    --     local texture = d3d8.gc_safe_release(ffi.cast('IDirect3DTexture8*', dx_texture_ptr[0]));
+    --     local result, desc = texture:GetLevelDesc(0);
 
 -- Moves items around inventory, unused, untested
 local function MoveItem(originContainer, originIndex, destinationContainer, count, destinationIndex)
