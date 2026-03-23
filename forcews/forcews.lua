@@ -9,7 +9,7 @@ local chat = require('chat');
 
 
 ashita.events.register('command', 'command_cb', function (e)
-    if (string.lower(e.command) == '/forcewidescan') then
+    if (string.lower(e.command) == '/forcewidescan') or (string.lower(e.command) == '/fws') then
         local packet = struct.pack('LL', 0, 0);
         AshitaCore:GetPacketManager():AddOutgoingPacket(0xF4, packet:totable());
         print(string.format('%s%s', chat.header('ForceWS'), chat.message('Sending widescan packet..')));
