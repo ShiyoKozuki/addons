@@ -2214,6 +2214,7 @@ local hideMenus = T{
     ['menu    jobcselu'] = true,
     ['menu    post1   '] = true,
     ['menu    stringdl'] = true,
+    ['menu    delivery'] = true,
     ['menu    auc1    '] = true,
     ['menu    auc2    '] = true,
     ['menu    auc3    '] = true,
