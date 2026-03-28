@@ -61,6 +61,7 @@ local enhancingDuration = {
     [15334] = 0.10, --Wise Pigaches
     [16064] = 0.10, --Yigit Turban
     [15022] = 0.10, --Oracle's Gloves
+    [14642] = 0.05, --Light Ring
 };
 
 local perpetuanceDuration = {
