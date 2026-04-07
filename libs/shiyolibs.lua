@@ -1344,9 +1344,33 @@ function EquipElementalObi(element)
     end
 end
 
+local weaponskillElements = T{
+    ['Burning Blade'] = 'Fire',
+    ['Red Lotus Blade'] = 'Fire',
+    ['Frostbite'] = 'Ice',
+    ['Freezebite'] = 'Ice',
+    ['Blade: To'] = 'Ice',
+    ['Gust Slash'] = 'Wind',
+    ['Cyclone'] = 'Wind',
+    ['Aeolian Edge'] = 'Wind',
+    ['Blade: Yu'] = 'Water',
+    ['Blade: Teki'] = 'Water',
+    ['Shining Blade'] = 'Light',
+    ['Seraph Blade'] = 'Light',
+    ['Shining Strike'] = 'Light',
+    ['Seraph Strike'] = 'Light',
+    ['Blade: Ei'] = 'Dark',
+    ['Sanguine Blade'] = 'Dark',
+    ['Infernal Scythe'] = 'Dark',
+}
+
 function ObiCheck()
     local action = gData.GetAction();
     local environment = gData.GetEnvironment()
+
+    if (action.ActionType == 'Weaponskill') then
+        action.Element = weaponskillElements[action.Name]
+    end
     if (environment.WeatherElement == action.Element) or (environment.DayElement == action.Element) then
         if HasItemInEquippableInventory(GetItemByName('Hachirin-no-Obi')) then
             gFunc.Equip('Waist', 'Hachirin-no-Obi');
