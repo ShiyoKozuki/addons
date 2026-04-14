@@ -5,6 +5,7 @@ addon.desc      = 'Displays party buffs next to vanilla party list.';
 addon.link      = 'https://github.com/ThornyFFXI/MiscAshita4';
 
 require('common');
+require("shiyolibs");
 local chat = require('chat');
 ffi  = require('ffi');
 d3d8 = require('d3d8');
@@ -207,6 +208,10 @@ ashita.events.register('command', 'command_cb', function (e)
 end);
 
 ashita.events.register('d3d_present', 'd3d_present_cb', function ()
+    if ShouldHideUI() then
+        return
+    end
+    
     renderer:Begin();
     for _,member in ipairs(partyMembers) do
         member:Render();
