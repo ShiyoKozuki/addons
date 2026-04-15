@@ -479,9 +479,11 @@ ashita.events.register("d3d_present", "present_cb", function ()
 
     ------------------------------------------------
     -- Points info bars --
-    ------------------------------------------------
-    DrawPointsBar(currJob);
-    UpdateCompactBar(currJob);
+    -----------------------------------------------
+    if not ShouldHideUI(true) then
+        DrawPointsBar(currJob)
+        UpdateCompactBar(currJob)
+    end
 
     -------------------
     -- Config window --
