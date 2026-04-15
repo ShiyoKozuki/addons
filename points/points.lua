@@ -408,13 +408,6 @@ end);
 -- desc: Event called when the Direct3D device is presenting a scene.
 ----------------------------------------------------------------------------------------------------
 ashita.events.register("d3d_present", "present_cb", function ()
-    if ShouldHideUI(true) then
-        SetCompactVisibility(false)
-        return
-    else
-        SetCompactVisibility(true)
-    end
-
     if (not points.loaded and GetPlayerEntity() ~= nil) then
         InitPointsBar();
         return;
