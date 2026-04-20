@@ -1,15 +1,15 @@
-addon.name      = 'spelltopool'
+addon.name      = 'skilltopool'
 addon.author    = 'Shiyo'
 addon.version   = '1.0'
-addon.desc      = 'Converts mob_spell_list entries to mob_pools.'
+addon.desc      = 'Converts mob_skill_lists entries to mob_pools.'
 addon.link      = ''
 -- Make sure to edit listIdStart and listIdEnd or it'll run on the entire mob_pools file!
 require('common')
 
 local poolSql = [[C:\Server and Notepad Files\FFXI\Topaz\Moos Pserver\sql\mob_pools.sql]]
-local spellListSql = [[C:\Server and Notepad Files\FFXI\Topaz\Moos Pserver\sql\mob_spell_lists.sql]]
-local listIdStart = 1028
-local listIdEnd = 1068
+local skillListSql = [[C:\Server and Notepad Files\FFXI\Topaz\Moos Pserver\sql\mob_skill_lists.sql]]
+local listIdStart = 1216
+local listIdEnd = 1266
 
 local function getColumnIndex(sqlFile, columnName)
     local inTable = false
@@ -39,25 +39,25 @@ local function getColumnIndex(sqlFile, columnName)
 end
 
 local function runSqlOutput()
-    local spellMap = {}
+    local skillMap = {}
 
-    local SPELLLIST_INDEX = getColumnIndex(poolSql, "spellList")
+    local SKILL_LIST_INDEX = getColumnIndex(poolSql, "skill_list_id")
 
-    if not SPELLLIST_INDEX then
-        print("ERROR: Could not find spellList column!")
+    if not SKILL_LIST_INDEX then
+        print("ERROR: Could not find skill_list_id column!")
         return
     end
 
     -- ----------------------------------------
     -- Step 1: Read mob_spell_lists.sql
     -- ----------------------------------------
-    for line in io.lines(spellListSql) do
+    for line in io.lines(skillListSql) do
         local name, id = line:match("VALUES%s*%(%s*'([^']+)'%s*,%s*(%d+)")
         if name and id then
             id = tonumber(id)
 
             if id >= listIdStart and id <= listIdEnd then
-                spellMap[name] = id
+                skillMap[name] = id
                 print(string.format("Updating: [%s] -> [%d]", name, id))
             end
         end
@@ -84,10 +84,10 @@ local function runSqlOutput()
                 -- name is 2nd column
                 local name = parts[2] and parts[2]:match("'([^']+)'")
 
-                if name and spellMap[name] then
-                    local spellId = spellMap[name]
+                if name and skillMap[name] then
+                    local skillId = skillMap[name]
 
-                    parts[SPELLLIST_INDEX] = tostring(spellId)
+                    parts[SKILL_LIST_INDEX] = tostring(skillId)
 
                     -- rebuild line
                     line = "INSERT INTO `mob_pools` VALUES (" .. table.concat(parts, ",") .. ");"
@@ -119,7 +119,7 @@ end)
 
 ashita.events.register('command', 'command_cb', function (e)
     local args = e.command:args();
-    if #args == 0 or (string.lower(args[1]) ~= '/spelltopool') then
+    if #args == 0 or (string.lower(args[1]) ~= '/skilltopool') then
         return;
     end
     e.blocked = true;
