@@ -1,4 +1,6 @@
 ---@diagnostic disable: lowercase-global
+local chat = require('chat')
+local dats = require('ffxi.dats');
 local statusEffect = require('statuseffect')
 local job = require('job')
 
@@ -2389,6 +2391,121 @@ function ValidatePackerTable(inputTable)
         table.insert(inputTable, { Name='Shinobi-Tabi', Quantity = 99 })
         table.insert(inputTable, { Name='Echo Drops', Quantity = 12 })
     end
+end
+
+-- Mob DAT look up
+-- TODO: Doesn't work, need to change lib to use where my actuall custommob dats are and not install, etc
+-- TODO: Can hardcode path here: dats.path = ashita.fs.get_install_dir(lang, 1); line 68
+function GetZoneIds()
+    local zonePtr = ashita.memory.find(0, 0, 'A1????????668B88????????668B90????????5152E8????????A3', 0x00, 0x00);
+    local offset1 = ashita.memory.read_uint32(zonePtr + 0x08);
+    local offset2 = ashita.memory.read_uint32(zonePtr + 0x0F);
+    local pointer = ashita.memory.read_uint32(zonePtr + 0x01);
+    pointer = ashita.memory.read_uint32(pointer);
+    local zone = ashita.memory.read_uint16(pointer + offset2);
+    local subZone = ashita.memory.read_uint16(pointer + offset1);
+    return zone, subZone;
+end
+
+local lastZone, lastSubZone;
+local activeEntities;
+function GetZoneEntities()
+    local zone, subZone = GetZoneIds();
+    if (lastZone == zone) and (subZone == lastSubZone) then
+        return;
+    end
+
+    local file = dats.get_zone_npclist(zone, subZone);
+
+    local f = io.open(file, 'rb');
+    if (f == nil) then
+        print(chat.header(addon.name):append(chat.error('Failed to access zone entity DAT file for current zone. [%s]'):fmt(file)));
+        return T{};
+    end
+
+    local size = f:seek('end');
+    f:seek('set', 0);
+
+    if (size == 0 or ((size - math.floor(size / 0x20) * 0x20) ~= 0)) then
+        f:close();
+        print(chat.header(addon.name):append(chat.error('Failed to validate zone entity DAT file for current zone. [%s]'):fmt(file)));
+        return T{};
+    end
+
+    local entities = T{};
+
+    for _ = 0, ((size / 0x20) - 0x01) do
+        local data = f:read(0x20);
+        local name, id = struct.unpack('c28L', data);
+        entities[id] = T{ Id=id, Index=bit.band(id, 0x0FFF), Name=name:trimend('\0') };
+    end
+
+    f:close();
+
+    activeEntities = entities;
+    lastZone = zone;
+    lastSubZone = subZone;
+end
+
+function getNameByDAT(entityId)
+    -- For lookup...
+    GetZoneEntities();
+    local name
+    local datEntry = activeEntities[entityId];
+    if datEntry then
+        name = datEntry.Name;
+    end
+
+    return name
+end
+
+--[[
+Creates a table of entity name then x, y, z positions. example:
+positionsById =
+{
+    [17522734] =
+    {
+        Name = "Myrmeleontide",
+        X = 198.66,
+        Y = 18.00,
+        Z = 545.92,
+    },
+
+    [17522735] =
+    {
+        Name = "Saltopus",
+        X = 189.17,
+        Y = 54.00,
+        Z = 680.51,
+    },
+}
+]]
+local positionsById = {};
+function RegisterEntitySpawnPositions()
+    ashita.events.register('packet_in', 'EntitySpawnPosPacket', function (e)
+        if (e.id == 0x00E) then
+            local entityId = struct.unpack('L', e.data, 0x04 + 1);
+            -- If this bit isn't set, position bytes don't mean anything and will be garbage data
+            if (positionsById[entityId] == nil) and (bit.band(struct.unpack('B', e.data, 0x0A + 1), 0x01) == 0x01) then
+                local name = struct.unpack('s', e.data, 0x034+1)
+                local position = {
+                    Name = name,
+                    X = struct.unpack('f', e.data, 0x0C+1),
+                    Y = struct.unpack('f', e.data, 0x14+1),
+                    Z = struct.unpack('f', e.data, 0x10+1)
+                };
+                positionsById[entityId] = position;
+            end
+        end
+    end);
+end
+
+function UnregisterEntitySpawnPositions()
+    ashita.events.unregister('packet_in', 'EntitySpawnPosPacket');
+end
+
+function GetEntitySpawnPositions()
+    return positionsById
 end
 
 -- Draw Status icons. Unused, untested
