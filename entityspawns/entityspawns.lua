@@ -20,9 +20,11 @@ end)
 
 ashita.events.register('command', 'command_cb', function (e)
     local args = e.command:args();
+
     if #args == 0 or (string.lower(args[1]) ~= '/entityspawns') then
         return;
     end
+
     e.blocked = true;
 
     if (args[2] == 'save') and (#args > 1) then
@@ -34,15 +36,34 @@ ashita.events.register('command', 'command_cb', function (e)
             return
         end
 
-        for id, data in pairs(positionIds) do
+        -- Collect ids
+        local sortedIds = {}
+
+        for id, _ in pairs(positionIds) do
+            table.insert(sortedIds, id)
+        end
+
+        -- Sort lowest -> highest
+        table.sort(sortedIds)
+
+        -- Create table of all mob Ids recorded then print them to glogmanager
+        for _, id in ipairs(sortedIds) do
+            local data = positionIds[id]
+
             local name2 = data.Name:gsub("(%l)(%u)", "%1 %2")
             local name1 = name2:gsub(" ", "_")
+
+            -- Escape apostrophes
+            name1 = name1:gsub("'", "\\'")
+            name2 = name2:gsub("'", "\\'")
+
             local x = data.X
             local y = data.Y
             local z = data.Z
+
             local data = string.format("INSERT INTO `mob_spawn_points` VALUES (%d,'%s','%s',32,%.3f,%.3f,%.3f,160);", id, name1, name2, x, y, z)
-            -- Should be formatted like: INSERT INTO `mob_spawn_points` VALUES (17522877,'Iron_CraniumV2','Iron Cranium',32,-530,-0.5,-650,160);
+
             gLogManager:Log(LogStyle.Message, 'EntitySpawns', data);
         end
     end
-end) 
+end)

@@ -2484,6 +2484,18 @@ local positionsById = {};
 function RegisterEntitySpawnPositions()
     ashita.events.register('packet_in', 'EntitySpawnPosPacket', function (e)
         if (e.id == 0x00E) then
+
+            -- Filter out trusts
+            local index = struct.unpack('H', e.data,0x08+1)
+            if index > 0x3FF then return end
+
+            -- Filter out invisible mobs
+            local mask = struct.unpack('B', e.data, 0x0A+1);
+            if (bit.band(mask, 0x07) ~= 0) then
+                local flags1 = struct.unpack('L', e.data, 0x20+1);
+                if bit.band(flags1, 0x02) == 2 then return end
+            end
+
             local entityId = struct.unpack('L', e.data, 0x04 + 1);
             -- If this bit isn't set, position bytes don't mean anything and will be garbage data
             if (positionsById[entityId] == nil) and (bit.band(struct.unpack('B', e.data, 0x0A + 1), 0x01) == 0x01) then
@@ -2491,8 +2503,8 @@ function RegisterEntitySpawnPositions()
                 local position = {
                     Name = name,
                     X = struct.unpack('f', e.data, 0x0C+1),
-                    Y = struct.unpack('f', e.data, 0x14+1),
-                    Z = struct.unpack('f', e.data, 0x10+1)
+                    Y = struct.unpack('f', e.data, 0x10+1),
+                    Z = struct.unpack('f', e.data, 0x14+1),
                 };
                 positionsById[entityId] = position;
             end
