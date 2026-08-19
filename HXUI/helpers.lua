@@ -56,7 +56,7 @@ function GetColorOfTarget(targetEntity, targetIndex)
     else --mob
 		local entMgr = AshitaCore:GetMemoryManager():GetEntity();
 		local claimStatus = entMgr:GetClaimStatus(targetIndex);
-		local claimId = bit.band(claimStatus, 0xFFFF);
+        local claimId = bit.band(claimStatus, 0x7FFFFFFF);
 --		local isClaimed = (bit.band(claimStatus, 0xFFFF0000) ~= 0);
 
 		if (claimId == 0) then
@@ -102,7 +102,7 @@ function GetColorOfTargetRGBA(targetEntity, targetIndex)
     else --mob
 		local entMgr = AshitaCore:GetMemoryManager():GetEntity();
 		local claimStatus = entMgr:GetClaimStatus(targetIndex);
-		local claimId = bit.band(claimStatus, 0xFFFF);
+        local claimId = bit.band(claimStatus, 0x7FFFFFFF);
 --		local isClaimed = (bit.band(claimStatus, 0xFFFF0000) ~= 0);
 
 		if (claimId == 0) then
