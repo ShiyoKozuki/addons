@@ -19,13 +19,14 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 --]]
+
 require('shiyolibs');
 local d3d = require('d3d8');
 local ffi = require('ffi');
 local config        = require('config');
 local customTracker = require('trackers.custom');
 local dummyTracker  = require('trackers.dummy');
-local trackers      = T{
+gTrackers      = T{
     { Name='Buff',   Tracker=require('trackers.buff') },
     { Name='Debuff', Tracker=require('trackers.debuff') },
     { Name='Recast', Tracker=require('trackers.recast') },
@@ -46,13 +47,13 @@ ashita.events.register('d3d_present', 'd3d_present_cb', function ()
     if ShouldHideUI() then
         return
     end
-    
+
     if (sprite == nil) or ((gSettings.HideWithPrimitives == true) and (AshitaCore:GetPrimitiveManager():GetVisible() == false)) then
         return;
     end
 
     sprite:Begin();
-    for _,entry in ipairs(trackers) do
+    for _,entry in ipairs(gTrackers) do
         local panel = gPanels[entry.Name];
         if (panel.ShowDebugTimers) then
             entry.Tracker:Tick();
@@ -61,8 +62,8 @@ ashita.events.register('d3d_present', 'd3d_present_cb', function ()
             panel:Render(sprite, entry.Tracker:Tick());
         end
     end
-    for i = #trackers,1,-1 do
-        local panel = gPanels[trackers[i].Name];
+    for i = #gTrackers,1,-1 do
+        local panel = gPanels[gTrackers[i].Name];
         panel:RenderTooltip(sprite);
     end
     sprite:End();

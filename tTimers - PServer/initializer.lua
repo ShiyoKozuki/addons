@@ -97,10 +97,7 @@ gDefaultSettings = T{
         AnimateCompletion = true,
         CompletionDuration = 3,
         UseTooltips = true;
-        BlockedAbilities = T{
-            --Defaults to empty..
-        },
-        BlockedSpells = T{
+        Blocked = T{
             --Defaults to empty..
         },
         Skin = T{
@@ -126,6 +123,7 @@ gDefaultSettings = T{
         Skin = T{},
         UpdateCustom = false,
     },
+    HideWithPrimitives = true,
 };
 gSettings = settings.load(gDefaultSettings:copy(true));
 

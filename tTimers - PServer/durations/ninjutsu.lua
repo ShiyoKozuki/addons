@@ -136,19 +136,17 @@ local function Initialize(tracker, buffer)
 
     --Myoshu: Ichi
     buffer[507] = function(targetId)
-        return 1800, 288;
+        return 180, 290;
     end
 
-    --
     --Yurin: Ichi
 	buffer[508] = function(targetId)
-		return 180, 167;
+		return 180, 148;
 	end
-    
 
     --Kakka: Ichi
     buffer[509] = function(targetId)
-        return 900, 39;
+        return 180, 227;
     end
 
     --Migawari: Ichi

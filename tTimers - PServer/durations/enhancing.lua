@@ -61,6 +61,7 @@ local enhancingDuration = {
     [15334] = 0.10, --Wise Pigaches
     [16064] = 0.10, --Yigit Turban
     [15022] = 0.10, --Oracle's Gloves
+    [14642] = 0.05, --Light Ring
 };
 
 local perpetuanceDuration = {
@@ -138,12 +139,15 @@ local function ApplyComposureModifiers(duration, targetId)
         return duration;
     end
 
-    if (targetId == dataTracker:GetPlayerId()) then
-        return duration * 3;
-    else
-        --return duration * GetComposureMod();
-        return duration;
-    end
+    -- if (targetId == dataTracker:GetPlayerId()) then
+    --     return duration * 3;
+    -- else
+    --     --return duration * GetComposureMod();
+    --     return duration;
+    -- end
+    
+    -- Custom edit for our server (Composure also works on buffs cast onto other players):
+    return duration * 3;
 end
 
 local function ApplyPerpetuanceModifiers(duration)
@@ -197,21 +201,37 @@ local function CalculateEnhancingDuration(baseDuration, targetId)
     return duration;
 end
 
+-- local function CalculateBarelementDuration(targetId)
+--     local duration = 480;
+--     local enhancingSkill = AshitaCore:GetMemoryManager():GetPlayer():GetCombatSkill(34):GetSkill();
+--     if (enhancingSkill < 240) then
+--         duration = enhancingSkill * 2;
+--     end    
+--     return CalculateEnhancingDuration(duration, targetId);
+-- end
+
+-- Custom Synced to my server
 local function CalculateBarelementDuration(targetId)
-    local duration = 480;
+    local duration = 150;
     local enhancingSkill = AshitaCore:GetMemoryManager():GetPlayer():GetCombatSkill(34):GetSkill();
-    if (enhancingSkill < 240) then
-        duration = enhancingSkill * 2;
-    end    
+    duration = enhancingSkill / 2;
     return CalculateEnhancingDuration(duration, targetId);
 end
 
+-- local function CalculateBarstatusDuration(targetId)
+--     local duration = 480;
+--     local enhancingSkill = AshitaCore:GetMemoryManager():GetPlayer():GetCombatSkill(34):GetSkill();
+--     if (enhancingSkill < 240) then
+--         duration = enhancingSkill * 2;
+--     end
+--     return CalculateEnhancingDuration(duration, targetId);
+-- end
+
+-- Custom synced to my server
 local function CalculateBarstatusDuration(targetId)
-    local duration = 480;
+    local duration = 150;
     local enhancingSkill = AshitaCore:GetMemoryManager():GetPlayer():GetCombatSkill(34):GetSkill();
-    if (enhancingSkill < 240) then
-        duration = enhancingSkill * 2;
-    end
+    duration = enhancingSkill / 2;
     return CalculateEnhancingDuration(duration, targetId);
 end
 

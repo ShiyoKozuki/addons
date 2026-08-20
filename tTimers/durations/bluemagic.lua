@@ -83,7 +83,7 @@ local function Initialize(tracker, buffer)
 
      --Refueling
     buffer[530] = function(targetId)
-        return CalculateBlueMagicDuration(300, true, false), 93;
+        return CalculateBlueMagicDuration(300, true, false), 33;
     end
 
      --Memento Mori
@@ -98,12 +98,12 @@ local function Initialize(tracker, buffer)
 
      --Feather Barrier
     buffer[574] = function(targetId)
-        return CalculateBlueMagicDuration(300, true, false), 116;
+        return CalculateBlueMagicDuration(30, true, false), 92;
     end
 
      --Reactor Cool
     buffer[613] = function(targetId)
-        return CalculateBlueMagicDuration(300, true, false), {35, 93};
+        return CalculateBlueMagicDuration(180, true, false), 35;
     end
 
      --Saline Coat
@@ -113,7 +113,7 @@ local function Initialize(tracker, buffer)
 
      --Plasma Charge
     buffer[615] = function(targetId)
-        return CalculateBlueMagicDuration(900, true, false), 38;
+        return CalculateBlueMagicDuration(600, true, false), 38; --Seems to be random between 10 and 15 minutes?
     end
 
      --Diamondhide
@@ -123,12 +123,12 @@ local function Initialize(tracker, buffer)
 
      --Warm-Up
     buffer[636] = function(targetId)
-        return CalculateBlueMagicDuration(180, true, false), {90, 92};
+        return CalculateBlueMagicDuration(180, true, false), 90;
     end
 
      --Amplification
     buffer[642] = function(targetId)
-        return CalculateBlueMagicDuration(90, true, false), {190, 191};
+        return CalculateBlueMagicDuration(90, true, false), 190;
     end
 
      --Zephyr Mantle
@@ -138,12 +138,12 @@ local function Initialize(tracker, buffer)
 
      --Triumphant Roar
     buffer[655] = function(targetId)
-        return CalculateBlueMagicDuration(90, true, false), 91;
+        return CalculateBlueMagicDuration(60, true, false), 91;
     end
 
      --Plenilune Embrace
     buffer[658] = function(targetId)
-        return CalculateBlueMagicDuration(90, false, false), {91, 190};
+        return CalculateBlueMagicDuration(90, false, false), 91;
     end
 
      --Animating Wail
@@ -188,12 +188,12 @@ local function Initialize(tracker, buffer)
 
      --O. Counterstance
     buffer[696] = function(targetId)
-        return CalculateBlueMagicDuration(180, true, false), 486;
+        return CalculateBlueMagicDuration(180, true, false), 486;        
     end
 
      --Nat. Meditation
     buffer[700] = function(targetId)
-        return CalculateBlueMagicDuration(90, true, false), 91;
+        return CalculateBlueMagicDuration(180, true, false), 91;
     end
 
      --Erratic Flutter
@@ -203,220 +203,220 @@ local function Initialize(tracker, buffer)
 
      --Harden Shell
     buffer[737] = function(targetId)
-        return CalculateBlueMagicDuration(30, true, true), 283;
+        return CalculateBlueMagicDuration(180, true, true), 93;
     end
 
      --Pyric Bulwark
     buffer[741] = function(targetId)
-        return CalculateBlueMagicDuration(60, true, true), 484;
+        return CalculateBlueMagicDuration(300, true, true), 150;
     end
 
      --Carcharian Verve
     buffer[745] = function(targetId)
-        return CalculateBlueMagicDuration(900, true, true), {39, 91, 190}; --This also has a 15 minute aquaveil, assuming that is less important than the attack bonus..?
+        return CalculateBlueMagicDuration(60, true, true), 91; --This also has a 15 minute aquaveil, assuming that is less important than the attack bonus..?
     end
 
      --Mighty Guard
     buffer[750] = function(targetId)
-        return CalculateBlueMagicDuration(180, true, true), 604; 
+        return CalculateBlueMagicDuration(180, true, true), 604;        
     end
 
-    --DEBUFFS : Many are not clear on land or not from packet, others lack data.  Filled in the ones wiki knew.
-    --Left this commented by default.
+    --[[DEBUFFS : Many are not clear on land or not from packet, others lack data.  Filled in the ones wiki knew.
+    Left this commented by default.
 
     --Venom Shell
 	buffer[513] = function(targetId)
-		return 180, 3;
+		return 0;
 	end
 
 	--Maelstrom
 	buffer[515] = function(targetId)
-		return 180, 136;
+		return 0;
 	end
 
 	--Sandspin
 	buffer[524] = function(targetId)
-		return 7, 146;
+		return 0;
 	end
 
 	--Ice Break
 	buffer[531] = function(targetId)
-		return 30, 11;
+		return 0;
 	end
 
 	--Blitzstrahl
 	buffer[532] = function(targetId)
-		return 4, 10;
+		return 0;
 	end
 
 	--Mysterious Light
 	buffer[534] = function(targetId)
-		return 180, 12;
+		return 0;
 	end
 
 	--Cold Wave
 	buffer[535] = function(targetId)
-		return 60, 129;
+		return 0;
 	end
 
 	--Poison Breath
 	buffer[536] = function(targetId)
-		return 180, 3;
+		return 30;
 	end
 
 	--Stinking Gas
 	buffer[537] = function(targetId)
-		return 180, 130;
+		return 60;
 	end
 
 	--Terror Touch
 	buffer[539] = function(targetId)
-		return 180, 147;
+		return 60;
 	end
 
 	--Filamented Hold
 	buffer[548] = function(targetId)
-		return 180, 13;
+		return 90;
 	end
 
 	--Magnetite Cloud
 	buffer[555] = function(targetId)
-		return 180, 12;
+		return 0;
 	end
 
 	--Frightful Roar
 	buffer[561] = function(targetId)
-		return 180, 149;
+		return 180;
 	end
 
 	--Hecatomb Wave
 	buffer[563] = function(targetId)
-		return 180, 5;
+		return 0;
 	end
 
 	--Radiant Breath
 	buffer[565] = function(targetId)
-		return 120, 6;
+		return 90;
 	end
 
 	--Sound Blast
 	buffer[572] = function(targetId)
-		return 180, 140;
+		return 30;
 	end
 
 	--Feather Tickle
 	buffer[573] = function(targetId)
-		return 180, 4;
+		return 0;
 	end
 
 	--Jettatura
 	buffer[575] = function(targetId)
-		return 30, 28;
+		return 0;
 	end
 
 	--Yawn
 	buffer[576] = function(targetId)
-		return 90, 2;
+		return 0;
 	end
 
 	--Chaotic Eye
 	buffer[582] = function(targetId)
-		return 120, 6;
+		return 0;
 	end
 
 	--Sheep Song
 	buffer[584] = function(targetId)
-		return 60, 2;
+		return 0;
 	end
 
 	--Lowing
 	buffer[588] = function(targetId)
-		return 180, 31;
+		return 0;
 	end
 
 	--Pinecone Bomb
 	buffer[596] = function(targetId)
-		return 60, 2;
+		return 0;
 	end
 
 	--Sprout Smack
 	buffer[597] = function(targetId)
-		return 180, 13;
+		return 0;
 	end
 
 	--Soporific
 	buffer[598] = function(targetId)
-		return 90, 2;
+		return 90;
 	end
 
 	--Queasyshroom
 	buffer[599] = function(targetId)
-		return 180, 3;
+		return 0;
 	end
 
 	--Wild Oats
 	buffer[603] = function(targetId)
-		return 180, 147;
+		return 0;
 	end
 
 	--Bad Breath
 	buffer[604] = function(targetId)
-		return 180, 3;
+		return 0;
 	end
 
 	--Awful Eye
 	buffer[606] = function(targetId)
-		return 180, 147;
+		return 30;
 	end
 
 	--Frost Breath
 	buffer[608] = function(targetId)
-		return 180, 4;
+		return 180;
 	end
 
 	--Infrasonics
 	buffer[610] = function(targetId)
-		return 180, 148;
+		return 60;
 	end
 
 	--Disseverment
 	buffer[611] = function(targetId)
-		return 180, 3;
+		return 180;
 	end
 
 	--Actinic Burst
 	buffer[612] = function(targetId)
-		return 12, 156;
+		return 0;
 	end
 
 	--Temporal Shift
 	buffer[616] = function(targetId)
-		return 4, 10;
+		return 0;
 	end
 
 	--Blastbomb
 	buffer[618] = function(targetId)
-		return 30, 11;
+		return 0;
 	end
 
 	--Battle Dance
 	buffer[620] = function(targetId)
-		return 180, 298;
+		return 0;
 	end
 
 	--Sandspray
 	buffer[621] = function(targetId)
-		return 180, 5;
+		return 0;
 	end
 
 	--Head Butt
 	buffer[623] = function(targetId)
-		return 4, 10;
+		return 0;
 	end
 
 	--Frypan
 	buffer[628] = function(targetId)
-		return 4, 10;
+		return 0;
 	end
 
 	--Hydro Shot
@@ -426,52 +426,52 @@ local function Initialize(tracker, buffer)
 
 	--Enervation
 	buffer[633] = function(targetId)
-		return 180, 167;
+		return 30;
 	end
 
 	--Light of Penance
 	buffer[634] = function(targetId)
-		return 180, 5;
+		return 30;
 	end
 
 	--Feather Storm
 	buffer[638] = function(targetId)
-		return 180, 3;
+		return 0;
 	end
 
 	--Tail Slap
 	buffer[640] = function(targetId)
-		return 4, 10;
+		return 0;
 	end
 
 	--Mind Blast
 	buffer[644] = function(targetId)
-		return 180, 4;
+		return 90;
 	end
 
 	--Regurgitation
 	buffer[648] = function(targetId)
-		return 45, 11;
+		return 0;
 	end
 
 	--Seedspray
 	buffer[650] = function(targetId)
-		return 180, 149;
+		return 0;
 	end
 
 	--Corrosive Ooze
 	buffer[651] = function(targetId)
-		return 180, 147;
+		return 0;
 	end
 
 	--Spiral Spin
 	buffer[652] = function(targetId)
-		return 180, 146;
+		return 0;
 	end
 
 	--Sub-zero Smash
 	buffer[654] = function(targetId)
-		return 180, 4;
+		return 180;
 	end
 
 	--Acrid Stream
@@ -481,17 +481,17 @@ local function Initialize(tracker, buffer)
 
 	--Demoralizing Roar
 	buffer[659] = function(targetId)
-		return 180, 147;
+		return 30;
 	end
 
 	--Cimicine Discharge
 	buffer[660] = function(targetId)
-		return 180, 13;
+		return 90;
 	end
 
 	--Whirl of Rage
 	buffer[669] = function(targetId)
-		return 4, 10;
+		return 0;
 	end
 
 	--Benthic Typhoon
@@ -501,14 +501,14 @@ local function Initialize(tracker, buffer)
 
 	--Auroral Drape
 	buffer[671] = function(targetId)
-		return 180, {5, 6};
+		return 0;
 	end
 
 	--Thermal Pulse
 	buffer[675] = function(targetId)
-		return 180, 5;
+		return 0;
 	end
-
+    
 	--Dream Flower
 	buffer[678] = function(targetId)
 		return 0;
@@ -516,7 +516,7 @@ local function Initialize(tracker, buffer)
 
 	--Delta Thrust
 	buffer[682] = function(targetId)
-		return 60, 31;
+		return 0;
 	end
 
 	--Mortal Ray
@@ -536,7 +536,7 @@ local function Initialize(tracker, buffer)
 
 	--Barbed Crescent
 	buffer[699] = function(targetId)
-		return 120, 146;
+		return 120;
 	end
 
 	--Embalming Earth
@@ -546,7 +546,7 @@ local function Initialize(tracker, buffer)
 
 	--Paralyzing Triad
 	buffer[704] = function(targetId)
-		return 180, 4;
+		return 60;
 	end
 
 	--Foul Waters
@@ -556,7 +556,7 @@ local function Initialize(tracker, buffer)
 
 	--Retinal Glare
 	buffer[707] = function(targetId)
-		return 15, 156;
+		return 15;
 	end
 
 	--Subduction
@@ -566,7 +566,7 @@ local function Initialize(tracker, buffer)
 
 	--Nectarous Deluge
 	buffer[716] = function(targetId)
-		return 180, 3;
+		return 0;
 	end
 
 	--Sweeping Gouge
@@ -621,32 +621,32 @@ local function Initialize(tracker, buffer)
 
 	--Tenebral Crush
 	buffer[728] = function(targetId)
-		return 180, 149;
+		return 180;
 	end
 
 	--Thunderbolt
 	buffer[736] = function(targetId)
-		return 25, 10;
+		return 0;
 	end
 
 	--Absolute Terror
 	buffer[738] = function(targetId)
-		return 180, 168;
+		return 0;
 	end
 
 	--Gates of Hades
 	buffer[739] = function(targetId)
-		return 90, 128;
+		return 90;
 	end
 
 	--Tourbillion
 	buffer[740] = function(targetId)
-		return 180, 149;
+		return 0;
 	end
 
 	--Bilgestorm
 	buffer[742] = function(targetId)
-		return 180, 147;
+		return 0;
 	end
 
 	--Bloodrake
@@ -656,28 +656,29 @@ local function Initialize(tracker, buffer)
 
 	--Blistering Roar
 	buffer[746] = function(targetId)
-		return 30, 28;
+		return 0;
 	end
 
 	--Polar Roar
 	buffer[749] = function(targetId)
-		return 45, 11;
+		return 0;
 	end
 
 	--Cruel Joke
 	buffer[751] = function(targetId)
-		return 60, 15;
+		return 60;
 	end
 
 	--Cesspool
 	buffer[752] = function(targetId)
-		return 90, 31;
+		return 60;
 	end
 
 	--Tearing Gust
 	buffer[753] = function(targetId)
-		return 90, 167;
+		return 60;
 	end
+    ]]--
 end
 
 return Initialize;

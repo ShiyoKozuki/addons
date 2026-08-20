@@ -24,8 +24,9 @@ local header = { 1.0, 0.75, 0.55, 1.0 };
 local imgui = require('imgui');
 local panels = T { 'Buff', 'Debuff', 'Recast', 'Custom' };
 local sortTypes = T { 'Nominal', 'Percentage', 'Alphabetical', 'Creation' };
-local trackModes = T { 'Self Cast Only', 'Party Only', 'All Players' };
+local trackModes = T { 'Self Cast Only', 'Party Only', 'Alliance Only', 'All Players' };
 
+local blockeditor = require('blockeditor');
 local config = {
     State = {
         IsOpen = { false },
@@ -223,19 +224,16 @@ function config:DrawPanelTab(panelName)
     end
 end
 
-
 function config:Render()
     local state = self.State;
 
     if (state.IsOpen[1]) then
         if (imgui.Begin(string.format('%s v%s Configuration', addon.name, addon.version), state.IsOpen, ImGuiWindowFlags_AlwaysAutoResize)) then
-            imgui.BeginGroup();
             if imgui.BeginTabBar('##tTimersConfigTabBar', ImGuiTabBarFlags_NoCloseWithMiddleMouseButton) then
                 self:DrawPanelTab('Buff');
                 self:DrawPanelTab('Debuff');
                 self:DrawPanelTab('Recast');
                 self:DrawPanelTab('Custom');
-
                 if imgui.BeginTabItem(string.format('Behavior##tTimersConfigBehaviorTab')) then
                     imgui.TextColored(header, 'Buffs');
                     if (imgui.Checkbox('Split By Duration##tTimersConfigBuffs_SplitByDuration', { gSettings.Buff.SplitByDuration })) then
@@ -285,8 +283,14 @@ function config:Render()
                         settings.save();
                     end
                     imgui.ShowHelp("When enabled, custom timers will overwrite existing custom timers of the same name, rather than be created again.");
+                    if (imgui.Checkbox('Hide With Primitives##tTimersConfigCustom_HideWithPrimitives', {gSettings.HideWithPrimitives})) then
+                        gSettings.HideWithPrimitives = not gSettings.HideWithPrimitives;
+                        settings.save();
+                    end
+                    imgui.ShowHelp("When enabled, tTimers won't be drawn while Ashita's primitive manager is hidden.");
                     imgui.EndTabItem();
                 end
+                blockeditor:DrawTabs();
                 imgui.EndTabBar();
             end
             imgui.End();

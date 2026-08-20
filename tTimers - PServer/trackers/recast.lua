@@ -220,7 +220,8 @@ function tracker:UpdateAbilities()
     for id,ability in pairs(state.AbilityTimers) do
         if (ability.Local.Delete) then
             if (ability.Local.Block) then
-                gSettings.Recast.BlockedAbilities[id] = true;
+                local key = string.format('Label:%s', ability.Label);
+                gSettings.Recast.Blocked[key] = true;
                 settings.save();
                 ability.Local.Block = nil;
                 print(chat.header('tTimers') .. chat.message('Blocked ability: ' .. ability.Label));
@@ -331,11 +332,10 @@ function tracker:UpdateAbilities()
         end
     end
 
-
-
     for id,ability in pairs(state.AbilityTimers) do
         if (activeIds:contains(id)) then
-            if (not ability.Hide) and (gSettings.Recast.BlockedAbilities[id] ~= true) then
+            local key = string.format('Label:%s', ability.Label);
+            if (not ability.Hide) and (gSettings.Recast.Blocked[key] ~= true) then
                 state.ActiveTimers:append(ability);
             end
         else
@@ -352,7 +352,8 @@ function tracker:UpdateSpells()
     for id,spell in pairs(state.SpellTimers) do
         if (spell.Local.Delete) then
             if (spell.Local.Block) then
-                gSettings.Recast.BlockedSpells[id] = true;
+                local key = string.format('Spell:%u', id);
+                gSettings.Recast.Blocked[key] = true;
                 settings.save();
                 spell.Local.Block = nil;
                 print(chat.header('tTimers') .. chat.message('Blocked spell: ' .. spell.Label));
@@ -395,7 +396,8 @@ function tracker:UpdateSpells()
     end
 
     for id,spell in pairs(state.SpellTimers) do
-        if (not spell.Hide) and (gSettings.Recast.BlockedSpells[id] ~= true) then
+        local key = string.format('Spell:%u', id);
+        if (not spell.Hide) and (gSettings.Recast.Blocked[key] ~= true) then
             state.ActiveTimers:append(spell);
         end
     end
@@ -423,7 +425,10 @@ ashita.events.register('packet_in', 'recast_tracker_handleincomingpacket', funct
             if (ashita.bits.unpack_be(e.data_raw, 10, 2, 4) == 4) then
                 local actionId = ashita.bits.unpack_be(e.data_raw, 10, 6, 10);
                 local res = AshitaCore:GetResourceManager():GetSpellById(actionId);
-                local label = res and res.Name[1] or string.format('Unknown Spell [%u]', actionId);
+                local label = string.format('Unknown Spell [%u]', actionId);
+                if res then
+                    label = encoding:ShiftJIS_To_UTF8(res.Name[1], true);
+                end
                 state.SpellTimers[actionId] = {
                     Icon  = GetSpellIcon(actionId),
                     Label = label,

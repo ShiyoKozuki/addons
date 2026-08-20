@@ -27,24 +27,16 @@ local actionPacket = require('actionpacket');
 local buffFlags = require('buffflags');
 
 --Constants..
+local pRealTime = ashita.memory.find('FFXiMain.dll', 0, '8B0D????????8B410C8B49108D04808D04808D04808D04C1C3', 2, 0);
 local abilityTypes = T{ 6, 14, 15 };
+
 local actionMessages = T{
     Death = T{ 6, 20, 113, 406, 605, 646 },
-    Expired = T{ 64, 204, 206, 350, 351 },
-    Damage = T{ 2, 110, 252, 317 },
-    Steps = T{ 519, 520, 521 },
-    Applied = T{ 127, 203, 236, 237, 268, 270, 271 },
+    Expired = T{ 206 },
+    Applied = T{ 100, 115, 205, 230, 266, 280, 319, 420, 421, 424, 425, 667 },
 };
-local dotPriority = T{
-    [232] = 6,
-    [25] = 5,
-    [231] = 4,
-    [24] = 3,
-    [230] = 2,
-    [23] = 1,
-    [33] = 1,
-};
-local debuffOverrides = T{
+local rolls = T{ 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 302, 303, 304, 305, 390, 391 };
+local buffOverrides = T{
 };
 
 --[[    
@@ -123,6 +115,7 @@ local function ClearConflicts(targetId, buffId)
     return entry;
 end
 
+
 local defaultPaths = T{
     ['Ability'] = 'abilities/default.png',
     ['Item'] = 'items/default.png',
@@ -133,7 +126,7 @@ local defaultPaths = T{
 };
 -- Determine the texture to be used for a given action.
 local function GetActionIcon(actionTable)
-    local override = debuffOverrides[actionTable.Key];
+    local override = buffOverrides[actionTable.Key];
     if (override) then
         if GetFilePath(override) then
             actionTable.Icon = override;
@@ -215,33 +208,17 @@ local function GetActionName(actionTable)
     end
 end
 
-local function MonsterIdToName(id)
+local function PlayerIdToName(id)
     local entity = AshitaCore:GetMemoryManager():GetEntity();
-    local index = bit.band(id, 0x7FF);
-    if (entity:GetServerId(index) ~= id) then
-        index = 0;
-        for i = 0x001,0x3FF do
-            if (entity:GetServerId(i) == id) then
-                index = i;
-            end
-        end
-        for i = 0x700,0x8FF do
-            if (entity:GetServerId(i) == id) then
-                index = i;
-            end
+    for i = 0x400,0x8FF do
+        if (entity:GetServerId(i) == id) then
+            return entity:GetName(i);
         end
     end
-
-    if (index == 0) then
-        return 'Unknown';
-    elseif (gSettings.Debuff.ShowMobIndex) then
-        return string.format('%s 0x%03X', entity:GetName(index), index);
-    else
-        return entity:GetName(index);
-    end
+    return 'Unknown';
 end
 
-local function RecordDebuff(targetId, actionType, actionId, buffId, duration)
+local function RecordBuff(targetId, actionType, actionId, buffId, duration)
     local playerTable = ClearConflicts(targetId, buffId);
     local key = string.format('%s:%u', actionType, actionId);
 
@@ -262,7 +239,7 @@ local function RecordDebuff(targetId, actionType, actionId, buffId, duration)
     if not target then
         target = {};
         target.Id = targetId;
-        target.Name = MonsterIdToName(targetId);
+        target.Name = PlayerIdToName(targetId);
         actionTable.Targets[targetId] = target;
     end
 
@@ -280,86 +257,17 @@ local function RecordDebuff(targetId, actionType, actionId, buffId, duration)
     playerTable:append(actionTable);
 end
 
-local function HandleDiaBio(targetId, actionType, actionId, buffId, duration)
-    local entry = buffsByTarget[targetId];
-    if entry then
-        local now = os.clock();
-        local value = dotPriority[actionId];
-        for _,buffData in pairs(entry) do
-            if (buffData.ActionType == 'Spell') then
-                local buffValue = dotPriority[buffData.ActionId];
-                if (buffValue ~= nil) then
-                    if buffData.Targets[targetId].Expiration > now then
-                        if (buffValue >= value) then
-                            return;
-                        else
-                            local target = buffData.Targets[targetId];
-                            if target then
-                                target.Delete = true;
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end
-    
-    RecordDebuff(targetId, actionType, actionId, buffId, duration);
-end
-
-local stepBuffIds = T{
-    [201] = 386,
-    [202] = 391,
-    [203] = 396,
-}
-local function HandleStep(targetId, actionId)
-    local mods = 0;
-    local tracker = durations:GetDataTracker();
-    if (tracker:GetJobData().Main == 19) then
-        mods = tracker:GetJobPointCount(19, 1);
-    end
-
-    local entry = buffsByTarget[targetId];
-    if entry then
-        for _,buffData in pairs(entry) do
-            if (buffData.ActionType == 'Ability') and (buffData.ActionId == actionId) then
-                local target = buffData.Targets[targetId];
-                if target then
-                    local remainingDuration = target.Expiration - os.clock();
-                    local duration = remainingDuration + 30 + mods;
-                    if (duration > (120 + mods)) then
-                        duration = 120 + mods; --Verify whether mods actually allow you more than 2min duration..
-                    end
-                    target.Creation = os.clock();
-                    target.Duration = duration;
-                    target.Expiration = os.clock() + duration;
-                    rebuildTimers = true;
-                    return;
-                end
-            end
-        end
-    end
-    
-    RecordDebuff(targetId, 'Ability', actionId, stepBuffIds[actionId], 60 + mods);
-end
-
 local function HandleSpellComplete(packet)
     for _,target in ipairs(packet.Targets) do
         for _,action in ipairs(target.Actions) do
-            local messageId = action.Message;
-            if (actionMessages.Applied:contains(messageId)) or (actionMessages.Damage:contains(messageId)) then
+            if (actionMessages.Applied:contains(action.Message)) then
                 local duration, buffId = durations:GetSpellDuration(packet.Id, target.Id);
-                if duration then
-                    if type(buffId) == 'table' then
-                        buffId = buffId[1];
-                    end
+                if type(buffId) == 'table' then
+                    buffId = buffId[1];
+                end
 
-                    local dotPrio = dotPriority[packet.Id];
-                    if dotPrio then
-                        HandleDiaBio(target.Id, 'Spell', packet.Id, buffId, duration);
-                    else
-                        RecordDebuff(target.Id, 'Spell', packet.Id, buffId, duration);
-                    end
+                if duration then
+                    RecordBuff(target.Id, 'Spell', packet.Id, buffId, duration);
                 end
             end
         end
@@ -369,24 +277,183 @@ end
 local function HandleAbilityComplete(packet)
     for _,target in ipairs(packet.Targets) do
         for _,action in ipairs(target.Actions) do
-            if (actionMessages.Steps:contains(action.Message)) then
-                HandleStep(target.Id, packet.Id, action.Param);
-            elseif (actionMessages.Applied:contains(action.Message)) then
+            if (actionMessages.Applied:contains(action.Message)) then
                 local duration, buffId = durations:GetAbilityDuration(packet.Id, target.Id);
+                
+                if (rolls:contains(packet.Id)) then
+                    if (packet.Id == pendingRoll.ActionId) and (pendingRoll.Time + 48 > os.clock()) then
+                        duration = pendingRoll.Duration - (os.clock() - pendingRoll.Time);
+                        buffId = pendingRoll.Buff;
+                        packet.Id = pendingRoll.ActionId;
+                    else
+                        pendingRoll.Time = os.clock();
+                        pendingRoll.Duration = duration;
+                        pendingRoll.Buff = buffId;
+                        pendingRoll.ActionId = packet.Id;
+                    end
+                end
 
                 if type(buffId) == 'table' then
                     buffId = buffId[1];
                 end
 
                 if duration then
-                    RecordDebuff(target.Id, 'Ability', packet.Id, buffId, duration);
+                    RecordBuff(target.Id, 'Ability', packet.Id, buffId, duration);
                 end
             end
         end
     end    
 end
 
-local function HandleDebuffExpiration(buff, targetId)
+local function HandlePartyBuffs(packet)
+    local now = os.clock();
+    for i = 0,4 do
+        local memberOffset = 0x04 + (0x30 * i) + 1;
+        local memberId = struct.unpack('L', packet.data, memberOffset);
+        
+        local entry = buffsByTarget[memberId];
+        if entry then
+            local buffs = T{};
+            for j = 0,31 do
+                local highBits = bit.lshift(ashita.bits.unpack_be(packet.data_raw, memberOffset + 7, j * 2, 2), 8);
+                local lowBits = struct.unpack('B', packet.data, memberOffset + 0x10 + j);
+                local buff = highBits + lowBits;
+                if (buff == 255) then
+                    break;
+                else
+                    buffs[j + 1] = buff;
+                end
+            end
+
+            --Clear any buff timers that have had the member's buff removed..
+            for _,buffData in ipairs(entry) do
+                if (buffData.BuffId ~= 0) and (not buffs:contains(buffData.BuffId)) then
+                    local target = buffData.Targets[memberId];
+                    if target then
+                        local timeDiff = now - target.Creation;
+                        if (timeDiff > 0.2) then
+                            target.Creation = now - target.Duration;
+                            target.Expiration = now;
+                            rebuildTimers = true;
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
+local function GetRealTime()
+    local ptr = ashita.memory.read_uint32(pRealTime);
+    ptr = ashita.memory.read_uint32(ptr);
+    return ashita.memory.read_uint32(ptr + 0x0C);
+end
+local function CalculateBuffDuration(value)
+    --Get the time since vanadiel epoch
+    local offset = GetRealTime() - 0x3C307D70;
+
+    --Multiply it by 60 to create like terms
+    local comparand = offset * 60;
+
+    --Get actual time remaining
+    local real_duration = value - comparand;
+    
+    while (real_duration < -2147483648) do
+        real_duration = real_duration + 0xFFFFFFFF;
+    end
+    
+    if (real_duration < 0) then
+        return 0;
+    end
+    
+    --Convert to seconds
+    return real_duration / 60;
+end
+local function UpdateDuration(buffId, expirationTime, newExpirationTime)
+    local now = os.clock();
+    for action,actionTable in pairs(buffsByAction) do
+        if (actionTable.BuffId == buffId) then
+            for targetId,target in pairs(actionTable.Targets) do
+                local timeDiff = now - target.Creation;
+                if (timeDiff < 2) and (math.abs(target.Expiration - expirationTime) < 2) then
+                    target.Expiration = newExpirationTime;
+                    target.TotalDuration = (newExpirationTime - now) + timeDiff;
+                    rebuildTimers = true;
+                end
+            end
+        end
+    end
+end
+local oldBuffTimers = T{};
+local function HandleBuffTimers(packet)
+    local myId = durations:GetDataTracker():GetPlayerId();
+    local entry = buffsByTarget[myId];
+    if not entry then
+        return;
+    end
+
+    local now = os.clock();
+    
+    local buffs = T{ };
+
+    for i = 1,32 do
+        local buff = struct.unpack('H', packet.data, 0x06 + (i * 2) + 1);
+        if (buff == 0) and (buffs:countf(function(b) return b.ID == 0 end) > 0) then
+            return;
+        end
+        if buff ~= 0xFF then
+            buff = T { ID=buff };
+            buff.Duration = CalculateBuffDuration(struct.unpack('L', packet.data, 0x44 + (i * 4) + 1));
+            buff.Expiration = os.clock() + buff.Duration;
+            buff.New = true;
+            for key,buffEntry in pairs(oldBuffTimers) do
+                if (buffEntry.ID == buff.ID) and (math.abs(buffEntry.Expiration - buff.Expiration) < 2) then
+                    buff.New = false;
+                    oldBuffTimers[key] = nil;
+                    break;
+                end
+            end
+            buffs:append(buff);
+        end
+    end
+
+    for _,buff in ipairs(buffs) do
+        if (buff.New) then
+            --Look for buffs applied less than 2 seconds ago to force duration..            
+            for _,buffData in ipairs(entry) do
+                if buffData.BuffId == buff.ID then
+                    local target = buffData.Targets[myId];
+                    if target then
+                        local timeDiff = now - target.Creation;
+                        if (timeDiff < 2) then
+                            UpdateDuration(buffData.BuffId, target.Expiration, buff.Expiration);
+                            if pendingRoll.BuffId == buff.ID then
+                                pendingRoll.Duration = (target.Expiration - pendingRoll.Time);
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    --Clear any buff timers that have had the member's buff removed..
+    for _,buffData in ipairs(entry) do
+        if (buffData.BuffId ~= 0) and (buffs:countf(function(b) return b.ID == buffData.BuffId end) == 0) then
+            local target = buffData.Targets[myId];
+            if target then
+                local timeDiff = now - target.Creation;
+                if (timeDiff > 0.2) and (now < target.Expiration) then
+                    target.Creation = now - target.Duration;
+                    target.Expiration = now;
+                    rebuildTimers = true;
+                end
+            end
+        end
+    end
+    oldBuffTimers = buffs;
+end
+local function HandleBuffCancel(buff, targetId)
     local flags = buffFlags[buff];
     if (flags) and (flags.MultipleInstance) then
         return;
@@ -407,8 +474,7 @@ local function HandleDebuffExpiration(buff, targetId)
         end
     end
 end
-
-local function HandleEnemyDeath(targetId)
+local function HandlePlayerDeath(targetId)
     local entry = buffsByTarget[targetId];
     if entry then
         for _,buffData in ipairs(entry) do
@@ -427,33 +493,55 @@ local function CheckDistance(index)
         return true;
     end
 end
-ashita.events.register('packet_in', 'debuff_tracker_handleincomingpacket', function (e)
-    if (e.id == 0x00E) then
+ashita.events.register('packet_in', 'buff_tracker_handleincomingpacket', function (e)
+    if (e.id == 0x00D) then
         local flags = struct.unpack('B', e.data, 0x0A + 1);
         if (bit.band(flags, 0x20) == 0x20) and (CheckDistance(struct.unpack('H', e.data, 0x08 + 1))) then
-            HandleEnemyDeath(struct.unpack('L', e.data, 0x04 + 1));
+            HandlePlayerDeath(struct.unpack('L', e.data, 0x04 + 1));
         elseif (bit.band(flags, 0x04) == 0x04) then
             local hp = struct.unpack('B', e.data, 0x1E + 1);
             if (hp == 0) then
-                HandleEnemyDeath(struct.unpack('L', e.data, 0x04 + 1));
+                HandlePlayerDeath(struct.unpack('L', e.data, 0x04 + 1));
+            end
+        end
+    end
+    if (e.id == 0x00E) then
+        local index = struct.unpack('H', e.data, 0x08 + 1);
+        if (index >= 0x700) then
+            local flags = struct.unpack('B', e.data, 0x0A + 1);
+            if (bit.band(flags, 0x20) == 0x20) and (CheckDistance(index)) then
+                HandlePlayerDeath(struct.unpack('L', e.data, 0x04 + 1));
+            elseif (bit.band(flags, 0x04) == 0x04) then
+                local hp = struct.unpack('B', e.data, 0x1E + 1);
+                if (hp == 0) then
+                    HandlePlayerDeath(struct.unpack('L', e.data, 0x04 + 1));
+                end
             end
         end
     end
 
+
     if (e.id == 0x028) then
-        local packet = actionPacket:parse(e);        
+        local packet = actionPacket:parse(e);
         local trackAction = (packet.UserId == durations:GetDataTracker():GetPlayerId());
         if (trackAction == false) then
-            if (gSettings.Debuff.TrackMode == 'All Players') then
+            if (gSettings.Buff.TrackMode == 'All Players') then
                 local ent = AshitaCore:GetMemoryManager():GetEntity();
                 for i = 0x400,0x6FF do
                     if (ent:GetServerId(i) == packet.UserId) then
                         trackAction = true;
                     end
                 end
-            elseif (gSettings.Debuff.TrackMode == 'Party Only') then
+            elseif (gSettings.Buff.TrackMode == 'Party Only') then
                 local party = AshitaCore:GetMemoryManager():GetParty();
                 for i = 1,5 do
+                    if (party:GetMemberIsActive(i) == 1) and (party:GetMemberServerId(i) == packet.UserId) then
+                        trackAction = true;
+                    end
+                end
+            elseif (gSettings.Buff.TrackMode == 'Alliance Only') then
+                local party = AshitaCore:GetMemoryManager():GetParty();
+                for i = 1,17 do
                     if (party:GetMemberIsActive(i) == 1) and (party:GetMemberServerId(i) == packet.UserId) then
                         trackAction = true;
                     end
@@ -475,14 +563,25 @@ ashita.events.register('packet_in', 'debuff_tracker_handleincomingpacket', funct
 
     if (e.id == 0x29) then
         local messageId = bit.band(struct.unpack('H', e.data, 0x18 + 1), 0x7FFF);
+        
         if (actionMessages.Death:contains(messageId)) then
-            HandleEnemyDeath(struct.unpack('L', e.data, 0x08 + 1));
+            HandlePlayerDeath(struct.unpack('L', e.data, 0x08 + 1));
         end
+
         if (actionMessages.Expired:contains(messageId)) then
-            HandleDebuffExpiration(struct.unpack('H', e.data, 0x0C + 1), struct.unpack('L', e.data, 0x08 + 1));
+            HandleBuffCancel(struct.unpack('H', e.data, 0x0C + 1), struct.unpack('L', e.data, 0x08 + 1));
         end
     end
+
+    if (e.id == 0x63) and (struct.unpack('B', e.data, 0x04 + 1) == 9) then
+        HandleBuffTimers(e);
+    end
+    
+    if (e.id == 0x076) then
+        HandlePartyBuffs(e);
+    end
 end);
+
 local function TimeToString(timer)
     if (timer >= 3600) then
         local h = math.floor(timer / 3600);
@@ -499,23 +598,23 @@ local function ClearDeletedTimers()
     for _,timer in ipairs(activeTimers) do
         --Clear timers that have been deleted via UI..
         if (timer.Local.Delete) then
-            for _,targetEntry in ipairs(timer.Targets) do
+            for _,targetEntry in ipairs(timer.Players) do
                 targetEntry.Delete = true;
             end
             if (timer.Local.Block) then
-                gSettings.Debuff.Blocked[timer.Key] = true;
+                gSettings.Buff.Blocked[timer.Key] = true;
                 settings.save();
                 timer.Local.Block = nil;
-                print(chat.header('tTimers') .. chat.message('Blocked Debuff: ' .. timer.Key));
+                print(chat.header('tTimers') .. chat.message('Blocked Buff: ' .. timer.Key));
             end
             rebuildTimers = true;
         else
             --Flag a rebuild if timers have any expired members..
-            local duration = timer.Targets[1].Expiration - os.clock();
-            if ((duration * -1) > gSettings.Debuff.CompletionDuration) then
-                for _,player in ipairs(timer.Targets) do
+            local duration = timer.Players[1].Expiration - os.clock();
+            if ((duration * -1) > gSettings.Buff.CompletionDuration) then
+                for _,player in ipairs(timer.Players) do
                     duration = player.Expiration - os.clock();
-                    if ((duration * -1) > gSettings.Debuff.CompletionDuration) then
+                    if ((duration * -1) > gSettings.Buff.CompletionDuration) then
                         player.Delete = true;
                     end
                 end
@@ -551,12 +650,12 @@ local function ClearDeletedTimers()
 end
 
 local function CreateTimer(buffData)
-    local targetArray = T{};
+    local playerArray = T{};
     for playerId,data in pairs(buffData.Targets) do
-        targetArray:append(data);
+        playerArray:append(data);
     end
 
-    table.sort(targetArray, function(a,b)
+    table.sort(playerArray, function(a,b)
         if (a.Expiration == b.Expiration) then
             return a.Name < b.Name;
         end
@@ -565,17 +664,17 @@ local function CreateTimer(buffData)
 
 
     local toolTipText;
-    if (targetArray[2]) then
+    if (playerArray[2]) then
         toolTipText = '';
-        for _,entry in ipairs(targetArray) do
+        for _,entry in ipairs(playerArray) do
             local timeRemaining = math.max(entry.Expiration - os.clock(), 0);
             local newLine = string.format('%s%-20s %s', (toolTipText == '') and '' or '\n', entry.Name, TimeToString(timeRemaining));
             toolTipText = toolTipText .. newLine;
         end
     end
 
-    local count = #targetArray;
-    local shortest = targetArray[1];
+    local count = #playerArray;
+    local shortest = playerArray[1];
     
     local timerData = {};
     timerData.Creation = shortest.Creation;
@@ -584,27 +683,50 @@ local function CreateTimer(buffData)
     timerData.Duration = math.max(timerData.Expiration - os.clock(), 0);
     timerData.Icon = buffData.Icon;
     if (count > 1) then
-        timerData.Label = string.format('%s[%u]', buffData.Name, count);
+        timerData.Label = string.format('%s[%s+%u]', buffData.Name, shortest.Name, count-1);
     else
         timerData.Label = string.format('%s[%s]', buffData.Name, shortest.Name);
     end
     timerData.Local = {};
-    timerData.Targets = targetArray;
+    timerData.Players = playerArray;
     timerData.Key = buffData.Key;
     timerData.Tooltip = toolTipText;
     activeTimers:append(timerData);
+end
+
+local function GetSplitTolerance(targetExpiration)
+    local remaining = targetExpiration - os.clock()
+
+    -- 90% of duration
+    local tolerance = remaining * 0.90
+    tolerance = math.max(60, math.min(180, tolerance))
+
+    return tolerance
 end
 
 local function CreateSplitTimers(buffData)
     local timers = T{};
     for id,target in pairs(buffData.Targets) do
         local targetTimer;
+        local mergeSetting = true -- TODO: Real Setting
+
         for _,timer in ipairs(timers) do
-            if (math.abs(timer.Expiration - target.Expiration) < 2) then
-                targetTimer = timer;
-                break;
+            if mergeSetting then
+                local tolerance = GetSplitTolerance(target.Expiration)
+                
+                if (math.abs(timer.Expiration - target.Expiration) < tolerance) then
+                    for _,timer in ipairs(timers) do
+                        targetTimer = timer;
+                    end
+                end
+            else
+                if (math.abs(timer.Expiration - target.Expiration) < 2) then
+                    targetTimer = timer;
+                    break;
+                end
             end
         end
+
         if not targetTimer then
             targetTimer = {
                 BuffId = buffData.BuffId,
@@ -628,7 +750,7 @@ local function RebuildTimers(splitByDuration)
     activeTimers = T{};
 
     for key,buffData in pairs(buffsByAction) do
-        if (gSettings.Debuff.Blocked[key] == nil) then
+        if (gSettings.Buff.Blocked[key] == nil) then
             if splitByDuration then
                 CreateSplitTimers(buffData);
             else
@@ -640,9 +762,9 @@ end
 
 local function UpdateTimer(timerData)
     timerData.Duration = math.max(timerData.Expiration - os.clock(), 0);
-    if (timerData.Targets[2]) then
+    if (timerData.Players[2]) then
         local toolTipText = '';
-        for _,entry in ipairs(timerData.Targets) do
+        for _,entry in ipairs(timerData.Players) do
             local timeRemaining = math.max(entry.Expiration - os.clock(), 0);
             local newLine = string.format('%s%-20s %s', (toolTipText == '') and '' or '\n', entry.Name, TimeToString(timeRemaining));
             toolTipText = toolTipText .. newLine;
@@ -653,15 +775,14 @@ local function UpdateTimer(timerData)
     end
 end
 
-
 local exports = {};
 
 local lastSetting;
 function exports:Tick()
     ClearDeletedTimers();
 
-    if (rebuildTimers) or (gSettings.Debuff.SplitByDuration ~= lastSetting) then
-        lastSetting = gSettings.Debuff.SplitByDuration;
+    if (rebuildTimers) or (gSettings.Buff.SplitByDuration ~= lastSetting) then
+        lastSetting = gSettings.Buff.SplitByDuration;
         RebuildTimers(lastSetting);
         rebuildTimers = false;
     else

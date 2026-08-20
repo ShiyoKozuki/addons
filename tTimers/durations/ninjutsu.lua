@@ -26,132 +26,111 @@ local function Initialize(tracker, buffer)
 
     --Monomi: Ichi
     buffer[318] = function(targetId)
-        return 420, 71;
+        return 120;
     end
 
     --Utsusemi: Ichi
     buffer[338] = function(targetId)
-        return 900, 445;
+        return 900;
     end
 
     --Utsusemi: Ni
     buffer[339] = function(targetId)
-        return 900, 445;
+        return 900;
     end
 
     --Utsusemi: San
     buffer[340] = function(targetId)
-        return 900, 445;
+        return 900;
     end
 
 	--Aisha: Ichi
 	buffer[319] = function(targetId)
-		return 180, 404;
+		return 120;
 	end
 
-    --Jubaku: Ichi
+    --[[UNKNOWN
+	--Jubaku: Ichi
 	buffer[341] = function(targetId)
-		return 120, 4;
+		return 0;
 	end
+    ]]--
 
-    --Jubaku: Ni
-	buffer[342] = function(targetId)
-		return 120, 4;
-	end
-
-    --Jubaku: Ni
-	buffer[343] = function(targetId)
-		return 120, 4;
-	end
-    
-    --Hojo: Ichi
+    --[[UNKNOWN
+	--Hojo: Ichi
 	buffer[344] = function(targetId)
-		return 180, 13;
+		return 0;
 	end
-    
-    --Hojo: Ni
+    ]]--
+
+    --[[UNKNOWN
+	--Hojo: Ni
 	buffer[345] = function(targetId)
-		return 180, 13;
+		return 0;
 	end
+    ]]--
 
-	
-    --Hojo: San
-	buffer[346] = function(targetId)
-		return 180, 13;
-	end
-    
-
-    --Kurayami: Ichi
+    --[[UNKNOWN
+	--Kurayami: Ichi
 	buffer[347] = function(targetId)
-		return 300, 5;
+		return 0;
 	end
-    
+    ]]--
 
-    --Kurayami: Ni
+    --[[UNKNOWN
+	--Kurayami: Ni
 	buffer[348] = function(targetId)
-		return 300, 5;
+		return 0;
 	end
+    ]]--
 
-	--Kurayami: San
-	buffer[349] = function(targetId)
-		return 300, 5;
-	end
-    
-
-    --Dokumori: Ichi
+    --[[UNKNOWN
+	--Dokumori: Ichi
 	buffer[350] = function(targetId)
-		return 90, 3;
+		return 60;
 	end
-
-    --Dokumori: Ni
-	buffer[350] = function(targetId)
-		return 120, 3;
-	end
-
-    --Dokumori: San
-	buffer[350] = function(targetId)
-		return 180, 3;
-	end
-    
+    ]]--
 
     --Tonko: Ichi
     buffer[353] = function(targetId)
-        return 420, 69;
+        return 180;
     end
 
     --Tonko: Ni
     buffer[354] = function(targetId)
-        return 540, 69;
+        return 300;
     end
-
+    
     --Gekka: Ichi
     buffer[505] = function(targetId)
-        return 180, 289;
+        return 180;
     end
-
+    
     --Yain: Ichi
     buffer[506] = function(targetId)
-        return 300, 171;
+        return 300;
     end
-
+    
     --Myoshu: Ichi
     buffer[507] = function(targetId)
-        return 180, 290;
+        return 300;
     end
-
+    
+    --[[UNKNOWN
     --Yurin: Ichi
 	buffer[508] = function(targetId)
-		return 180, 148;
+		return 0;
 	end
+    ]]--
 
     --Kakka: Ichi
     buffer[509] = function(targetId)
-        return 180, 227;
-    end
-
+        return 300;
+    end    
+    
     --Migawari: Ichi
     buffer[510] = function(targetId)
-        return 60, 471;
+        return 60;
     end
 end
 

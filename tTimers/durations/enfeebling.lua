@@ -37,6 +37,15 @@ local saboteurModifiers = {
     [23558] = 0.14, --Leth. Ganth. +3
 };
 
+local rdmEmpyrean = T{ 11068, 11088, 11108, 11128, 11148, 23089, 23156, 23223, 23290, 23357, 23424, 23491, 23558, 23625, 23692, 26748, 26749, 26906, 26907, 27060, 27061, 27245, 27246, 27419, 27420 };
+do
+    local buffer = {};
+    for _,id in ipairs(rdmEmpyrean) do
+        buffer[id] = 1;
+    end
+    rdmEmpyrean = buffer;
+end
+
 local function ApplyEnfeeblingAdditions(duration, augments)
     local job = dataTracker:GetJobData();
     if job.Main ~= 5 then
@@ -89,12 +98,28 @@ local function ApplySaboteurMultipliers(duration, targetId)
     return duration * saboteur;
 end
 
+local composureValues = T{ [0]=1, [1]=1, [2]=1.1, [3]=1.2, [4]=1.35, [5]=1.5 };
+local function GetComposureMod()
+    local equipCount = dataTracker:EquipSum(rdmEmpyrean);
+    return composureValues[equipCount];
+end
+
+local function ApplyComposureModifiers(duration, targetId)
+	--Not verified whether durations over 1800 sec are truncated the same way as buffs.. can any debuff even reach 30 min?
+    if not dataTracker:GetBuffActive(419) or (duration >= 1800) then
+        return duration;
+    end
+	
+	return duration * GetComposureMod();
+end
+
 local function CalculateEnfeeblingDuration(base, targetId)
     local duration = base;
     local augments = dataTracker:ParseAugments();
     duration = ApplySaboteurMultipliers(duration, targetId);
     duration = ApplyEnfeeblingAdditions(duration, augments);
     duration = ApplyEnfeeblingMultipliers(duration, augments);
+	duration = ApplyComposureModifiers(duration);
     return duration;
 end
 
@@ -140,7 +165,7 @@ end
 
 local function Initialize(tracker, buffer)
     dataTracker = tracker;
-
+    
 	--Dia
 	buffer[23] = function(targetId)
 		return CalculateEnfeeblingDuration(60, targetId), 134;
@@ -269,7 +294,7 @@ local function Initialize(tracker, buffer)
 
 	--Blind
 	buffer[254] = function(targetId)
-		return CalculateEnfeeblingDuration(300, targetId), 5;
+		return CalculateEnfeeblingDuration(180, targetId), 5;
 	end
 
 	--Break
@@ -277,10 +302,12 @@ local function Initialize(tracker, buffer)
 		return CalculateEnfeeblingDuration(30, targetId), 7;
 	end
 
+	--[[UNKNOWN
     --Bind
 	buffer[258] = function(targetId)
-		return CalculateEnfeeblingDuration(60, targetId);
+		return CalculateEnfeeblingDuration(40, targetId);
 	end
+    ]]--
 
 	--Sleep II
 	buffer[259] = function(targetId)
@@ -296,11 +323,11 @@ local function Initialize(tracker, buffer)
 	buffer[274] = function(targetId)
 		return CalculateEnfeeblingDuration(90, targetId), 2;
 	end
-
+    
 	--Blind II
 	buffer[276] = function(targetId)
-		return CalculateEnfeeblingDuration(300, targetId), 5;
-	end
+		return CalculateEnfeeblingDuration(180, targetId), 5;
+	end    
 
     --UNKNOWN
 	--Addle
@@ -363,7 +390,7 @@ local function Initialize(tracker, buffer)
 	buffer[365] = function(targetId)
 		return CalculateEnfeeblingDuration(30, targetId), 7;
 	end
-
+    
 	--Kaustra
 	buffer[502] = function(targetId)
         local darkSkill = AshitaCore:GetMemoryManager():GetPlayer():GetCombatSkill(37):GetSkill();

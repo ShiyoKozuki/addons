@@ -19,7 +19,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 --]]
-
 require('shiyolibs');
 local d3d = require('d3d8');
 local ffi = require('ffi');
@@ -43,12 +42,13 @@ end
 
 ashita.events.register('d3d_present', 'd3d_present_cb', function ()
     config:Render();
-    if (sprite == nil) then
-        return;
-    end
 
     if ShouldHideUI() then
         return
+    end
+    
+    if (sprite == nil) or ((gSettings.HideWithPrimitives == true) and (AshitaCore:GetPrimitiveManager():GetVisible() == false)) then
+        return;
     end
 
     sprite:Begin();
@@ -92,6 +92,7 @@ ashita.events.register('command', 'command_cb', function (e)
                 panel.AllowDrag = true;
                 panel.ShowDebugTimers = true;
             end
+            return;
         end
         
         if (args[2] == 'lock') then
@@ -99,6 +100,7 @@ ashita.events.register('command', 'command_cb', function (e)
                 panel.AllowDrag = false;
                 panel.ShowDebugTimers = false;
             end
+            return;
         end
 
         if (args[2] == 'custom') then
@@ -120,6 +122,30 @@ ashita.events.register('command', 'command_cb', function (e)
                     if type(time) == 'number' then
                         duration = time * multiplier;
                     end
+                    if (args[4]:len() == 8 or args[4]:len() == 7) and string.find(args[4], ":") then
+                        local datetime = args[4];
+                        local pattern = "(%d+):(%d+):(%d+)";
+                        local hour, min, sec = datetime:match(pattern);
+                        hour = tonumber(hour);
+                        min = tonumber(min);
+                        sec = tonumber(sec);
+
+                        if type(hour) == 'number' and type(min) == 'number' and type(sec) == 'number' then 
+                            local timestamp = os.time({
+                                year = os.date("%Y"),
+                                month = os.date("%m"),
+                                day = os.date("%d"),
+                                hour = hour,
+                                min = min,
+                                sec = sec
+                            });
+                            local now = os.time();
+                            local timeDiff = os.difftime(timestamp, now);
+                            if timeDiff > 0 then
+                                duration = timeDiff;
+                            end
+                        end
+                    end
                 end
                 if (type(duration) == 'number') then
                     local newCustomTimer = {
@@ -130,7 +156,14 @@ ashita.events.register('command', 'command_cb', function (e)
                         TotalDuration = duration;
                     };
                     if (#args > 4) then
-                        newCustomTimer.Tooltip = args[5];
+                        if (args[5] == 'repeat') then
+                            newCustomTimer.Repeating = true;
+                            if (#args > 5) then
+                                newCustomTimer.Tooltip = args[6];
+                            end
+                        else
+                            newCustomTimer.Tooltip = args[5];
+                        end
                     end
                     customTracker:AddTimer(newCustomTimer);
                 end
@@ -138,5 +171,20 @@ ashita.events.register('command', 'command_cb', function (e)
             e.blocked = true;
             return;
         end
+
+        if (args[2] == 'stop') then
+            if (#args > 2) then
+                customTracker:DeleteTimer(args[3]);
+            end
+            e.blocked = true;
+            return;
+        end
+
+        print(chat.header('tTimers') .. chat.message('Command Descriptions:'));
+        print(chat.header('tTimers') .. chat.color1(2, '/tt') .. chat.message(' - Opens configuration menu.'));
+        print(chat.header('tTimers') .. chat.color1(2, '/tt reposition') .. chat.message(' - Starts reposition mode, which shows debug timers to fill all panels and provides draggable handles to move them.'));
+        print(chat.header('tTimers') .. chat.color1(2, '/tt lock') .. chat.message(' - Ends repositioning mode and saves positions for the current character.'));
+        print(chat.header('tTimers') .. chat.color1(2, '/tt custom [label] [duration]') .. chat.message(' - Adds a custom timer.  Duration can be specified in number of seconds or using s,m, or h suffixes with or without decimal places(30m, 1h, 10.5m, etc).'));
+        print(chat.header('tTimers') .. chat.color1(2, '/tt stop [label]') .. chat.message(' - Deletes a custom timer.'));
     end
 end);

@@ -26,7 +26,7 @@ local function Initialize(tracker, buffer)
 
 	--Banish
 	buffer[28] = function(targetId)
-		return 30;
+		return 15;
 	end
 
 	--Banish II
@@ -111,92 +111,92 @@ local function Initialize(tracker, buffer)
     
 	--Katon: Ichi
 	buffer[320] = function(targetId)
-		return 30;
+		return 10;
 	end
 
 	--Katon: Ni
 	buffer[321] = function(targetId)
-		return 30;
+		return 10;
 	end
 
 	--Katon: San
 	buffer[322] = function(targetId)
-		return 30;
+		return 10;
 	end
 
 	--Hyoton: Ichi
 	buffer[323] = function(targetId)
-		return 30;
+		return 10;
 	end
 
 	--Hyoton: Ni
 	buffer[324] = function(targetId)
-		return 30;
+		return 10;
 	end
 
 	--Hyoton: San
 	buffer[325] = function(targetId)
-		return 30;
+		return 10;
 	end
 
 	--Huton: Ichi
 	buffer[326] = function(targetId)
-		return 30;
+		return 10;
 	end
 
 	--Huton: Ni
 	buffer[327] = function(targetId)
-		return 30;
+		return 10;
 	end
 
 	--Huton: San
 	buffer[328] = function(targetId)
-		return 30;
+		return 10;
 	end
 
 	--Doton: Ichi
 	buffer[329] = function(targetId)
-		return 30;
+		return 10;
 	end
 
 	--Doton: Ni
 	buffer[330] = function(targetId)
-		return 30;
+		return 10;
 	end
 
 	--Doton: San
 	buffer[331] = function(targetId)
-		return 30;
+		return 10;
 	end
 
 	--Raiton: Ichi
 	buffer[332] = function(targetId)
-		return 30;
+		return 10;
 	end
 
 	--Raiton: Ni
 	buffer[333] = function(targetId)
-		return 30;
+		return 10;
 	end
 
 	--Raiton: San
 	buffer[334] = function(targetId)
-		return 30;
+		return 10;
 	end
 
 	--Suiton: Ichi
 	buffer[335] = function(targetId)
-		return 30;
+		return 10;
 	end
 
 	--Suiton: Ni
 	buffer[336] = function(targetId)
-		return 30;
+		return 10;
 	end
 
 	--Suiton: San
 	buffer[337] = function(targetId)
-		return 30;
+		return 10;
 	end
 end
 

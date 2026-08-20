@@ -93,7 +93,7 @@ local function Initialize(tracker, buffer)
 
      --Cocoon
     buffer[547] = function(targetId)
-        return CalculateBlueMagicDuration(300, true, false), 93;
+        return CalculateBlueMagicDuration(90, true, false), 93;
     end
 
      --Feather Barrier
@@ -138,7 +138,7 @@ local function Initialize(tracker, buffer)
 
      --Triumphant Roar
     buffer[655] = function(targetId)
-        return CalculateBlueMagicDuration(180, true, false), 91;
+        return CalculateBlueMagicDuration(90, true, false), 91;
     end
 
      --Plenilune Embrace
@@ -193,7 +193,7 @@ local function Initialize(tracker, buffer)
 
      --Nat. Meditation
     buffer[700] = function(targetId)
-        return CalculateBlueMagicDuration(180, true, false), 91;
+        return CalculateBlueMagicDuration(90, true, false), 91;
     end
 
      --Erratic Flutter
@@ -203,7 +203,7 @@ local function Initialize(tracker, buffer)
 
      --Harden Shell
     buffer[737] = function(targetId)
-        return CalculateBlueMagicDuration(300, true, true), {40, 41};
+        return CalculateBlueMagicDuration(30, true, true), 283;
     end
 
      --Pyric Bulwark
