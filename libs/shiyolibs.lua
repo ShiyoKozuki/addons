@@ -2459,6 +2459,295 @@ function getNameByDAT(entityId)
     return name
 end
 
+function BuildPartyMemberList(excludeTrusts)
+    local partyMemberName = T{};
+    local party = AshitaCore:GetMemoryManager():GetParty();
+
+    for i = 0, 5 do
+        if party:GetMemberIsActive(i) == 1 then
+            local name = party:GetMemberName(i);
+            if name then
+                if excludeTrusts then
+                    if not IsTrust(GetPlayerIndex(name)) then
+                        partyMemberName:append(name);
+                    end
+                else
+                    partyMemberName:append(name);
+                end
+            end
+        end
+    end
+
+    return partyMemberName;
+end
+
+function BuildWeaponSkillList()
+    local ws = T{};
+    local playMgr = AshitaCore:GetMemoryManager():GetPlayer();
+    local resMgr = AshitaCore:GetResourceManager();
+
+    for i = 1, 0x200 do
+        local res = resMgr:GetAbilityById(i);
+
+        if res and playMgr:HasAbility(res.Id) then
+            ws:append(res.Name[1]);
+        end
+    end
+
+    if #ws == 0 then
+        ws:append('None');
+    end
+
+    return ws;
+end
+
+function BuildCorsairRollList()
+    local roll = T{};
+    local playMgr = AshitaCore:GetMemoryManager():GetPlayer();
+    local resMgr = AshitaCore:GetResourceManager();
+
+    for i = 1, 1792 do
+        local res = resMgr:GetAbilityById(i);
+
+        if res and playMgr:HasAbility(res.Id) then
+            local name = res.Name[1];
+
+            if name and string.find(name, 'Roll') and not string.find(name, 'Phantom Roll') then
+                roll:append(name);
+            end
+        end
+    end
+
+    if #roll == 0 then
+        roll:append('None');
+    end
+
+    return roll;
+end
+
+function GetAbilityIdByName(Name)
+    local abilityId = nil
+    local playMgr = AshitaCore:GetMemoryManager():GetPlayer();
+    local resMgr = AshitaCore:GetResourceManager();
+
+    for i = 1, 1792 do
+        local res = resMgr:GetAbilityById(i);
+
+        if res and playMgr:HasAbility(res.Id) then
+            if res.Name[1] == Name then
+                abilityId = res.Id
+                break
+            end
+        end
+    end
+
+
+    return abilityId;
+end
+
+-- Corsair Roll functions
+
+function GetRollData(rollName)
+    local rolls = {
+        ['Fighter\'s Roll'] = { Lucky=5, Unlucky=9, BuffId=310 },
+        ['Monk\'s Roll'] = { Lucky=3, Unlucky=7, BuffId=311 },
+        ['Healer\'s Roll'] = { Lucky=3, Unlucky=7, BuffId=312 },
+        ['Wizard\'s Roll'] = { Lucky=5, Unlucky=9, BuffId=313 },
+        ['Warlock\'s Roll'] = { Lucky=4, Unlucky=8, BuffId=314 },
+        ['Rogue\'s Roll'] = { Lucky=5, Unlucky=9, BuffId=315 },
+        ['Gallant\'s Roll'] = { Lucky=3, Unlucky=7, BuffId=316 },
+        ['Chaos Roll'] = { Lucky=4, Unlucky=8, BuffId=317 },
+        ['Beast Roll'] = { Lucky=4, Unlucky=8, BuffId=318 },
+        ['Choral Roll'] = { Lucky=2, Unlucky=6, BuffId=319 },
+        ['Hunter\'s Roll'] = { Lucky=4, Unlucky=8, BuffId=320 },
+        ['Samurai Roll'] = { Lucky=2, Unlucky=6, BuffId=321 },
+        ['Ninja Roll'] = { Lucky=4, Unlucky=8, BuffId=322 },
+        ['Drachen Roll'] = { Lucky=4, Unlucky=8, BuffId=323 },
+        ['Evoker\'s Roll'] = { Lucky=5, Unlucky=9, BuffId=324 },
+        ['Magus\'s Roll'] = { Lucky=2, Unlucky=6, BuffId=325 },
+        ['Corsair\'s Roll'] = { Lucky=5, Unlucky=9, BuffId=326 },
+        ['Puppet Roll'] = { Lucky=3, Unlucky=7, BuffId=327 },
+        ['Dancer\'s Roll'] = { Lucky=3, Unlucky=7, BuffId=328 },
+        ['Scholar\'s Roll'] = { Lucky=2, Unlucky=6, BuffId=329 },
+        ['Bolter\'s Roll'] = { Lucky=3, Unlucky=9, BuffId=330 },
+        ['Caster\'s Roll'] = { Lucky=2, Unlucky=7, BuffId=331 },
+        ['Courser\'s Roll'] = { Lucky=3, Unlucky=9, BuffId=332 },
+        ['Blitzer\'s Roll'] = { Lucky=4, Unlucky=9, BuffId=333 },
+        ['Tactician\'s Roll'] = { Lucky=5, Unlucky=8, BuffId=334 },
+        ['Allies\' Roll'] = { Lucky=3, Unlucky=10, BuffId=335 },
+        ['Miser\'s Roll'] = { Lucky=5, Unlucky=7, BuffId=336 },
+        ['Companion\'s Roll'] = { Lucky=2, Unlucky=10, BuffId=337 },
+        ['Avenger\'s Roll'] = { Lucky=4, Unlucky=8, BuffId=338 },
+        ['Naturalist\'s Roll'] = { Lucky=3, Unlucky=7, BuffId=339 },
+    }
+
+    return rolls[rollName]
+end
+
+function GetRollCount(MyIndex, rollData)
+    local rollCount = 0
+
+    -- Track how many of our own rolls are active on us
+    local buffs = AshitaCore:GetMemoryManager():GetPlayer():GetBuffs()
+
+    for _, buff in pairs(buffs) do
+        if (buff >= statusEffect.FIGHTERS_ROLL and buff <= statusEffect.NATURALISTS_ROLL)
+            or buff == statusEffect.RUNEISTS_ROLL or buff == statusEffect.BUST
+        then
+
+            rollCount = rollCount +1
+
+            -- TODO: Has to be found in packet
+            -- Make sure roll was casted by us
+            -- if (effect:getSubType() == mob:getID()) then
+            -- end
+        end
+    end
+
+    -- Fold if busted
+    if GetBuffActive(statusEffect.BUST) then
+        if TryUseAbility('Fold', MyIndex) then
+            return rollCount
+        end
+    end
+
+    return rollCount
+end
+
+function TryDoubleUp(MyIndex, rollData)
+    local canDoubleUp = false
+    local snakeEye = false
+    local lucky = false
+    
+    if os.time() <= DoubleUpDelay then return end
+
+    if not GetBuffActive(statusEffect.DOUBLE_UP_CHANCE) then
+        return false
+    end
+
+    if (CurrentRoll < 6) then
+        canDoubleUp = true
+    end
+
+    if (CurrentRoll == 10) then
+        snakeEye = true
+        if GetBuffActive(statusEffect.SNAKE_EYE) then
+            canDoubleUp = true
+        end
+    end
+
+    if canDoubleUp then
+        if CurrentRoll == rollData.Lucky then
+            lucky = true
+        end
+    end
+
+    if snakeEye and not GetBuffActive(statusEffect.SNAKE_EYE) then
+        if TryUseAbility('Snake Eye', MyIndex) then
+            return true
+        end
+    end
+
+    if canDoubleUp and not lucky then
+        if TryUseAbility('Double-Up', MyIndex) then
+            return true
+        end
+    end
+
+    return false
+end
+
+function ChooseCorsairRoll(roll1, roll2, crookedCards1, crookedCards2)
+    if GetBuffActive(statusEffect.DOUBLE_UP_CHANCE) then return end
+
+    Roll.Name = roll1
+    Roll.CrookedCards = crookedCards1
+
+    -- Get roll data
+    local rollData = GetRollData(Roll.Name)
+
+    if not rollData then return end
+
+    local lucky = rollData.Lucky
+    local unlucky = rollData.Unlucky
+    local buffId = rollData.BuffId
+    Roll.Id = GetAbilityIdByName(Roll.Name)
+
+    -- Check which roll to use
+
+    if GetBuffActive(buffId) then
+        Roll.Name = roll2
+        Roll.CrookedCards = crookedCards2
+    end
+
+    -- Get roll data again incase roll changed
+    rollData = GetRollData(Roll.Name)
+
+    if not rollData then return end
+
+    lucky = rollData.Lucky
+    unlucky = rollData.Unlucky
+    buffId = rollData.BuffId
+    Roll.Id = GetAbilityIdByName(Roll.Name)
+
+    -- Both rolls are active, do nothing
+    if GetBuffActive(buffId) then
+        return
+    end
+end
+
+function DoCorsairRolls(MyIndex, roll, crookedCards)
+    -- Get roll data
+    local rollData = GetRollData(roll)
+
+    if not rollData then return end
+
+    lucky = rollData.Lucky
+    unlucky = rollData.Unlucky
+    buffId = rollData.BuffId
+
+    if GetBuffActive(statusEffect.DOUBLE_UP_CHANCE) then
+        if TryDoubleUp(MyIndex, rollData) then
+            return
+        end
+    end
+
+    -- print(string.format("Roll count %d", GetRollCount(MyIndex, rollData)))
+
+    if GetRollCount(MyIndex, rollData) < 2 then
+        if crookedCards and not GetBuffActive(statusEffect.CROOKED_CARDS) then
+            if TryUseAbility('Crooked Cards', MyIndex) then
+                return
+            end
+        end
+
+        if TryUseAbility(roll, MyIndex) then
+            return
+        end
+    end
+end
+
+function RegisterRollCheck()
+    ashita.events.register('packet_in', 'roll_packet_cb', function (e)
+        if (e.id == 0x28) then
+            local packet = ParseActionPacket(e);
+            if (packet.Type ~= 6) then
+                return;
+            end
+
+            if (packet.UserId ~= AshitaCore:GetMemoryManager():GetParty():GetMemberServerId(0)) then
+                return;
+            end
+
+            if ((packet.Id + 512) == Roll.Id) then
+                CurrentRoll = packet.Targets[1].Actions[1].Param;
+                DoubleUpDelay = os.time() + 3
+                -- print(string.format("Current roll: %d", CurrentRoll))
+            end
+        end
+    end)
+end
+
 --[[
 Creates a table of entity name then x, y, z positions. example:
 positionsById =
