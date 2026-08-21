@@ -9,6 +9,10 @@ mpTemps = T{ 'Lucid Ether I', 'Lucid Ether II', 'Lucid Ether III', 'Dusty Elixir
 dpsTemps = T{ 'Braver\'s Drink', 'Berserker\'s Tonic', 'Spy\'s Drink', 'Monarch\'s Drink', 'Stalwart\'s Tonic' }
 wingTemps = T{ 'Dusty Wing', 'Daedalus Wing', 'Lucid Wings I',  }
 
+function GetMyIndex()
+    return AshitaCore:GetMemoryManager():GetParty():GetMemberTargetIndex(0)
+end
+
 local function GetShortFlags(entityIndex)
     -- if shortFlags is 0x10, entity is a monster
     -- if shortflags is 0x01 entity is the player running that instance
