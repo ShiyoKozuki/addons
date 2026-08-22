@@ -13,6 +13,10 @@ function GetMyIndex()
     return AshitaCore:GetMemoryManager():GetParty():GetMemberTargetIndex(0)
 end
 
+function GetPet(masterIndex)
+    return AshitaCore:GetMemoryManager():GetPetIndex(masterIndex)
+end
+
 local function GetShortFlags(entityIndex)
     -- if shortFlags is 0x10, entity is a monster
     -- if shortflags is 0x01 entity is the player running that instance
@@ -216,6 +220,7 @@ function TryUseAbility(ability, target)
     if not AshitaCore:GetMemoryManager():GetPlayer():HasAbility(abilityResource.Id) then
         return false;
     end
+    
     if GetBuffActive(16) then -- Amnesia
         return false
     end
@@ -436,7 +441,7 @@ function TryKeepUpSSBlink(blinkToggle, ssToggle)
                     return;
                 end
                 if (TryCastSpell('Blink', MyIndex)) then
-                 return;
+                    return;
                 end
             end
         end
@@ -1899,6 +1904,11 @@ function HasDot()
 end
 
 function IsCharmed(targetIndex)
+
+    if (IsTrust(targetIndex)) then
+        return false
+    end
+
     local RenderFlag = AshitaCore:GetMemoryManager():GetEntity():GetRenderFlags3(targetIndex)
     if (bit.band(RenderFlag, 0x2000) ~= 0) then
         return true
@@ -2529,6 +2539,57 @@ function BuildCorsairRollList()
     return roll;
 end
 
+function BuildIndiSpellList()
+    local indi = T{};
+    local player = AshitaCore:GetMemoryManager():GetPlayer();
+    local resMgr = AshitaCore:GetResourceManager();
+
+    for i = 1, 1024 do
+        if player:HasSpell(i) then
+            local res = resMgr:GetSpellById(i);
+
+            if res and res.Name[1] then
+                local name = res.Name[1];
+
+                if string.find(name, 'Indi') then
+                    indi:append(name);
+                end
+            end
+        end
+    end
+
+    if #indi == 0 then
+        indi:append('None');
+    end
+
+    return indi;
+end
+
+function BuildGeoSpellList()
+    local geo = T{};
+    local resMgr = AshitaCore:GetResourceManager();
+
+    for i = 1, 1024 do
+        if AshitaCore:GetMemoryManager():GetPlayer():HasSpell(i) then
+            local res = resMgr:GetSpellById(i);
+
+            if res and res.Name[1] then
+                local name = res.Name[1];
+
+                if string.sub(name, 1, 4) == 'Geo-' then
+                    geo:append(name);
+                end
+            end
+        end
+    end
+
+    if #geo == 0 then
+        geo:append('None');
+    end
+
+    return geo;
+end
+
 function GetAbilityIdByName(Name)
     local abilityId = nil
     local playMgr = AshitaCore:GetMemoryManager():GetPlayer();
@@ -2750,6 +2811,104 @@ function RegisterRollCheck()
             end
         end
     end)
+end
+
+-- Geo functions
+function CastIndiSpell(myIndex, indiSpell)
+    if not indiSpell or GetBuffActive(statusEffect.COLURE_ACTIVE) then return end
+
+    if CheckJobLevels(indiSpell) then
+        if (CheckIfStand(33)) then
+            return;
+        end
+
+        if (TryCastSpell(indiSpell, myIndex)) then
+            return;
+        end
+    end
+end
+
+function CastEntrustSpell(myIndex, entrustIndex, entrustSpell)
+    if not entrustSpell then return end
+
+    if GetBuffActive(16) then -- Amnesia
+        return
+    end
+
+    local abilityResource = AshitaCore:GetResourceManager():GetAbilityByName('Entrust', 0);
+    if GetAbilityRecast(abilityResource.RecastTimerId) ~= 0 and not GetBuffActive(statusEffect.ENTRUST) then
+        return
+    end
+
+    if CheckJobLevels(entrustSpell) then
+        if (CheckIfStand(33)) then
+            return;
+        end
+
+        if TryUseAbility('Entrust', myIndex) then
+            return
+        end
+
+        if (TryCastSpell(entrustSpell, entrustIndex)) then
+            return;
+        end
+    end
+end
+
+function CastGeoSpell(myIndex, targetIndex, pet, bubbleData)
+    if IsPetAlive() then return end
+
+    local geoSpell = bubbleData.geo_active
+
+    if not geoSpell or not IsMonster(targetIndex) then return end
+
+    if CheckJobLevels(geoSpell) then
+        if (CheckIfStand(100)) then
+            return;
+        end
+
+        if bubbleData.blazeOfGlory then
+            if TryUseAbility('Blaze of Glory', myIndex) then
+                return
+            end
+        end
+
+        if (TryCastSpell(geoSpell, targetIndex)) then
+            return;
+        end
+    end
+end
+
+function HandleGeoPetAbilities(myIndex, petIndex, bubbleData)
+    if not IsPetAlive() then return end
+
+    local petHpp = AshitaCore:GetMemoryManager():GetEntity():GetHPPercent(petIndex) 
+
+    if petHpp <= 75 then
+        if bubbleData.lifeCycle then
+            if TryUseAbility('Life Cycle', myIndex) then
+                return
+            end
+        end
+    end
+
+    if bubbleData.lastingEmanation then
+        if TryUseAbility('Lasting Emanation', myIndex) then
+            return
+        end
+    end
+
+    if bubbleData.eclipticAttrition then
+        if TryUseAbility('Ecliptic Attrition', myIndex) then
+            return
+        end
+    end
+
+    if bubbleData.dematerialize then
+        if TryUseAbility('Dematerialize', myIndex) then
+            return
+        end
+    end
 end
 
 --[[
