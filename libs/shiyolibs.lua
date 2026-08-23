@@ -2981,24 +2981,23 @@ end
 
 local mules = T { "Kaeren", "Faeyris", } -- My mules
 
-local myName = AshitaCore:GetMemoryManager():GetParty():GetMemberName(0);
-
-if string.find(myName, 'town') then
-    mules = { "Mootowncow", "Meowtowncat", "Quacktownduck" } -- Moo's mules
-end
-
 local function AllTalk()
     local target = GetCurrentTargetIndex();
     local myName = AshitaCore:GetMemoryManager():GetParty():GetMemberName(0);
     local first = true;
+    local myName = AshitaCore:GetMemoryManager():GetParty():GetMemberName(0);
+
+    if string.find(myName, 'town') then
+        mules = { "Mootowncow", "Meowtowncat", "Quacktownduck" } -- Moo's mules
+    end
 
     for _,mule in ipairs(mules) do
         if (mule ~= myName) then
             if not first then
                 coroutine.sleep(3);
             end
-            first = true;
-            print(string.format(myName .. " sending alltalk command to " .. mule))
+            first = false;
+            -- print(string.format(myName .. " sending alltalk command to " .. mule))
             AshitaCore:GetChatManager():QueueCommand(-1, string.format("/mst %s /global talk %u", mule, target));
         end
     end
