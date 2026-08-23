@@ -2981,6 +2981,8 @@ end
 
 local mules = T { "Kaeren", "Faeyris", } -- My mules
 
+local myName = AshitaCore:GetMemoryManager():GetParty():GetMemberName(0);
+
 if string.find(myName, 'town') then
     mules = { "Mootowncow", "Meowtowncat", "Quacktownduck" } -- Moo's mules
 end
