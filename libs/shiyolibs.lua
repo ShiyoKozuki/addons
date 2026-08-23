@@ -2985,7 +2985,6 @@ local function AllTalk()
     local target = GetCurrentTargetIndex();
     local myName = AshitaCore:GetMemoryManager():GetParty():GetMemberName(0);
     local first = true;
-    local myName = AshitaCore:GetMemoryManager():GetParty():GetMemberName(0);
 
     if string.find(myName, 'town') then
         mules = { "Mootowncow", "Meowtowncat", "Quacktownduck" } -- Moo's mules
