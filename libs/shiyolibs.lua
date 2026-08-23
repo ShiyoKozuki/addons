@@ -2990,12 +2990,12 @@ end
 local function AllTalk()
     local target = GetCurrentTargetIndex();
     local myName = AshitaCore:GetMemoryManager():GetParty():GetMemberName(0);
+    local first = true;
 
-        local first = true;
     for _,mule in ipairs(mules) do
         if (mule ~= myName) then
             if not first then
-                coroutine.sleep(2);
+                coroutine.sleep(3);
             end
             first = true;
             AshitaCore:GetChatManager():QueueCommand(-1, string.format("/mst %s /global talk %u", mule, target));
