@@ -2979,10 +2979,15 @@ local function GetCurrentTargetIndex()
     return targetMgr:GetTargetIndex(targetMgr:GetIsSubTargetActive());
 end
 
-local mules = T { "Kaeren", "Faeyris", "Mootowncow", "Meowtowncat", "Quacktownduck" }
+local mules = T { "Kaeren", "Faeyris", } -- My mules
 local function AllTalk()
     local target = GetCurrentTargetIndex();
     local myName = AshitaCore:GetMemoryManager():GetParty():GetMemberName(0);
+
+    if string.find(myName, 'town') then
+        mules = { "Mootowncow", "Meowtowncat", "Quacktownduck" } -- Moo's mules
+    end
+    
     local first = true;
     for _,mule in ipairs(mules) do
         if (mule ~= myName) then
