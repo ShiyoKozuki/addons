@@ -3003,6 +3003,14 @@ local function AllTalk()
     end
 end
 
+local function MountCommand()
+    if GetBuffActive(statusEffect.MOUNTED) then
+        AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /dismount");
+    else
+        AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /mount coeurl");
+    end
+end
+
 -- Global in game slash (/) commands
 function RegisterGlobalCommands()
     ashita.events.register('command', 'command_cb', function (e)
@@ -3015,7 +3023,11 @@ function RegisterGlobalCommands()
         if args[2] == 'alltalk' then
             AllTalk()
         end
-        
+
+        if args[2] == 'mount' then
+            MountCommand()
+        end
+  
         if (#args < 3) then
             return;
         end
