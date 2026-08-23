@@ -2979,7 +2979,7 @@ local function GetCurrentTargetIndex()
     return targetMgr:GetTargetIndex(targetMgr:GetIsSubTargetActive());
 end
 
-local mules = T { "Kaeren", "Faeyris", } -- My mules
+local mules = T { "Kaeren", "Faeyris", "Raenko" } -- My mules
 
 local function AllTalk()
     local target = GetCurrentTargetIndex();
@@ -2993,7 +2993,7 @@ local function AllTalk()
     for _,mule in ipairs(mules) do
         if (mule ~= myName) then
             if not first then
-                coroutine.sleep(3);
+                coroutine.sleep(1);
             end
             first = false;
             -- print(string.format(myName .. " sending alltalk command to " .. mule))
@@ -3021,27 +3021,40 @@ local function FollowMeCommand()
     end
 end
 
+volumeMuted = false
+local function VolumeMuteMeCommand()
+    if followMe then
+        AshitaCore:GetChatManager():QueueCommand(-1, "/vol unmute");
+        volumeMuted = false
+    else
+        AshitaCore:GetChatManager():QueueCommand(-1, "/vol mute");
+        volumeMuted = true
+    end
+end
+
 -- Global in game slash (/) commands
 function RegisterGlobalCommands()
     ashita.events.register('command', 'command_cb', function (e)
+        local commands =
+        {
+            ['alltalk']   = AllTalk,
+            ['mount']     = MountCommand,
+            ['followme']  = FollowMeCommand,
+            ['volume']    = VolumeMuteMeCommand,
+        }
+
         local args = e.command:args();
         if (#args == 0 or args[1] ~= '/global') then
             return;
         end
         e.blocked = true;
 
-        if args[2] == 'alltalk' then
-            AllTalk()
+        local command = commands[args[2]]
+
+        if command then
+            command()
         end
 
-        if args[2] == 'mount' then
-            MountCommand()
-        end
-
-        if args[2] == 'followme' then
-            FollowMeCommand()
-        end
-        
         if (#args < 3) then
             return;
         end
