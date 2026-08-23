@@ -2998,7 +2998,7 @@ local function AllTalk()
                 coroutine.sleep(3);
             end
             first = true;
-            print(string.format(myName .. " sending alltalk command"))
+            print(string.format(myName .. " sending alltalk command to " .. mule))
             AshitaCore:GetChatManager():QueueCommand(-1, string.format("/mst %s /global talk %u", mule, target));
         end
     end
