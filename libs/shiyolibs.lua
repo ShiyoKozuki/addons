@@ -701,7 +701,7 @@ value = value + nameValue;
     return value;
 end
 
-function ValidateEntity(index)
+function ValidateEntity(index, checkEngaged)
     local ent = AshitaCore:GetMemoryManager():GetEntity();
     if ent:GetRawEntity(index) == nil then
         return false;
@@ -712,9 +712,11 @@ function ValidateEntity(index)
         return false;
     end
     
-    --Do you want things that aren't engaged..?
-    if ent:GetStatus(index) ~= 1 then
-        return false;
+    -- Make sure target is engaged
+    if checkEngaged then
+        if ent:GetStatus(index) ~= 1 then
+            return false;
+        end
     end
 
     --Cheaper to use the squared value already in memory(20 yalms squared = 400.  adjust if needed.)
@@ -2970,6 +2972,56 @@ end
 
 function GetEntitySpawnPositions()
     return positionsById
+end
+
+local function GetCurrentTargetIndex()
+    local targetMgr = AshitaCore:GetMemoryManager():GetTarget();
+    return targetMgr:GetTargetIndex(targetMgr:GetIsSubTargetActive());
+end
+
+local mules = T { "Kaeren", "Faeyris", "Mootowncow", "Meowtowncat", "Quacktownduck" }
+local function AllTalk()
+    local target = GetCurrentTargetIndex();
+    local myName = AshitaCore:GetMemoryManager():GetParty():GetMemberName(0);
+    local first = true;
+    for _,mule in ipairs(mules) do
+        if (mule ~= myName) then
+            if not first then
+                coroutine.sleep(2);
+            end
+            first = true;
+            AshitaCore:GetChatManager():QueueCommand(-1, string.format("/mst %s /global talk %u", mule, target));
+        end
+    end
+end
+
+-- Global in game slash (/) commands
+function RegisterGlobalCommands()
+    ashita.events.register('command', 'command_cb', function (e)
+        local args = e.command:args();
+        if (#args == 0 or args[1] ~= '/global') then
+            return;
+        end
+        e.blocked = true;
+
+        if args[2] == 'alltalk' then
+            AllTalk()
+        end
+        
+        if (#args < 3) then
+            return;
+        end
+
+        if args[2] == 'talk' then
+            local NpcIndex = tonumber(args[3])
+
+            if ValidateEntity(NpcIndex, false) and GetDistanceToIndex(NpcIndex) <= 6 then
+                local id = AshitaCore:GetMemoryManager():GetEntity():GetServerId(NpcIndex);
+                local talkPacket = struct.pack('LLHHHHLLL', 0, id, NpcIndex, 0, 0, 0, 0, 0, 0);
+                AshitaCore:GetPacketManager():AddOutgoingPacket(0x1A, talkPacket:totable());
+            end
+        end
+    end);
 end
 
 -- Draw Status icons. Unused, untested
