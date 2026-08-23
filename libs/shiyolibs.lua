@@ -3011,6 +3011,17 @@ local function MountCommand()
     end
 end
 
+followMe = false
+local function FollowMeCommand()
+    if followMe then
+        AshitaCore:GetChatManager():QueueCommand(-1, "/ms followme off");
+        followMe = false
+    else
+        AshitaCore:GetChatManager():QueueCommand(-1, "/ms followme on");
+        followMe = true
+    end
+end
+
 -- Global in game slash (/) commands
 function RegisterGlobalCommands()
     ashita.events.register('command', 'command_cb', function (e)
@@ -3027,7 +3038,11 @@ function RegisterGlobalCommands()
         if args[2] == 'mount' then
             MountCommand()
         end
-  
+
+        if args[2] == 'followme' then
+            FollowMeCommand()
+        end
+        
         if (#args < 3) then
             return;
         end
