@@ -49,23 +49,12 @@ ashita.events.register('d3d_present', 'present_cb', function ()
     end
 
     if not GetBuffActive(statusEffect.RERAISE) then
-         -- Check for main job
-        if (mJob == job.WHM or mJob == job.SCH) then
-            if (mJobLevel >= 35) then
-                if (os.time() > mChatTimer) then
-                    AshitaCore:GetChatManager():QueueCommand(0, ('/p I don\'t have reraise active!'))
-                    mChatTimer = os.time() + 30;
-                end
-            end
-        end
-
-        -- Check for sub job
-        if (sJob == job.WHM or sJob == job.SCH) then
-            if (sJobLevel >= 35) then
-                if (os.time() > mChatTimer) then
-                    AshitaCore:GetChatManager():QueueCommand(0, ('/p I don\'t have reraise active!'))
-                    mChatTimer = os.time() + 30;
-                end
+        local hasReraise = CheckJobLevels('Reraise') or CheckJobLevels('Reraise II') or CheckJobLevels('Reraise III')
+        
+        if hasReraise then
+            if (os.time() > mChatTimer) then
+                AshitaCore:GetChatManager():QueueCommand(0, ('/p I don\'t have reraise active!'))
+                mChatTimer = os.time() + 30;
             end
         end
     end
