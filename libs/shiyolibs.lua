@@ -149,19 +149,49 @@ function GetMemberBuffs(memberIndex)
     return memberBuffs;
 end
 
+function HasSpellByName(spell)
+    local player = AshitaCore:GetMemoryManager():GetPlayer();
+    local resMgr = AshitaCore:GetResourceManager();
+    local hasSpell = false
+
+    for i = 1, 1024 do
+        if player:HasSpell(i) then
+            local res = resMgr:GetSpellById(i);
+
+            if res and res.Name[1] then
+                if spell == res.Name[1] then
+                    hasSpell = true
+                    break
+                end
+            end
+        end
+    end
+
+    return hasSpell
+end
+
 function CheckJobLevels(spell)
     local mJob = AshitaCore:GetMemoryManager():GetPlayer():GetMainJob();
     local sJob = AshitaCore:GetMemoryManager():GetPlayer():GetSubJob();
     local mJobLevel = AshitaCore:GetMemoryManager():GetPlayer():GetMainJobLevel();
     local sJobLevel = AshitaCore:GetMemoryManager():GetPlayer():GetSubJobLevel();
     local resource = AshitaCore:GetResourceManager():GetSpellByName(spell, 0);
-    if (resource.LevelRequired[mJob + 1] > 0) and (resource.LevelRequired[mJob + 1] <= mJobLevel) then
-        return true;
-    elseif (resource.LevelRequired[sJob + 1] > 0) and (resource.LevelRequired[sJob + 1] <= sJobLevel) then
-        return true;
-    else
-        return false;
+
+    if not resource then
+        return false
     end
+
+    if (resource.LevelRequired[mJob + 1] > 0) and (resource.LevelRequired[mJob + 1] <= mJobLevel) then
+        if HasSpellByName(spell) then
+            return true;
+        end
+    elseif (resource.LevelRequired[sJob + 1] > 0) and (resource.LevelRequired[sJob + 1] <= sJobLevel) then
+        if HasSpellByName(spell) then
+            return true;
+        end
+    end
+
+    return false
 end
 
 function TryCastSpell(spell, target)
