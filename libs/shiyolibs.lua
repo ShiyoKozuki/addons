@@ -2916,7 +2916,7 @@ function HandleGeoPetAbilities(myIndex, petIndex, bubbleData)
 
     local petHpp = AshitaCore:GetMemoryManager():GetEntity():GetHPPercent(petIndex)
 
-    if GetDistanceToIndex(petIndex) >= 15 then
+    if GetDistanceToIndex(petIndex) > 10 then
         if TryUseAbility('Full Circle', myIndex) then
             return
         end
