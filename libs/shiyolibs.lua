@@ -2914,7 +2914,13 @@ end
 function HandleGeoPetAbilities(myIndex, petIndex, bubbleData)
     if not IsPetAlive() then return end
 
-    local petHpp = AshitaCore:GetMemoryManager():GetEntity():GetHPPercent(petIndex) 
+    local petHpp = AshitaCore:GetMemoryManager():GetEntity():GetHPPercent(petIndex)
+
+    if GetDistanceToIndex(petIndex) >= 15 then
+        if TryUseAbility('Full Circle', myIndex) then
+            return
+        end
+    end
 
     if petHpp <= 75 then
         if bubbleData.lifeCycle then
@@ -3009,7 +3015,7 @@ local function GetCurrentTargetIndex()
     return targetMgr:GetTargetIndex(targetMgr:GetIsSubTargetActive());
 end
 
-local mules = T { "Kaeren", "Faeyris", "Raenko" } -- My mules
+local mules = T { "Kaeren", "Faeyris", } -- My mules (Missing "Raenko")
 
 local function AllTalk()
     local target = GetCurrentTargetIndex();
