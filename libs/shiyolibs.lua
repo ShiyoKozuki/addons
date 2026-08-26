@@ -731,14 +731,21 @@ value = value + nameValue;
     return value;
 end
 
+function IsEntityRendered(index)
+    local ent = AshitaCore:GetMemoryManager():GetEntity();
+    local renderflags = ent:GetRenderFlags0(index)
+
+    return bit.band(renderflags, 0x200) == 0x200
+        and bit.band(renderflags, 0x4000) == 0
+end
+
 function ValidateEntity(index, checkEngaged)
     local ent = AshitaCore:GetMemoryManager():GetEntity();
     if ent:GetRawEntity(index) == nil then
         return false;
     end
     
-    local renderflags = ent:GetRenderFlags0(index);
-    if bit.band(renderflags, 0x200) ~= 0x200 or bit.band(renderflags, 0x4000) ~= 0 then
+    if not IsEntityRendered(index) then
         return false;
     end
     
@@ -2623,11 +2630,12 @@ end
 function BuildPartyMemberList(excludeTrusts)
     local partyMemberName = T{};
     local party = AshitaCore:GetMemoryManager():GetParty();
+    local myName = AshitaCore:GetMemoryManager():GetParty():GetMemberName(0);
 
     for i = 0, 5 do
         if party:GetMemberIsActive(i) == 1 then
             local name = party:GetMemberName(i);
-            if name then
+            if name and name ~= myName then
                 if excludeTrusts then
                     if not IsTrust(GetPlayerIndex(name)) then
                         partyMemberName:append(name);
@@ -2637,6 +2645,10 @@ function BuildPartyMemberList(excludeTrusts)
                 end
             end
         end
+    end
+
+    if #partyMemberName == 0 then
+        partyMemberName:append('None');
     end
 
     return partyMemberName;
