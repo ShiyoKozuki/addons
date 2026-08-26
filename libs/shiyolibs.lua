@@ -1736,6 +1736,111 @@ function IsCCed()
     return GetAnyBuffActive(ccEffects)
 end
 
+pos = {}
+pos.x = 0
+pos.y = 0
+
+stuckCheckTimer = os.time()
+
+function IsStuck(myIndex)
+    if os.time() < stuckCheckTimer then
+        return false
+    end
+
+    local myPosX = AshitaCore:GetMemoryManager():GetEntity():GetLocalPositionX(myIndex)
+    local myPosY = AshitaCore:GetMemoryManager():GetEntity():GetLocalPositionY(myIndex)
+
+    local dx = math.abs(myPosX - pos.x)
+    local dy = math.abs(myPosY - pos.y)
+
+    local stuck = (dx < 0.1 and dy < 0.1)
+
+    pos.x = myPosX
+    pos.y = myPosY
+
+    stuckCheckTimer = os.time() + 1
+
+    return stuck
+end
+
+stuckRepositionUntil = 0
+stuckDirection = 1
+
+function TryReposition(myIndex, targetIndex)
+    local now = os.time()
+    
+    -- Already repositioning
+    if now < stuckRepositionUntil then
+        return true
+    end
+
+    if not IsStuck(myIndex) then
+        return false
+    end
+
+    -- Alternate left/right each time we get stuck
+    stuckDirection = stuckDirection * -1
+
+    local entity = AshitaCore:GetMemoryManager():GetEntity()
+
+    local myX = entity:GetLocalPositionX(myIndex)
+    local myY = entity:GetLocalPositionY(myIndex)
+
+    local targetX = entity:GetLocalPositionX(targetIndex)
+    local targetY = entity:GetLocalPositionY(targetIndex)
+
+    local dx = targetX - myX
+    local dy = targetY - myY
+
+    -- Normalize direction toward target
+    local length = math.sqrt((dx * dx) + (dy * dy))
+
+    if length == 0 then
+        return false
+    end
+
+    dx = dx / length
+    dy = dy / length
+
+    -- Rotate 90 degrees to move sideways
+    local sideX = -dy * stuckDirection
+    local sideY = dx * stuckDirection
+
+    -- Move sideways ~3 yalms
+    local repositionX = myX + (sideX * 3)
+    local repositionY = myY + (sideY * 3)
+
+    RunToPoint(repositionX, repositionY, 0.2)
+
+    stuckRepositionUntil = now + 3
+
+    print('Stuck! Repositioning.')
+
+    return true
+end
+
+function FaceEntity(entityIndex)
+    local entMgr = AshitaCore:GetMemoryManager():GetEntity()
+    local MyIndex = AshitaCore:GetMemoryManager():GetParty():GetMemberTargetIndex(0)
+
+    local entityPosX = entMgr:GetLocalPositionX(entityIndex)
+    local entityPosY = entMgr:GetLocalPositionY(entityIndex)
+
+    local myPosX = entMgr:GetLocalPositionX(MyIndex)
+    local myPosY = entMgr:GetLocalPositionY(MyIndex)
+
+    local xDiff = entityPosX - myPosX
+    local yDiff = entityPosY - myPosY
+
+    local direction = math.atan2(yDiff, xDiff)
+
+    local actPtr = entMgr:GetActorPointer(MyIndex)
+
+    if actPtr ~= 0 then
+        ashita.memory.write_float(actPtr + 72, direction)
+    end
+end
+
 function RunTowardEntity(index)
     local MyIndex = AshitaCore:GetMemoryManager():GetParty():GetMemberTargetIndex(0);
     local entityPosX = AshitaCore:GetMemoryManager():GetEntity():GetLocalPositionX(index);
@@ -1747,6 +1852,8 @@ function RunTowardEntity(index)
     if (CheckIfStand(50)) then
         return true
     end
+
+    FaceEntity(index)
     AshitaCore:GetMemoryManager():GetAutoFollow():SetFollowDeltaX(xDiff);
     AshitaCore:GetMemoryManager():GetAutoFollow():SetFollowDeltaY(yDiff);
     AshitaCore:GetMemoryManager():GetAutoFollow():SetIsAutoRunning(1);
@@ -2640,313 +2747,6 @@ function GetAbilityIdByName(Name)
 
 
     return abilityId;
-end
-
--- Corsair Roll functions
-
-function GetRollData(rollName)
-    local rolls = {
-        ['Fighter\'s Roll'] = { Lucky=5, Unlucky=9, BuffId=310 },
-        ['Monk\'s Roll'] = { Lucky=3, Unlucky=7, BuffId=311 },
-        ['Healer\'s Roll'] = { Lucky=3, Unlucky=7, BuffId=312 },
-        ['Wizard\'s Roll'] = { Lucky=5, Unlucky=9, BuffId=313 },
-        ['Warlock\'s Roll'] = { Lucky=4, Unlucky=8, BuffId=314 },
-        ['Rogue\'s Roll'] = { Lucky=5, Unlucky=9, BuffId=315 },
-        ['Gallant\'s Roll'] = { Lucky=3, Unlucky=7, BuffId=316 },
-        ['Chaos Roll'] = { Lucky=4, Unlucky=8, BuffId=317 },
-        ['Beast Roll'] = { Lucky=4, Unlucky=8, BuffId=318 },
-        ['Choral Roll'] = { Lucky=2, Unlucky=6, BuffId=319 },
-        ['Hunter\'s Roll'] = { Lucky=4, Unlucky=8, BuffId=320 },
-        ['Samurai Roll'] = { Lucky=2, Unlucky=6, BuffId=321 },
-        ['Ninja Roll'] = { Lucky=4, Unlucky=8, BuffId=322 },
-        ['Drachen Roll'] = { Lucky=4, Unlucky=8, BuffId=323 },
-        ['Evoker\'s Roll'] = { Lucky=5, Unlucky=9, BuffId=324 },
-        ['Magus\'s Roll'] = { Lucky=2, Unlucky=6, BuffId=325 },
-        ['Corsair\'s Roll'] = { Lucky=5, Unlucky=9, BuffId=326 },
-        ['Puppet Roll'] = { Lucky=3, Unlucky=7, BuffId=327 },
-        ['Dancer\'s Roll'] = { Lucky=3, Unlucky=7, BuffId=328 },
-        ['Scholar\'s Roll'] = { Lucky=2, Unlucky=6, BuffId=329 },
-        ['Bolter\'s Roll'] = { Lucky=3, Unlucky=9, BuffId=330 },
-        ['Caster\'s Roll'] = { Lucky=2, Unlucky=7, BuffId=331 },
-        ['Courser\'s Roll'] = { Lucky=3, Unlucky=9, BuffId=332 },
-        ['Blitzer\'s Roll'] = { Lucky=4, Unlucky=9, BuffId=333 },
-        ['Tactician\'s Roll'] = { Lucky=5, Unlucky=8, BuffId=334 },
-        ['Allies\' Roll'] = { Lucky=3, Unlucky=10, BuffId=335 },
-        ['Miser\'s Roll'] = { Lucky=5, Unlucky=7, BuffId=336 },
-        ['Companion\'s Roll'] = { Lucky=2, Unlucky=10, BuffId=337 },
-        ['Avenger\'s Roll'] = { Lucky=4, Unlucky=8, BuffId=338 },
-        ['Naturalist\'s Roll'] = { Lucky=3, Unlucky=7, BuffId=339 },
-    }
-
-    return rolls[rollName]
-end
-
-function GetRollCount(MyIndex, rollData)
-    local rollCount = 0
-
-    -- Track how many of our own rolls are active on us
-    local buffs = AshitaCore:GetMemoryManager():GetPlayer():GetBuffs()
-
-    for _, buff in pairs(buffs) do
-        if (buff >= statusEffect.FIGHTERS_ROLL and buff <= statusEffect.NATURALISTS_ROLL)
-            or buff == statusEffect.RUNEISTS_ROLL or buff == statusEffect.BUST
-        then
-
-            rollCount = rollCount +1
-
-            -- TODO: Has to be found in packet
-            -- Make sure roll was casted by us
-            -- if (effect:getSubType() == mob:getID()) then
-            -- end
-        end
-    end
-
-    -- Fold if busted
-    if GetBuffActive(statusEffect.BUST) then
-        if TryUseAbility('Fold', MyIndex) then
-            return rollCount
-        end
-    end
-
-    return rollCount
-end
-
-function TryDoubleUp(MyIndex, rollData)
-    local canDoubleUp = false
-    local snakeEye = false
-    local lucky = false
-    
-    if os.time() <= DoubleUpDelay then return end
-
-    if not GetBuffActive(statusEffect.DOUBLE_UP_CHANCE) then
-        return false
-    end
-
-    if (CurrentRoll < 6) then
-        canDoubleUp = true
-    end
-
-    if (CurrentRoll == 10) then
-        snakeEye = true
-        if GetBuffActive(statusEffect.SNAKE_EYE) then
-            canDoubleUp = true
-        end
-    end
-
-    if canDoubleUp then
-        if CurrentRoll == rollData.Lucky then
-            lucky = true
-        end
-    end
-
-    if snakeEye and not GetBuffActive(statusEffect.SNAKE_EYE) then
-        if TryUseAbility('Snake Eye', MyIndex) then
-            return true
-        end
-    end
-
-    if canDoubleUp and not lucky then
-        if TryUseAbility('Double-Up', MyIndex) then
-            return true
-        end
-    end
-
-    return false
-end
-
-function ChooseCorsairRoll(roll1, roll2, crookedCards1, crookedCards2)
-    if GetBuffActive(statusEffect.DOUBLE_UP_CHANCE) then return end
-
-    Roll.Name = roll1
-    Roll.CrookedCards = crookedCards1
-
-    -- Get roll data
-    local rollData = GetRollData(Roll.Name)
-
-    if not rollData then return end
-
-    local lucky = rollData.Lucky
-    local unlucky = rollData.Unlucky
-    local buffId = rollData.BuffId
-    Roll.Id = GetAbilityIdByName(Roll.Name)
-
-    -- Check which roll to use
-
-    if GetBuffActive(buffId) then
-        Roll.Name = roll2
-        Roll.CrookedCards = crookedCards2
-    end
-
-    -- Get roll data again incase roll changed
-    rollData = GetRollData(Roll.Name)
-
-    if not rollData then return end
-
-    lucky = rollData.Lucky
-    unlucky = rollData.Unlucky
-    buffId = rollData.BuffId
-    Roll.Id = GetAbilityIdByName(Roll.Name)
-
-    -- Both rolls are active, do nothing
-    if GetBuffActive(buffId) then
-        return
-    end
-end
-
-function DoCorsairRolls(MyIndex, roll, crookedCards)
-    -- Get roll data
-    local rollData = GetRollData(roll)
-
-    if not rollData then return end
-
-    lucky = rollData.Lucky
-    unlucky = rollData.Unlucky
-    buffId = rollData.BuffId
-
-    if GetBuffActive(statusEffect.DOUBLE_UP_CHANCE) then
-        if TryDoubleUp(MyIndex, rollData) then
-            return
-        end
-    end
-
-    -- print(string.format("Roll count %d", GetRollCount(MyIndex, rollData)))
-
-    if GetRollCount(MyIndex, rollData) < 2 then
-        if crookedCards and not GetBuffActive(statusEffect.CROOKED_CARDS) then
-            if TryUseAbility('Crooked Cards', MyIndex) then
-                return
-            end
-        end
-
-        if TryUseAbility(roll, MyIndex) then
-            return
-        end
-    end
-end
-
-function RegisterRollCheck()
-    ashita.events.register('packet_in', 'roll_packet_cb', function (e)
-        if (e.id == 0x28) then
-            local packet = ParseActionPacket(e);
-            if (packet.Type ~= 6) then
-                return;
-            end
-
-            if (packet.UserId ~= AshitaCore:GetMemoryManager():GetParty():GetMemberServerId(0)) then
-                return;
-            end
-
-            if ((packet.Id + 512) == Roll.Id) then
-                CurrentRoll = packet.Targets[1].Actions[1].Param;
-                DoubleUpDelay = os.time() + 3
-                -- print(string.format("Current roll: %d", CurrentRoll))
-            end
-        end
-    end)
-end
-
--- Geo functions
-function CastIndiSpell(myIndex, indiSpell)
-    if not indiSpell or GetBuffActive(statusEffect.COLURE_ACTIVE) then return end
-
-    if CheckJobLevels(indiSpell) then
-        if (CheckIfStand(33)) then
-            return;
-        end
-
-        if (TryCastSpell(indiSpell, myIndex)) then
-            return;
-        end
-    end
-end
-
-function CastEntrustSpell(myIndex, entrustIndex, entrustSpell)
-    if not entrustSpell then return end
-
-    if GetBuffActive(16) then -- Amnesia
-        return
-    end
-
-    local abilityResource = AshitaCore:GetResourceManager():GetAbilityByName('Entrust', 0);
-    if GetAbilityRecast(abilityResource.RecastTimerId) ~= 0 and not GetBuffActive(statusEffect.ENTRUST) then
-        return
-    end
-
-    if CheckJobLevels(entrustSpell) then
-        if (CheckIfStand(33)) then
-            return;
-        end
-
-        if TryUseAbility('Entrust', myIndex) then
-            return
-        end
-
-        if (TryCastSpell(entrustSpell, entrustIndex)) then
-            return;
-        end
-    end
-end
-
-function CastGeoSpell(myIndex, targetIndex, pet, bubbleData)
-    if IsPetAlive() then return end
-
-    local geoSpell = bubbleData.geo_active
-
-    if not geoSpell or not IsMonster(targetIndex) then return end
-
-    if CheckJobLevels(geoSpell) then
-        if (CheckIfStand(100)) then
-            return;
-        end
-
-        if bubbleData.blazeOfGlory then
-            if TryUseAbility('Blaze of Glory', myIndex) then
-                return
-            end
-        end
-
-        if (TryCastSpell(geoSpell, targetIndex)) then
-            return;
-        end
-    end
-end
-
-function HandleGeoPetAbilities(myIndex, petIndex, bubbleData)
-    if not IsPetAlive() then return end
-
-    local petHpp = AshitaCore:GetMemoryManager():GetEntity():GetHPPercent(petIndex)
-
-    if GetDistanceToIndex(petIndex) > 10 then
-        if TryUseAbility('Full Circle', myIndex) then
-            return
-        end
-    end
-
-    if petHpp <= 75 then
-        if bubbleData.lifeCycle then
-            if TryUseAbility('Life Cycle', myIndex) then
-                return
-            end
-        end
-    end
-
-    if bubbleData.lastingEmanation then
-        if TryUseAbility('Lasting Emanation', myIndex) then
-            return
-        end
-    end
-
-    if bubbleData.eclipticAttrition then
-        if TryUseAbility('Ecliptic Attrition', myIndex) then
-            return
-        end
-    end
-
-    if bubbleData.dematerialize then
-        if TryUseAbility('Dematerialize', myIndex) then
-            return
-        end
-    end
 end
 
 --[[
