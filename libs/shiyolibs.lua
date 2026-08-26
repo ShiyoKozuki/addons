@@ -1767,8 +1767,14 @@ stuckRepositionUntil = 0
 stuckDirection = 1
 
 function TryReposition(myIndex, targetIndex)
+    local engaged = (AshitaCore:GetMemoryManager():GetEntity():GetStatus(myIndex) == 1);
     local now = os.time()
-    
+
+    -- In combat, reset timer
+    if engaged then
+        stuckRepositionUntil = 0
+        return false
+    end
     -- Already repositioning
     if now < stuckRepositionUntil then
         return true
@@ -1806,9 +1812,9 @@ function TryReposition(myIndex, targetIndex)
     local sideX = -dy * stuckDirection
     local sideY = dx * stuckDirection
 
-    -- Move sideways ~3 yalms
-    local repositionX = myX + (sideX * 3)
-    local repositionY = myY + (sideY * 3)
+    -- Move sideways ~2 yalms
+    local repositionX = myX + (sideX * 2)
+    local repositionY = myY + (sideY * 2)
 
     RunToPoint(repositionX, repositionY, 0.2)
 
