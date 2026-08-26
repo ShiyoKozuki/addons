@@ -1775,10 +1775,11 @@ stuckDirection = 1
 
 function TryReposition(myIndex, targetIndex)
     local engaged = (AshitaCore:GetMemoryManager():GetEntity():GetStatus(myIndex) == 1);
+    local isMounted = GetBuffActive(statusEffect.MOUNTED)
     local now = os.time()
 
     -- In combat, reset timer
-    if engaged then
+    if engaged or isMounted then
         stuckRepositionUntil = 0
         return false
     end
