@@ -1832,7 +1832,7 @@ function FaceEntity(entityIndex)
     local xDiff = entityPosX - myPosX
     local yDiff = entityPosY - myPosY
 
-    local direction = math.atan2(yDiff, xDiff)
+    local direction = math.atan2(xDiff, yDiff) - (math.pi / 2)
 
     local actPtr = entMgr:GetActorPointer(MyIndex)
 
