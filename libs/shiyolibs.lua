@@ -1870,6 +1870,8 @@ function RunAwayFromEntity(index)
     if (CheckIfStand(50)) then
         return true
     end
+
+    FaceEntity(index)
     AshitaCore:GetMemoryManager():GetAutoFollow():SetFollowDeltaX(xDiff);
     AshitaCore:GetMemoryManager():GetAutoFollow():SetFollowDeltaY(yDiff);
     AshitaCore:GetMemoryManager():GetAutoFollow():SetIsAutoRunning(1);
