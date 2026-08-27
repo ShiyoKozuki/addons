@@ -245,6 +245,30 @@ function GetStratagemCount()
     return 0;
 end
 
+function CanUseAbility(ability)
+    local mJob = AshitaCore:GetMemoryManager():GetPlayer():GetMainJob();
+    local sJob = AshitaCore:GetMemoryManager():GetPlayer():GetSubJob();
+    local mJobLevel = AshitaCore:GetMemoryManager():GetPlayer():GetMainJobLevel();
+    local sJobLevel = AshitaCore:GetMemoryManager():GetPlayer():GetSubJobLevel();
+    local resource = AshitaCore:GetResourceManager():GetSpellByName(spell, 0);
+
+    if not resource then
+        return false
+    end
+
+    if (resource.LevelRequired[mJob + 1] > 0) and (resource.LevelRequired[mJob + 1] <= mJobLevel) then
+        if HasSpellByName(spell) then
+            return true;
+        end
+    elseif (resource.LevelRequired[sJob + 1] > 0) and (resource.LevelRequired[sJob + 1] <= sJobLevel) then
+        if HasSpellByName(spell) then
+            return true;
+        end
+    end
+
+    return false
+end
+
 function TryUseAbility(ability, target)
     local abilityResource = AshitaCore:GetResourceManager():GetAbilityByName(ability, 0);
     if not AshitaCore:GetMemoryManager():GetPlayer():HasAbility(abilityResource.Id) then
@@ -1778,8 +1802,12 @@ function TryReposition(myIndex, targetIndex, distance)
     local isMounted = GetBuffActive(statusEffect.MOUNTED)
     local now = os.time()
 
-    -- In combat, mounted or not moving, reset timer
-    if engaged or isMounted or not mIsRunning or distance < 8 then
+    if engaged then
+        stuckRepositionUntil = os.time() + 3
+    end
+
+    -- In combat or not moving, reset timer
+    if engaged or not mIsRunning or distance < 8 then
         stuckRepositionUntil = 0
         return false
     end
@@ -1793,7 +1821,7 @@ function TryReposition(myIndex, targetIndex, distance)
         return false
     end
 
-    -- Alternate left/right each time we get stuck
+    -- Alternate left/right when stuck
     stuckDirection = stuckDirection * -1
 
     local entity = AshitaCore:GetMemoryManager():GetEntity()
