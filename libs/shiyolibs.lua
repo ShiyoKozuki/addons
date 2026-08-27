@@ -1773,16 +1773,17 @@ end
 stuckRepositionUntil = 0
 stuckDirection = 1
 
-function TryReposition(myIndex, targetIndex)
+function TryReposition(myIndex, targetIndex, distance)
     local engaged = (AshitaCore:GetMemoryManager():GetEntity():GetStatus(myIndex) == 1);
     local isMounted = GetBuffActive(statusEffect.MOUNTED)
     local now = os.time()
 
-    -- In combat, reset timer
-    if engaged or isMounted then
+    -- In combat, mounted or not moving, reset timer
+    if engaged or isMounted or not mIsRunning or distance < 8 then
         stuckRepositionUntil = 0
         return false
     end
+
     -- Already repositioning
     if now < stuckRepositionUntil then
         return true
@@ -1827,8 +1828,7 @@ function TryReposition(myIndex, targetIndex)
     RunToPoint(repositionX, repositionY, 0.2)
 
     stuckRepositionUntil = now + 3
-
-    print('Stuck! Repositioning.')
+    print('Stuck! Repositioning')
 
     return true
 end
