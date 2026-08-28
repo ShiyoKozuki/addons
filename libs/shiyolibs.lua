@@ -1789,7 +1789,7 @@ function IsStuck(myIndex)
     pos.x = myPosX
     pos.y = myPosY
 
-    stuckCheckTimer = os.time() + 1
+    stuckCheckTimer = os.time() + 2
 
     return stuck
 end
@@ -1807,7 +1807,7 @@ function TryReposition(myIndex, targetIndex, distance)
     end
 
     -- In combat or not moving, reset timer
-    if engaged or not mIsRunning or distance < 8 then
+    if engaged or distance < 8 then
         stuckRepositionUntil = 0
         return false
     end
@@ -1849,13 +1849,16 @@ function TryReposition(myIndex, targetIndex, distance)
     local sideX = -dy * stuckDirection
     local sideY = dx * stuckDirection
 
-    -- Move sideways ~2 yalms
-    local repositionX = myX + (sideX * 2)
-    local repositionY = myY + (sideY * 2)
+    -- Move sideways ~3 yalms
+    local repositionDistance = 2.0
+    local repositionX = myX + (sideX * repositionDistance)
+    local repositionY = myY + (sideY * repositionDistance)
+
+    print(string.format("repositionX %f, repositionY %f", repositionX, repositionY))
 
     RunToPoint(repositionX, repositionY, 0.2)
 
-    stuckRepositionUntil = now + 3
+    stuckRepositionUntil = now + 1
     print('Stuck! Repositioning')
 
     return true
@@ -1981,7 +1984,7 @@ function GetDistanceToIndex(index)
     return GetDistanceBetweenIndices(index, myIndex);
 end
 
- function StopRunning()
+function StopRunning()
 	return AshitaCore:GetMemoryManager():GetAutoFollow():SetIsAutoRunning(0);
 end
 
@@ -2179,6 +2182,23 @@ function GetIndexFromId(serverId)
     end
     return 0;
 end
+
+-- 0x00 - talk to npc
+-- 0x02 - engage
+-- 0x03 - magic
+-- 0x04 - disengage
+-- 0x05 - cfh
+-- 0x07 - ws
+-- 0x09 - ja
+-- 0x0C - assist
+-- 0x0D - reraise
+-- 0x0E - fish
+-- 0x0F - change targets
+-- 0x10 - ranged
+-- 0x11 - chocobo dig
+-- 0x12 - dismount
+-- 0x13 - accept tractor
+-- 0x1A - mount
 
 local bitData;
 local bitOffset;
@@ -2954,6 +2974,32 @@ function RegisterGlobalCommands()
             end
         end
     end);
+end
+
+function TryEngage(engageData)
+    if (engageData.TankEngaged) and (engageData.TargetDistance <= 8) then
+
+        -- Swap targets if I'm not on the tanks target
+        if (engageData.meEngaged) then
+            if (IsMonster(engageData.EnemyIndex) and engageData.myTarget ~= engageData.EnemyIndex and engageData.assistTargetDistance <= 25) then
+                if (CheckIfStand(50)) then
+                    return true
+                end
+                
+                AshitaCore:GetChatManager():QueueCommand(0, ('/attack %u'):fmt(AshitaCore:GetMemoryManager():GetEntity():GetServerId(engageData.EnemyIndex)));
+                return true
+            end
+        else
+
+        if (engageData.checkIfStand and CheckIfStand(engageData.checkIfStandPct)) then
+            return true
+        end
+
+        AshitaCore:GetChatManager():QueueCommand(0, ('/attack %u'):fmt(AshitaCore:GetMemoryManager():GetEntity():GetServerId(engageData.EnemyIndex)));
+        mActionTimer = os.time() + 2;
+            return true
+        end
+    end
 end
 
 -- Draw Status icons. Unused, untested
