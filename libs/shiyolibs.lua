@@ -246,30 +246,6 @@ function GetStratagemCount()
 end
 
 function CanUseAbility(ability)
-    local mJob = AshitaCore:GetMemoryManager():GetPlayer():GetMainJob();
-    local sJob = AshitaCore:GetMemoryManager():GetPlayer():GetSubJob();
-    local mJobLevel = AshitaCore:GetMemoryManager():GetPlayer():GetMainJobLevel();
-    local sJobLevel = AshitaCore:GetMemoryManager():GetPlayer():GetSubJobLevel();
-    local resource = AshitaCore:GetResourceManager():GetSpellByName(spell, 0);
-
-    if not resource then
-        return false
-    end
-
-    if (resource.LevelRequired[mJob + 1] > 0) and (resource.LevelRequired[mJob + 1] <= mJobLevel) then
-        if HasSpellByName(spell) then
-            return true;
-        end
-    elseif (resource.LevelRequired[sJob + 1] > 0) and (resource.LevelRequired[sJob + 1] <= sJobLevel) then
-        if HasSpellByName(spell) then
-            return true;
-        end
-    end
-
-    return false
-end
-
-function TryUseAbility(ability, target)
     local abilityResource = AshitaCore:GetResourceManager():GetAbilityByName(ability, 0);
     if not AshitaCore:GetMemoryManager():GetPlayer():HasAbility(abilityResource.Id) then
         return false;
@@ -287,9 +263,19 @@ function TryUseAbility(ability, target)
         return false;
     end
 
-    AshitaCore:GetChatManager():QueueCommand(0, ('/ja "%s" %u'):fmt(abilityResource.Name[1], AshitaCore:GetMemoryManager():GetEntity():GetServerId(target)));
-    mActionTimer = os.time() + 1;
-    return true;
+    return true
+end
+
+function TryUseAbility(ability, target)
+    local abilityResource = AshitaCore:GetResourceManager():GetAbilityByName(ability, 0);
+
+    if CanUseAbility(ability) then
+        AshitaCore:GetChatManager():QueueCommand(0, ('/ja "%s" %u'):fmt(abilityResource.Name[1], AshitaCore:GetMemoryManager():GetEntity():GetServerId(target)));
+        mActionTimer = os.time() + 1;
+        return true
+    end
+
+    return false
 end
 
 function IsAbiityReady(ability)
