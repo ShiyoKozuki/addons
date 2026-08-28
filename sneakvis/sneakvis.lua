@@ -106,6 +106,17 @@ local function CancelBuff(id)
     AshitaCore:GetPacketManager():AddOutgoingPacket(0xF1, packet);
 end
     
+ashita.events.register('packet_out', 'packet_out_cb', function (e)
+    if (e.id == 0x1A) and (e.injected == false) then
+        local category = struct.unpack('H', e.data, 0x0A + 0x01);
+        local actionId = struct.unpack('H', e.data, 0x0C + 0x01);
+        local targetIndex = struct.unpack('H', e.data, 0x08 + 0x01);
+        if (category == 0x09) and (actionId == 196) then  -- Spectral Jig
+            CancelBuff(69);
+            CancelBuff(71);
+        end
+    end
+end);
 
 ashita.events.register('packet_in', 'packet_in_cb', function (e)
     if (e.id == 0x028) then
