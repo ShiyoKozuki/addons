@@ -247,6 +247,10 @@ end
 
 function CanUseAbility(ability)
     local abilityResource = AshitaCore:GetResourceManager():GetAbilityByName(ability, 0);
+    if not abilityResource then 
+        return false
+    end
+
     if not AshitaCore:GetMemoryManager():GetPlayer():HasAbility(abilityResource.Id) then
         return false;
     end
