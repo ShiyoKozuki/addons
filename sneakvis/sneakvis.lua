@@ -137,11 +137,6 @@ ashita.events.register('packet_in', 'packet_in_cb', function (e)
                         if (action.Param == 4165) and GetBuffActive(71) then
                             CancelBuff(71);
                         end      
-                    elseif packet.ActionType == 14 then -- Spectral Jig
-                        if (action.ActionId == 196) then
-                            CancelBuff(69);
-                            CancelBuff(71);
-                        end
                     end
                 end
             end
