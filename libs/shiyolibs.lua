@@ -1985,8 +1985,24 @@ end
 	return CampX, CampY
 end
 
-function DoWeaponSkill(ws, target)
-    if IsMonster(target) then
+local function GetWSTarget(myIndex, targetIndex, ws)
+    if not ws then return end
+
+    local resource = AshitaCore:GetResourceManager():GetAbilityByName(ws, 0);
+
+    if not resource then return end
+
+    if bit.band(resource.Targets, 0x20) == 0x20 then
+        return targetIndex
+    end
+
+    return myIndex
+end
+
+function DoWeaponSkill(ws, myIndex, targetIndex)
+    local target = GetWSTarget(myIndex, targetIndex, ws)
+
+    if target then
         AshitaCore:GetChatManager():QueueCommand(0, ('/ws "%s" %u'):fmt(ws, AshitaCore:GetMemoryManager():GetEntity():GetServerId(target)));
         mActionTimer = os.time() + 1;
         CloseSC = false
