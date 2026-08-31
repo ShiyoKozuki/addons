@@ -597,6 +597,113 @@ function GetBuffsByTargetIndex(targetIndex)
     return T{};
 end
 
+function TryUseStatusCureItem(statusCures)
+    local consumableEffects = {
+        Poison = {
+            statusEffect.POISON,
+            { 'Antidote', 'Remedy', 'Vicar\'s Drink', 'Cleric\'s Drink', 'Catholicon', 'Catholicon +1' },
+        },
+
+        Paralysis = {
+            statusEffect.PARALYSIS,
+            { 'Remedy', 'Vicar\'s Drink', 'Cleric\'s Drink', 'Catholicon', 'Catholicon +1' },
+        },
+
+        Blindness = {
+            statusEffect.BLINDNESS,
+            { 'Eye Drops', 'Remedy', 'Vicar\'s Drink', 'Cleric\'s Drink', 'Catholicon', 'Catholicon +1' },
+        },
+
+        Silence = {
+            statusEffect.SILENCE,
+            { 'Echo Drops', 'Remedy', 'Vicar\'s Drink', 'Cleric\'s Drink', 'Catholicon', 'Catholicon +1' },
+        },
+
+        Curse = {
+            statusEffect.CURSE_I,
+            { 'Holy Water', 'Remedy', 'Vicar\'s Drink', 'Cleric\'s Drink', 'Catholicon', 'Catholicon +1' },
+        },
+
+        Doom = {
+            statusEffect.DOOM,
+            { 'Holy Water', 'Vicar\'s Drink', 'Cleric\'s Drink', 'Catholicon', 'Catholicon +1' },
+        },
+
+        Disease = {
+            statusEffect.DISEASE,
+            { 'Remedy', 'Vicar\'s Drink', 'Cleric\'s Drink', 'Catholicon', 'Catholicon +1' },
+        },
+
+        MaxHPDown = {
+            statusEffect.MAX_HP_DOWN,
+            { 'Vicar\'s Drink', 'Cleric\'s Drink', 'Catholicon', 'Catholicon +1', 'Remedy', 'Panacea' },
+        },
+
+        MaxMPDown = {
+            statusEffect.MAX_MP_DOWN,
+            { 'Vicar\'s Drink', 'Cleric\'s Drink', 'Catholicon', 'Catholicon +1', 'Remedy', 'Panacea' },
+        },
+
+        MaxTPDown = {
+            statusEffect.MAX_TP_DOWN,
+            { 'Vicar\'s Drink', 'Cleric\'s Drink', 'Catholicon', 'Catholicon +1', 'Remedy', 'Panacea' },
+        },
+
+        Elegy = {
+            statusEffect.ELEGY,
+            { 'Vicar\'s Drink', 'Cleric\'s Drink', 'Catholicon', 'Catholicon +1', 'Remedy', 'Panacea' },
+        },
+
+        AttackDown = {
+            statusEffect.ATTACK_DOWN,
+            { 'Vicar\'s Drink', 'Cleric\'s Drink', 'Catholicon', 'Catholicon +1', 'Remedy', 'Panacea' },
+        },
+
+        DefenseDown = {
+            statusEffect.DEFENSE_DOWN,
+            { 'Vicar\'s Drink', 'Cleric\'s Drink', 'Catholicon', 'Catholicon +1', 'Remedy', 'Panacea' },
+        },
+
+        AccuracyDown = {
+            statusEffect.ACCURACY_DOWN,
+            { 'Vicar\'s Drink', 'Cleric\'s Drink', 'Catholicon', 'Catholicon +1', 'Remedy', 'Panacea' },
+        },
+
+        MagicDefDown = {
+            statusEffect.MAGIC_DEF_DOWN,
+            { 'Vicar\'s Drink', 'Cleric\'s Drink', 'Catholicon', 'Catholicon +1', 'Remedy', 'Panacea' },
+        },
+    }
+
+    local MyIndex = AshitaCore:GetMemoryManager():GetParty():GetMemberTargetIndex(0)
+
+    for effectName, cure in pairs(consumableEffects) do
+        local effectId = cure[1]
+        local items = cure[2]
+
+        -- Is this status enabled in the UI?
+        if statusCures[effectName] then
+
+            -- Do we actually have the status?
+            if GetBuffActive(effectId) then
+
+                if CheckIfStand(50) then
+                    return true
+                end
+
+                -- Try each item in order
+                for _, item in ipairs(items) do
+                    if TryUseItem(item, MyIndex) then
+                        return true
+                    end
+                end
+            end
+        end
+    end
+
+    return false
+end
+
 function HasStatusEffectByTargetIndex(target, effect)
     local buffs = GetBuffsByTargetIndex(target)
     if buffs:contains(effect) then
