@@ -5,7 +5,10 @@ local statusEffect = require('statuseffect')
 local job = require('job')
 
 hpTemps = T{ 'Dusty Potion', 'Lucid Potion I', 'Lucid Potion II', 'Lucid Potion III', 'Dusty Elixir', 'Lucid Elixir I', 'Lucid Elixir II', 'Healing Mist', 'Healing Powder', 'Megalixir' }
-mpTemps = T{ 'Lucid Ether I', 'Lucid Ether II', 'Lucid Ether III', 'Dusty Elixir', 'Lucid Elixir I', 'Lucid Elixir II', 'Mana Mist', 'Mana Powder', 'Megalixir' }
+mpRestoreItems = 
+{ 
+    'Lucid Ether I', 'Lucid Ether II', 'Lucid Ether III', 'Lucid Elixir I', 'Lucid Elixir II', 'Mana Mist', 'Mana Powder', 'Dusty Elixir', 'Megalixir', 'Hyper Ether', 'Pro-Ether', 'Vile Elixir', 'Vile Elixir +1',
+ }
 dpsTemps = T{ 'Braver\'s Drink', 'Berserker\'s Tonic', 'Spy\'s Drink', 'Monarch\'s Drink', 'Stalwart\'s Tonic' }
 wingTemps = T{ 'Dusty Wing', 'Daedalus Wing', 'Lucid Wings I',  }
 
