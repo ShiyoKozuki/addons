@@ -3093,7 +3093,7 @@ function RegisterGlobalCommands()
 end
 
 function TryEngage(engageData)
-    if (engageData.TankEngaged) and (engageData.TargetDistance <= 8) then
+    if (engageData.TankEngaged) and (engageData.TargetDistance <= 25) then
 
         -- Swap targets if I'm not on the tanks target
         if (engageData.meEngaged) then
