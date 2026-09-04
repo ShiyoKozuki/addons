@@ -6,11 +6,11 @@
 rdmtracker - old/
 /statustimers - old
 /logincmd
-meleebot/
-rollbot/
-rdmbot/
-Yukibot/
+/meleebot
+/rollbot
+/rdmbot
+/Yukibot
 /sayakibot
-bubblebot/bubblebot.lua
+/bubblebot
 /bubblebot
 /Kozumibot
