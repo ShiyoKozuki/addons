@@ -639,42 +639,42 @@ function TryUseStatusCureItem(statusCures)
 
         MaxHPDown = {
             statusEffect.MAX_HP_DOWN,
-            { 'Vicar\'s Drink', 'Cleric\'s Drink', 'Catholicon', 'Catholicon +1', 'Remedy', 'Panacea' },
+            { 'Vicar\'s Drink', 'Cleric\'s Drink', 'Catholicon', 'Catholicon +1', 'Panacea' },
         },
 
         MaxMPDown = {
             statusEffect.MAX_MP_DOWN,
-            { 'Vicar\'s Drink', 'Cleric\'s Drink', 'Catholicon', 'Catholicon +1', 'Remedy', 'Panacea' },
+            { 'Vicar\'s Drink', 'Cleric\'s Drink', 'Catholicon', 'Catholicon +1', 'Panacea' },
         },
 
         MaxTPDown = {
             statusEffect.MAX_TP_DOWN,
-            { 'Vicar\'s Drink', 'Cleric\'s Drink', 'Catholicon', 'Catholicon +1', 'Remedy', 'Panacea' },
+            { 'Vicar\'s Drink', 'Cleric\'s Drink', 'Catholicon', 'Catholicon +1', 'Panacea' },
         },
 
         Elegy = {
             statusEffect.ELEGY,
-            { 'Vicar\'s Drink', 'Cleric\'s Drink', 'Catholicon', 'Catholicon +1', 'Remedy', 'Panacea' },
+            { 'Vicar\'s Drink', 'Cleric\'s Drink', 'Catholicon', 'Catholicon +1', 'Panacea' },
         },
 
         AttackDown = {
             statusEffect.ATTACK_DOWN,
-            { 'Vicar\'s Drink', 'Cleric\'s Drink', 'Catholicon', 'Catholicon +1', 'Remedy', 'Panacea' },
+            { 'Vicar\'s Drink', 'Cleric\'s Drink', 'Catholicon', 'Catholicon +1', 'Panacea' },
         },
 
         DefenseDown = {
             statusEffect.DEFENSE_DOWN,
-            { 'Vicar\'s Drink', 'Cleric\'s Drink', 'Catholicon', 'Catholicon +1', 'Remedy', 'Panacea' },
+            { 'Vicar\'s Drink', 'Cleric\'s Drink', 'Catholicon', 'Catholicon +1', 'Panacea' },
         },
 
         AccuracyDown = {
             statusEffect.ACCURACY_DOWN,
-            { 'Vicar\'s Drink', 'Cleric\'s Drink', 'Catholicon', 'Catholicon +1', 'Remedy', 'Panacea' },
+            { 'Vicar\'s Drink', 'Cleric\'s Drink', 'Catholicon', 'Catholicon +1', 'Panacea' },
         },
 
         MagicDefDown = {
             statusEffect.MAGIC_DEF_DOWN,
-            { 'Vicar\'s Drink', 'Cleric\'s Drink', 'Catholicon', 'Catholicon +1', 'Remedy', 'Panacea' },
+            { 'Vicar\'s Drink', 'Cleric\'s Drink', 'Catholicon', 'Catholicon +1', 'Panacea' },
         },
     }
 
@@ -3023,11 +3023,11 @@ local function AllTalk()
     end
 end
 
-local function MountCommand()
+local function MountCommand(mount)
     if GetBuffActive(statusEffect.MOUNTED) then
         AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /dismount");
     else
-        AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /mount coeurl");
+        AshitaCore:GetChatManager():QueueCommand(-1, string.format("/ms send /mount %s", mount));
     end
 end
 
@@ -3056,28 +3056,27 @@ end
 -- Global in game slash (/) commands
 function RegisterGlobalCommands()
     ashita.events.register('command', 'command_cb', function (e)
+        local args = e.command:args()
+
+        if (#args == 0 or args[1] ~= '/global') then
+            return
+        end
+
+        e.blocked = true
+
         local commands =
         {
-            ['alltalk']   = AllTalk,
-            ['mount']     = MountCommand,
-            ['followme']  = FollowMeCommand,
-            ['volume']    = VolumeMuteMeCommand,
+            ['alltalk']  = AllTalk,
+            ['followme'] = FollowMeCommand,
+            ['volume']   = VolumeMuteMeCommand,
+            ['mount']    = MountCommand,
         }
-
-        local args = e.command:args();
-        if (#args == 0 or args[1] ~= '/global') then
-            return;
-        end
-        e.blocked = true;
 
         local command = commands[args[2]]
 
         if command then
-            command()
-        end
-
-        if (#args < 3) then
-            return;
+            command(args[3])
+            return
         end
 
         if args[2] == 'talk' then
@@ -3089,7 +3088,7 @@ function RegisterGlobalCommands()
                 AshitaCore:GetPacketManager():AddOutgoingPacket(0x1A, talkPacket:totable());
             end
         end
-    end);
+    end)
 end
 
 function TryEngage(engageData)
