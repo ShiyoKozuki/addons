@@ -113,6 +113,73 @@ function GetAnyBuffActive(buffs)
     return false;
 end
 
+function GetTotalSongs()
+    local songCount = 0
+    local buffs = AshitaCore:GetMemoryManager():GetPlayer():GetBuffs()
+
+    for _, buff in pairs(buffs) do
+        if (buff >= statusEffect.PAEON and buff <= statusEffect.CAROL)
+            or (buff >= statusEffect.HYMNUS and buff <= statusEffect.NOCTURNE)
+        then
+            songCount = songCount + 1
+        end
+    end
+
+    if songCount > 0 then
+        print(songCount)
+    end
+
+    return songCount
+end
+
+function GetSongCount(songBuffId)
+    if not songBuffId then 
+        return 0 
+    end
+
+    local songCount = 0
+    local buffs = AshitaCore:GetMemoryManager():GetPlayer():GetBuffs()
+
+    for _, buff in pairs(buffs) do
+        if buff == songBuffId then
+            songCount = songCount + 1
+        end
+    end
+
+    return songCount
+end
+
+local pRealTime = ashita.memory.find('FFXiMain.dll', 0, '8B0D????????8B410C8B49108D04808D04808D04808D04C1C3', 2, 0);
+function GetRealTime()
+    local ptr = ashita.memory.read_uint32(pRealTime);
+    ptr = ashita.memory.read_uint32(ptr);
+    return ashita.memory.read_uint32(ptr + 0x0C);
+end
+
+local VANA_OFFSET = 0x3C307D70;
+
+function CalculateBuffDuration(value)
+    --Get the time since vanadiel epoch
+    local offset = GetRealTime() - VANA_OFFSET;
+
+    --Multiply it by 60 to create like terms
+    local comparand = offset * 60;
+
+    --Get actual time remaining
+    local real_duration = value - comparand;
+    
+    -- Simulate overflow
+    while (real_duration < -2147483648) do
+        real_duration = real_duration + 0xFFFFFFFF;
+    end
+    
+    if (real_duration > 0) then
+        return real_duration;
+    else
+        return 0;
+    end
+end
+
 local partybuffsptr = ashita.memory.find('FFXiMain.dll', 0, 'B93C0000008D7004BF????????F3A5', 9, 0);
 partybuffsptr  = ashita.memory.read_uint32(partybuffsptr);
 
@@ -150,6 +217,18 @@ function GetMemberBuffs(memberIndex)
         end
     end
     return memberBuffs;
+end
+
+function GetSpellNameById(spellId)
+    local resMgr = AshitaCore:GetResourceManager();
+    local spellName = 'None'
+    local res = resMgr:GetSpellById(spellId);
+
+    if res and res.Name[1] then
+        spellName = res.Name[1]
+    end
+
+    return spellName
 end
 
 function HasSpellByName(spell)
@@ -2861,6 +2940,66 @@ function BuildCorsairRollList()
     end
 
     return roll;
+end
+
+function BuildSongSpellList()
+    local song = T{};
+    local player = AshitaCore:GetMemoryManager():GetPlayer();
+    local resMgr = AshitaCore:GetResourceManager();
+
+    for i = 1, 1024 do
+        if player:HasSpell(i) then
+            local res = resMgr:GetSpellById(i);
+
+            if res and res.Skill then
+                local skill = res.Skill;
+                local name = res.Name[1];
+
+                if (skill == 40) then -- Singing
+                    if name then
+                        song:append(name);
+                    end
+                end
+            end
+        end
+    end
+
+    if #song == 0 then
+        song:append('None');
+    end
+
+    return song;
+end
+
+function BuildBuffSongSpellList()
+    local song = T{};
+    local player = AshitaCore:GetMemoryManager():GetPlayer();
+    local resMgr = AshitaCore:GetResourceManager();
+
+    for i = 1, 1024 do
+        if player:HasSpell(i) then
+            local res = resMgr:GetSpellById(i);
+
+            if res and res.Skill then
+                local skill = res.Skill;
+                local name = res.Name[1];
+
+                if (skill == 40) then -- Singing
+                    if bit.band(res.Targets, 0x20) ~= 0x20 then -- Non-enemy target songs
+                        if name then
+                            song:append(name);
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    if #song == 0 then
+        song:append('None');
+    end
+
+    return song;
 end
 
 function BuildIndiSpellList()
