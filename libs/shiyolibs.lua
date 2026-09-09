@@ -3073,6 +3073,16 @@ function GetAbilityIdByName(Name)
     return abilityId;
 end
 
+function GetBestSpell(spellTable)
+    for _, spell in ipairs(spellTable) do
+        if CheckJobLevels(spell) then
+            return spell
+        end
+    end
+
+    return 'None'
+end
+
 --[[
 Creates a table of entity name then x, y, z positions. example:
 positionsById =
