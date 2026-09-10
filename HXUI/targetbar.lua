@@ -284,7 +284,7 @@ targetbar.DrawWindow = function(settings)
 
         -- Use the ImGui style for spacing and draw the status icons
         imgui.PushStyleVar(ImGuiStyleVar_ItemSpacing, {1, 3})
-        if #buffIds > 0 then
+        if buffIds and #buffIds > 0 then
             imgui.SameLine()
             DrawStatusIcons(buffIds, settings.iconSize, settings.maxIconColumns, 3, false, settings.barHeight / 2)
         end
