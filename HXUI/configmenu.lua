@@ -26,9 +26,9 @@ config.DrawWindow = function(us)
             gShowPatchNotes = { true; }
             UpdateSettings();
         end
-        imgui.BeginChild("Config Options", { 0, 0 }, true);
+        imgui.BeginChild("Config Options", { 0, 0 }, ImGuiChildFlags_Borders);
         if (imgui.CollapsingHeader("General")) then
-            imgui.BeginChild("GeneralSettings", { 0, 150 }, true);
+            imgui.BeginChild("GeneralSettings", { 0, 150 }, ImGuiChildFlags_Borders);
             if (imgui.Checkbox('Lock HUD Position', { gConfig.lockPositions })) then
                 gConfig.lockPositions = not gConfig.lockPositions;
                 UpdateSettings();
@@ -88,7 +88,7 @@ config.DrawWindow = function(us)
             imgui.EndChild();
         end
         if (imgui.CollapsingHeader("Player Bar")) then
-            imgui.BeginChild("PlayerBarSettings", { 0, 160 }, true);
+            imgui.BeginChild("PlayerBarSettings", { 0, 160 }, ImGuiChildFlags_Borders);
             if (imgui.Checkbox('Enabled', { gConfig.showPlayerBar })) then
                 gConfig.showPlayerBar = not gConfig.showPlayerBar;
                 UpdateSettings();
@@ -120,7 +120,7 @@ config.DrawWindow = function(us)
             imgui.EndChild();
         end
         if (imgui.CollapsingHeader("Target Bar")) then
-            imgui.BeginChild("TargetBarSettings", { 0, 220 }, true);
+            imgui.BeginChild("TargetBarSettings", { 0, 220 }, ImGuiChildFlags_Borders);
             if (imgui.Checkbox('Enabled', { gConfig.showTargetBar })) then
                 gConfig.showTargetBar = not gConfig.showTargetBar;
                 UpdateSettings();
@@ -162,7 +162,7 @@ config.DrawWindow = function(us)
             imgui.EndChild();
         end
         if (imgui.CollapsingHeader("Enemy List")) then
-            imgui.BeginChild("EnemyListSettings", { 0, 160 }, true);
+            imgui.BeginChild("EnemyListSettings", { 0, 160 }, ImGuiChildFlags_Borders);
             if (imgui.Checkbox('Enabled', { gConfig.showEnemyList })) then
                 gConfig.showEnemyList = not gConfig.showEnemyList;
                 UpdateSettings();
@@ -194,7 +194,7 @@ config.DrawWindow = function(us)
             imgui.EndChild();
         end
         if (imgui.CollapsingHeader("Party List")) then
-            imgui.BeginChild("PartyListSettings", { 0, 300 }, true);
+            imgui.BeginChild("PartyListSettings", { 0, 300 }, truImGuiChildFlags_Borderse);
             if (imgui.Checkbox('Enabled', { gConfig.showPartyList })) then
                 gConfig.showPartyList = not gConfig.showPartyList;
                 UpdateSettings();
@@ -305,7 +305,7 @@ config.DrawWindow = function(us)
             imgui.EndChild();
         end
         if (imgui.CollapsingHeader("Exp Bar")) then
-            imgui.BeginChild("ExpBarSettings", { 0, 160 }, true);
+            imgui.BeginChild("ExpBarSettings", { 0, 160 }, ImGuiChildFlags_Borders);
             if (imgui.Checkbox('Enabled', { gConfig.showExpBar })) then
                 gConfig.showExpBar = not gConfig.showExpBar;
                 UpdateSettings();
@@ -332,7 +332,7 @@ config.DrawWindow = function(us)
             imgui.EndChild();
         end
         if (imgui.CollapsingHeader("Gil Tracker")) then
-            imgui.BeginChild("GilTrackerSettings", { 0, 160 }, true);
+            imgui.BeginChild("GilTrackerSettings", { 0, 160 }, ImGuiChildFlags_Borders);
             if (imgui.Checkbox('Enabled', { gConfig.showGilTracker })) then
                 gConfig.showGilTracker = not gConfig.showGilTracker;
                 UpdateSettings();
@@ -350,7 +350,7 @@ config.DrawWindow = function(us)
             imgui.EndChild();
         end
         if (imgui.CollapsingHeader("Inventory Tracker")) then
-            imgui.BeginChild("InventoryTrackerSettings", { 0, 160 }, true);
+            imgui.BeginChild("InventoryTrackerSettings", { 0, 160 }, ImGuiChildFlags_Borders);
             if (imgui.Checkbox('Enabled', { gConfig.showInventoryTracker })) then
                 gConfig.showInventoryTracker = not gConfig.showInventoryTracker;
                 UpdateSettings();
@@ -368,7 +368,7 @@ config.DrawWindow = function(us)
             imgui.EndChild();
         end
         if (imgui.CollapsingHeader("Cast Bar")) then
-            imgui.BeginChild("CastBarSettings", { 0, 160 }, true);
+            imgui.BeginChild("CastBarSettings", { 0, 160 }, ImGuiChildFlags_Borders);
             if (imgui.Checkbox('Enabled', { gConfig.showCastBar })) then
                 gConfig.showCastBar = not gConfig.showCastBar;
                 UpdateSettings();
