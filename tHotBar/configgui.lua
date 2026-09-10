@@ -38,10 +38,10 @@ local function GetLayouts()
     end
 
     state.Layouts = layouts;
-    state.Scale = { gSettings.Scale };
+    state.Scale = { gActiveResolution.Scale };
     state.SelectedLayout = -1;
     for index,layout in ipairs(state.Layouts) do
-        if (gSettings.Layout == layout) then
+        if (gActiveResolution.Layout == layout) then
             state.SelectedLayout = index;
         end
     end
@@ -59,7 +59,6 @@ local exposed = {};
 function exposed:Render()
     if (state.IsOpen[1]) then
         if (imgui.Begin(string.format('%s v%s Configuration', addon.name, addon.version), state.IsOpen, ImGuiWindowFlags_AlwaysAutoResize)) then
-            imgui.BeginGroup();
             if imgui.BeginTabBar('##tHotBarConfigTabBar', ImGuiTabBarFlags_NoCloseWithMiddleMouseButton) then
                 if imgui.BeginTabItem('Layouts##tHotBarConfigLayoutsTab', 0, state.ForceTab and 6 or 4) then
                     state.ForceTab = nil;
@@ -81,7 +80,7 @@ function exposed:Render()
                         imgui.ShowHelp('Allows you to drag the display.', true);
                         imgui.SameLine();
                         if (imgui.Button('Reset##tHotBarReset')) then
-                            gSettings.Position = GetDefaultPosition(gDisplay.Layout);
+                            gActiveResolution.Position = GetDefaultPosition(gDisplay.Layout);
                             gDisplay:UpdatePosition();
                             settings.save();
                         end
@@ -93,10 +92,10 @@ function exposed:Render()
                         if (layout == nil) then
                             Error('You must select a valid layout to apply it.');
                         else
-                            gSettings.Layout = layout;
-                            gSettings.Scale = state.Scale[1];
+                            gActiveResolution.Layout = layout;
+                            gActiveResolution.Scale = state.Scale[1];
                             gInitializer:ApplyLayout();
-                            gSettings.Position = GetDefaultPosition(gDisplay.Layout);
+                            gActiveResolution.Position = GetDefaultPosition(gDisplay.Layout);
                             gDisplay:UpdatePosition();
                             gBindings:Update();
                             settings.save();
@@ -169,6 +168,7 @@ function exposed:Render()
                     CheckBox('Default To <st>', 'DefaultSelectTarget');
                     imgui.ShowHelp('When enabled, new bindings that can target anything besides yourself will default to <st>.');
                     imgui.EndTabItem();
+                    imgui.EndGroup();
                 end
                 
                 imgui.EndTabBar();

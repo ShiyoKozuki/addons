@@ -12,6 +12,7 @@ settings         = require('settings');
 local d3d8       = require('d3d8');
 local ffi        = require('ffi');
 local scaling    = require('scaling');
+gToggleHide = false;
 
 --Create directories..
 local controllerConfigFolder = string.format('%sconfig/addons/%s/resources/controllers', AshitaCore:GetInstallPath(), addon.name);
@@ -42,6 +43,9 @@ local defaultSettings = T{
     ShowSkillchainIcon = true,
     ShowSkillchainAnimation = true,
     ShowTrigger = true,
+    ShowReadyPulse = true,
+    ReadyPulseHz = 1.0,
+    ReadyPulseMinAlpha = 0.45,
     ShowPalette = true,
     ShowSinglePalette = false,
 

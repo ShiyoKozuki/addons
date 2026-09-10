@@ -36,7 +36,7 @@ local function bind(hotkey, index)
     end
 
     local kb = AshitaCore:GetInputManager():GetKeyboard();
-    kb:Bind(kb:S2D(working), true, defaults.alt, defaults.apps, defaults.ctrl, defaults.shift, defaults.win,
+    kb:Bind(kb:S2D(working), true, defaults.alt, defaults.apps, defaults.ctrl, defaults.shift, defaults.win, true, false,
     string.format('/tb activate %u', index));
 end
 
@@ -58,7 +58,7 @@ local function unbind(hotkey)
     end
 
     local kb = AshitaCore:GetInputManager():GetKeyboard();
-    kb:Unbind(kb:S2D(working), true, defaults.alt, defaults.apps, defaults.ctrl, defaults.shift, defaults.win);
+    kb:Unbind(kb:S2D(working), true, defaults.alt, defaults.apps, defaults.ctrl, defaults.shift, defaults.win, true, false);
 end
 
 local Display = { Valid = false };
@@ -69,7 +69,9 @@ function Display:Destroy()
         local bindSetting = AshitaCore:GetInputManager():GetKeyboard():GetSilentBinds();
         AshitaCore:GetInputManager():GetKeyboard():SetSilentBinds(true);
         for _,element in ipairs(self.Elements) do
-            unbind(element.State.Hotkey);
+            if (not element.NoBind) then
+                unbind(element.State.Hotkey);
+            end
         end
         AshitaCore:GetInputManager():GetKeyboard():SetSilentBinds(bindSetting);
     end
@@ -81,7 +83,7 @@ function Display:Initialize(layout)
     self.Layout = layout;
     self.Elements = T{};
 
-    local position = gSettings.Position;
+    local position = gActiveResolution.Position;
 
     local bindSetting = AshitaCore:GetInputManager():GetKeyboard():GetSilentBinds();
     AshitaCore:GetInputManager():GetKeyboard():SetSilentBinds(true);
@@ -91,7 +93,11 @@ function Display:Initialize(layout)
         newElement.OffsetY = data.OffsetY;
         newElement:SetPosition(position);
         self.Elements:append(newElement);
-        bind(data.DefaultMacro, #self.Elements);
+        if (data.NoBind == true) then
+            newElement.NoBind = true;
+        else
+            bind(data.DefaultMacro, #self.Elements);
+        end
     end
     AshitaCore:GetInputManager():GetKeyboard():SetSilentBinds(bindSetting);
 
@@ -133,7 +139,7 @@ function Display:Render()
         return;
     end
 
-    local pos = gSettings.Position;
+    local pos = gActiveResolution.Position;
     local sprite = self.Sprite;
     sprite:Begin();
 
@@ -183,7 +189,7 @@ local dragPosition = { 0, 0 };
 local dragActive = false;
 function Display:DragTest(e)
     local handle = self.Layout.DragHandle;
-    local pos = gSettings.Position;
+    local pos = gActiveResolution.Position;
     local minX = pos[1] + handle.OffsetX;
     local maxX = minX + handle.Width;
     if (e.x < minX) or (e.x > maxX) then
@@ -201,7 +207,7 @@ function Display:HandleMouse(e)
     end
 
     if dragActive then
-        local pos = gSettings.Position;
+        local pos = gActiveResolution.Position;
         pos[1] = pos[1] + (e.x - dragPosition[1]);
         pos[2] = pos[2] + (e.y - dragPosition[2]);
         dragPosition[1] = e.x;
@@ -238,7 +244,7 @@ function Display:HitTest(x, y)
         return;
     end
 
-    local pos = gSettings.Position;
+    local pos = gActiveResolution.Position;
     if (x < pos[1]) or (y < pos[2]) then
         return false;
     end
@@ -273,7 +279,7 @@ function Display:UpdatePosition()
         return;
     end
     
-    local position = gSettings.Position;
+    local position = gActiveResolution.Position;
 
     for _,element in ipairs(self.Elements) do
         element:SetPosition(position);

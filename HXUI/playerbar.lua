@@ -122,138 +122,138 @@ playerbar.DrawWindow = function(settings)
 	if (gConfig.lockPositions) then
 		windowFlags = bit.bor(windowFlags, ImGuiWindowFlags_NoMove);
 	end
-    if (imgui.Begin('PlayerBar', true, windowFlags)) then
+    -- if (imgui.Begin('PlayerBar', true, windowFlags)) then
 
-		local hpNameColor, hpGradient = GetHpColors(SelfHPPercent/100);
+	-- 	local hpNameColor, hpGradient = GetHpColors(SelfHPPercent/100);
 
-		local SelfJob = GetJobStr(party:GetMemberMainJob(0));
-		local SelfSubJob = GetJobStr(party:GetMemberSubJob(0));
-		local bShowMp = buffTable.IsSpellcaster(SelfJob) or buffTable.IsSpellcaster(SelfSubJob) or gConfig.alwaysShowMpBar;
+	-- 	local SelfJob = GetJobStr(party:GetMemberMainJob(0));
+	-- 	local SelfSubJob = GetJobStr(party:GetMemberSubJob(0));
+	-- 	local bShowMp = buffTable.IsSpellcaster(SelfJob) or buffTable.IsSpellcaster(SelfSubJob) or gConfig.alwaysShowMpBar;
 
-		-- Draw HP Bar (two bars to fake animation
-		local hpX = imgui.GetCursorPosX();
-		local barSize = (settings.barWidth / 3) - settings.barSpacing;
+	-- 	-- Draw HP Bar (two bars to fake animation
+	-- 	local hpX = imgui.GetCursorPosX();
+	-- 	local barSize = (settings.barWidth / 3) - settings.barSpacing;
 
-		local hpPercentData = {{SelfHPPercent / 100, hpGradient}};
+	-- 	local hpPercentData = {{SelfHPPercent / 100, hpGradient}};
 
-		if _HXUI_DEV_DEBUG_INTERPOLATION then
-			hpPercentData[1][1] = 0.5;
-		end
+	-- 	if _HXUI_DEV_DEBUG_INTERPOLATION then
+	-- 		hpPercentData[1][1] = 0.5;
+	-- 	end
 
-		if interpolationPercent then
-			local interpolationOverlay;
+	-- 	if interpolationPercent then
+	-- 		local interpolationOverlay;
 
-			if gConfig.healthBarFlashEnabled then
-				interpolationOverlay = {
-					'#ffacae', -- overlay color,
-					interpolationOverlayAlpha -- overlay alpha
-				};
-			end
+	-- 		if gConfig.healthBarFlashEnabled then
+	-- 			interpolationOverlay = {
+	-- 				'#ffacae', -- overlay color,
+	-- 				interpolationOverlayAlpha -- overlay alpha
+	-- 			};
+	-- 		end
 
-			table.insert(
-				hpPercentData,
-				{
-					interpolationPercent / 100, -- interpolation percent
-					{'#cf3437', '#c54d4d'}, -- interpolation gradient
-					interpolationOverlay
-				}
-			);
-		end
+	-- 		table.insert(
+	-- 			hpPercentData,
+	-- 			{
+	-- 				interpolationPercent / 100, -- interpolation percent
+	-- 				{'#cf3437', '#c54d4d'}, -- interpolation gradient
+	-- 				interpolationOverlay
+	-- 			}
+	-- 		);
+	-- 	end
 
-		if (bShowMp == false) then
-			imgui.Dummy({(barSize + settings.barSpacing) / 2, 0});
+	-- 	if (bShowMp == false) then
+	-- 		imgui.Dummy({(barSize + settings.barSpacing) / 2, 0});
 
-			imgui.SameLine();
-		end
+	-- 		imgui.SameLine();
+	-- 	end
 		
-		progressbar.ProgressBar(hpPercentData, {barSize, settings.barHeight}, {decorate = gConfig.showPlayerBarBookends});
+	-- 	progressbar.ProgressBar(hpPercentData, {barSize, settings.barHeight}, {decorate = gConfig.showPlayerBarBookends});
 		
-		imgui.SameLine();
-		local hpEndX = imgui.GetCursorPosX();
-		local hpLocX, hpLocY = imgui.GetCursorScreenPos();	
-		if (SelfHPPercent > 0) then
-			imgui.SetCursorPosX(hpX);
+	-- 	imgui.SameLine();
+	-- 	local hpEndX = imgui.GetCursorPosX();
+	-- 	local hpLocX, hpLocY = imgui.GetCursorScreenPos();	
+	-- 	if (SelfHPPercent > 0) then
+	-- 		imgui.SetCursorPosX(hpX);
 
-			imgui.SameLine();
-		end
+	-- 		imgui.SameLine();
+	-- 	end
 
-		local mpLocX
-		local mpLocY;
+	-- 	local mpLocX
+	-- 	local mpLocY;
 		
-		if (bShowMp) then
-			-- Draw MP Bar
-			imgui.SetCursorPosX(hpEndX + settings.barSpacing);
-			progressbar.ProgressBar({{SelfMPPercent / 100, {'#9abb5a', '#bfe07d'}}}, {barSize, settings.barHeight}, {decorate = gConfig.showPlayerBarBookends});
-			imgui.SameLine();
-			mpLocX, mpLocY  = imgui.GetCursorScreenPos()
-		end
+	-- 	if (bShowMp) then
+	-- 		-- Draw MP Bar
+	-- 		imgui.SetCursorPosX(hpEndX + settings.barSpacing);
+	-- 		progressbar.ProgressBar({{SelfMPPercent / 100, {'#9abb5a', '#bfe07d'}}}, {barSize, settings.barHeight}, {decorate = gConfig.showPlayerBarBookends});
+	-- 		imgui.SameLine();
+	-- 		mpLocX, mpLocY  = imgui.GetCursorScreenPos()
+	-- 	end
 		
-		-- Draw TP Bars
-		imgui.SetCursorPosX(imgui.GetCursorPosX() + settings.barSpacing);
+	-- 	-- Draw TP Bars
+	-- 	imgui.SetCursorPosX(imgui.GetCursorPosX() + settings.barSpacing);
 		
-		local tpGradient = {'#3898ce', '#78c4ee'};
-		local mainPercent;
-		local tpOverlay;
+	-- 	local tpGradient = {'#3898ce', '#78c4ee'};
+	-- 	local mainPercent;
+	-- 	local tpOverlay;
 		
-		if (SelfTP >= 1000) then
-			mainPercent = (SelfTP - 1000) / 2000;
+	-- 	if (SelfTP >= 1000) then
+	-- 		mainPercent = (SelfTP - 1000) / 2000;
 
-			local tpOverlayGradient = {'#0078CC', '#0078CC'};
+	-- 		local tpOverlayGradient = {'#0078CC', '#0078CC'};
 
-			tpOverlay = {
-				{
-					1, -- overlay percent
-					tpOverlayGradient -- overlay gradient
-				},
-				math.ceil(settings.barHeight * 2/7), -- overlay height
-				1, -- overlay vertical padding
-				{
-					'#2fa9ff', -- overlay pulse color
-					1 -- overlay pulse seconds
-				}
-			};
-		else
-			mainPercent = SelfTP / 1000;
-		end
+	-- 		tpOverlay = {
+	-- 			{
+	-- 				1, -- overlay percent
+	-- 				tpOverlayGradient -- overlay gradient
+	-- 			},
+	-- 			math.ceil(settings.barHeight * 2/7), -- overlay height
+	-- 			1, -- overlay vertical padding
+	-- 			{
+	-- 				'#2fa9ff', -- overlay pulse color
+	-- 				1 -- overlay pulse seconds
+	-- 			}
+	-- 		};
+	-- 	else
+	-- 		mainPercent = SelfTP / 1000;
+	-- 	end
 		
-		progressbar.ProgressBar({{mainPercent, tpGradient}}, {barSize, settings.barHeight}, {overlayBar=tpOverlay, decorate = gConfig.showPlayerBarBookends});
+	-- 	progressbar.ProgressBar({{mainPercent, tpGradient}}, {barSize, settings.barHeight}, {overlayBar=tpOverlay, decorate = gConfig.showPlayerBarBookends});
 		
-		imgui.SameLine();
+	-- 	imgui.SameLine();
 
-		local tpLocX, tpLocY  = imgui.GetCursorScreenPos();
+	-- 	local tpLocX, tpLocY  = imgui.GetCursorScreenPos();
 		
-		-- Update our HP Text
-		hpText:SetPositionX(hpLocX - settings.barSpacing - settings.barHeight / 2);
-		hpText:SetPositionY(hpLocY + settings.barHeight + settings.textYOffset);
-		hpText:SetText(tostring(SelfHP));
-		hpText:SetColor(hpNameColor);
+	-- 	-- Update our HP Text
+	-- 	hpText:SetPositionX(hpLocX - settings.barSpacing - settings.barHeight / 2);
+	-- 	hpText:SetPositionY(hpLocY + settings.barHeight + settings.textYOffset);
+	-- 	hpText:SetText(tostring(SelfHP));
+	-- 	hpText:SetColor(hpNameColor);
 		
-		hpText:SetVisible(true);
+	-- 	hpText:SetVisible(true);
 
-		if (bShowMp) then
-			-- Update our MP Text
-			mpText:SetPositionX(mpLocX - settings.barSpacing - settings.barHeight / 2);
-			mpText:SetPositionY(mpLocY + settings.barHeight + settings.textYOffset);
-			mpText:SetText(tostring(SelfMP));
-			mpText:SetColor(gAdjustedSettings.mpColor);
-		end
+	-- 	if (bShowMp) then
+	-- 		-- Update our MP Text
+	-- 		mpText:SetPositionX(mpLocX - settings.barSpacing - settings.barHeight / 2);
+	-- 		mpText:SetPositionY(mpLocY + settings.barHeight + settings.textYOffset);
+	-- 		mpText:SetText(tostring(SelfMP));
+	-- 		mpText:SetColor(gAdjustedSettings.mpColor);
+	-- 	end
 
-		mpText:SetVisible(bShowMp);
+	-- 	mpText:SetVisible(bShowMp);
 			
-		-- Update our TP Text
-		tpText:SetPositionX(tpLocX - settings.barSpacing - settings.barHeight / 2);
-		tpText:SetPositionY(tpLocY + settings.barHeight + settings.textYOffset);
-		tpText:SetText(tostring(SelfTP));
+	-- 	-- Update our TP Text
+	-- 	tpText:SetPositionX(tpLocX - settings.barSpacing - settings.barHeight / 2);
+	-- 	tpText:SetPositionY(tpLocY + settings.barHeight + settings.textYOffset);
+	-- 	tpText:SetText(tostring(SelfTP));
 
-		if (SelfTP >= 1000) then 
-			tpText:SetColor(gAdjustedSettings.tpFullColor);
-		else
-			tpText:SetColor(gAdjustedSettings.tpEmptyColor);
-	    end
+	-- 	if (SelfTP >= 1000) then 
+	-- 		tpText:SetColor(gAdjustedSettings.tpFullColor);
+	-- 	else
+	-- 		tpText:SetColor(gAdjustedSettings.tpEmptyColor);
+	--     end
 
-		tpText:SetVisible(true);
-    end
-	imgui.End();
+	-- 	tpText:SetVisible(true);
+    -- end
+	-- imgui.End();
 end
 
 

@@ -44,6 +44,7 @@ local function WriteBinding(writer, depth, hotkey, binding)
     writer:write(string.format('%sShowRecast              = %s,\n', pad2, binding.ShowRecast and 'true' or 'false'));
     writer:write(string.format('%sShowName                = %s,\n', pad2, binding.ShowName and 'true' or 'false'));
     writer:write(string.format('%sShowTrigger             = %s,\n', pad2, binding.ShowTrigger and 'true' or 'false'));
+    writer:write(string.format('%sShowReadyPulse          = %s,\n', pad2, binding.ShowReadyPulse and 'true' or 'false'));
     writer:write(string.format('%sShowSkillchainIcon      = %s,\n', pad2, binding.ShowSkillchainIcon and 'true' or 'false'));
     writer:write(string.format('%sShowSkillchainAnimation = %s,\n', pad2, binding.ShowSkillchainAnimation and 'true' or 'false'));
     writer:write(string.format('%sShowHotkey              = %s,\n', pad2, binding.ShowHotkey and 'true' or 'false'));

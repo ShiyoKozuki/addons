@@ -172,6 +172,16 @@ local layout = {
         Easier to fill in OffsetX and OffsetY with iteration(see end of file).
     ]]--
     Elements = T{
+        { DefaultMacro = 'PH1-1', NoBind=true },
+        { DefaultMacro = 'PH1-2', NoBind=true },
+        { DefaultMacro = 'PH1-3', NoBind=true },
+        { DefaultMacro = 'PH1-4', NoBind=true },
+        { DefaultMacro = 'PH1-5', NoBind=true },
+        { DefaultMacro = 'PH1-6', NoBind=true },
+        { DefaultMacro = 'PH1-7', NoBind=true },
+        { DefaultMacro = 'PH1-8', NoBind=true },
+        { DefaultMacro = 'PH1-9', NoBind=true },
+        { DefaultMacro = 'PH1-0', NoBind=true },
         { DefaultMacro = '1' },
         { DefaultMacro = '2' },
         { DefaultMacro = '3' },
@@ -228,7 +238,7 @@ local layout = {
 local index = 1;
 local offsetX;
 local offsetY = 30;
-for y = 0,4 do
+for y = 0,5 do
     offsetX = 7;
     for x = 0,9 do
         layout.Elements[index].OffsetX = offsetX;

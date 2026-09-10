@@ -253,6 +253,8 @@ function exposed:Render()
                     imgui.ShowHelp('Display action cost indicators.');
                     CheckBox('Trigger', 'ShowTrigger');
                     imgui.ShowHelp('Shows an overlay when you activate an action.');
+                    CheckBox('Ready Pulse', 'ShowReadyPulse');
+                    imgui.ShowHelp('Master toggle for the ready-pulse effect. Each macro must also have Ready Pulse enabled in its bindings to actually pulse.');
                     CheckBox('SC Icon', 'ShowSkillchainIcon');
                     imgui.ShowHelp('Overrides weaponskill icons when a skillchain would be formed.');
                     CheckBox('SC Animation', 'ShowSkillchainAnimation');

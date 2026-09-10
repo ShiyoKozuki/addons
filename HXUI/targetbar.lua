@@ -253,7 +253,6 @@ targetbar.DrawWindow = function(settings)
 		end
 
         -- Draw buffs and debuffs
-        imgui.SameLine()
         local preBuffX, preBuffY = imgui.GetCursorScreenPos()
         local buffIds = {}  -- Initialize as an empty table
 
@@ -285,7 +284,10 @@ targetbar.DrawWindow = function(settings)
 
         -- Use the ImGui style for spacing and draw the status icons
         imgui.PushStyleVar(ImGuiStyleVar_ItemSpacing, {1, 3})
-        DrawStatusIcons(buffIds, settings.iconSize, settings.maxIconColumns, 3, false, settings.barHeight / 2)
+        if #buffIds > 0 then
+            imgui.SameLine()
+            DrawStatusIcons(buffIds, settings.iconSize, settings.maxIconColumns, 3, false, settings.barHeight / 2)
+        end
         imgui.PopStyleVar(1)
 
         -- I don't want target of target, commented out

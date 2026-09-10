@@ -582,6 +582,7 @@ local function AttemptBind()
     binding.ShowRecast = state.Components.Recast;
     binding.ShowName = state.Components.Name;
     binding.ShowTrigger = state.Components.Trigger;
+    binding.ShowReadyPulse = state.Components.ReadyPulse;
     binding.ShowSkillchainIcon = state.Components.SkillchainIcon;
     binding.ShowSkillchainAnimation = state.Components.SkillchainAnimation;
     binding.ShowHotkey = state.Components.Hotkey;
@@ -697,7 +698,7 @@ function exposed:Render()
                     if (state.ForceTab == 1) then
                         state.ForceTab = nil;
                     end
-                    imgui.BeginChild('BindingChild', { 253, 390 }, true);
+                    imgui.BeginChild('BindingChild', { 253, 390 }, ImGuiChildFlags_Borders);
                     imgui.TextColored(header, 'Combo Type');
                     imgui.Text(GetMacroStateText(state.MacroState));
                     imgui.TextColored(header, 'Macro Button');
@@ -739,7 +740,7 @@ function exposed:Render()
                         width = layout.Icon.Width;
                         height = layout.Icon.Height;
                     end
-                    imgui.BeginChild('AppearanceChild', { 253, 235 + height }, true);
+                    imgui.BeginChild('AppearanceChild', { 253, 235 + height }, ImGuiChildFlags_Borders);
                     imgui.TextColored(header, 'Image');
                     imgui.ShowHelp('While the image file and size are correct, rendering here is done with ImGui instead of GdiPlus and may vary slightly in appearance.');
                     local posY = imgui.GetCursorPosY();
@@ -776,6 +777,8 @@ function exposed:Render()
                         imgui.ShowHelp('Shows action names.');
                         CheckBox('Trigger');
                         imgui.ShowHelp('Shows an overlay when you activate an action.');
+                        CheckBox('Ready Pulse', 'ReadyPulse');
+                        imgui.ShowHelp('Pulses the icon brightness while the action is off cooldown and usable. Best on long-cooldown abilities like Steal, Mug, Provoke.');
                         CheckBox('SC Icon', 'SkillchainIcon');
                         imgui.ShowHelp('Overrides weaponskill icons when a skillchain would be formed.');
                         CheckBox('SC Animation', 'SkillchainAnimation');
@@ -854,6 +857,7 @@ function exposed:Show(macroState, macroButton)
                 Recast = true,
                 Name = true,
                 Trigger = true,
+                ReadyPulse = false,
                 SkillchainIcon = true,
                 SkillchainAnimation = true,
                 Hotkey = false,
@@ -891,6 +895,7 @@ function exposed:Show(macroState, macroButton)
             Recast = binding.ShowRecast,
             Name = binding.ShowName,
             Trigger = binding.ShowTrigger,
+            ReadyPulse = binding.ShowReadyPulse,
             SkillchainIcon = binding.ShowSkillchainIcon,
             SkillchainAnimation = binding.ShowSkillchainAnimation,
             Hotkey = binding.ShowHotkey,
