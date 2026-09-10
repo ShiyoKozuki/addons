@@ -1,5 +1,5 @@
 --[[
-* Addons - Copyright (c) 2021 Ashita Development Team
+* Addons - Copyright (c) 2025 Ashita Development Team
 * Contact: https://www.ashitaxi.com/
 * Contact: https://discord.gg/Ashita
 *
@@ -21,20 +21,20 @@
 
 addon.name      = 'equipmon';
 addon.author    = 'atom0s';
-addon.version   = '1.0';
+addon.version   = '1.5';
 addon.desc      = 'Displays the players equipment onscreen at all times.';
 addon.link      = 'https://ashitaxi.com/';
 
-require('common');
-require('shiyolibs');
-local chat      = require('chat');
-local d3d       = require('d3d8');
-local ffi       = require('ffi');
-local fonts     = require('fonts');
-local imgui     = require('imgui');
-local prims     = require('primitives');
-local scaling   = require('scaling');
-local settings  = require('settings');
+require 'common';
+
+local chat      = require 'chat';
+local d3d       = require 'd3d8';
+local ffi       = require 'ffi';
+local fonts     = require 'fonts';
+local imgui     = require 'imgui';
+local prims     = require 'primitives';
+local scaling   = require 'scaling';
+local settings  = require 'settings';
 
 local C = ffi.C;
 local d3d8dev = d3d.get_device();
@@ -219,11 +219,25 @@ local function get_equipped_item(slot)
 end
 
 --[[
+* Returns the items max stack count.
+*
+* @param {number} itemid - The item id to obtain the max stack size of.
+* @return {number} The items max stack count.
+--]]
+local function get_item_max_stack_size(itemid)
+    local item = AshitaCore:GetResourceManager():GetItemById(itemid);
+    if (item == nil) then
+        return 1;
+    end
+    return item.StackSize;
+end
+
+--[[
 * Updates the current equipment textures.
 --]]
 local function update_equipment_textures()
     eqmon.slots:each(function (v)
-        local id, count = get_equipped_item(v.slot);
+        local id, _ = get_equipped_item(v.slot);
         if (id == nil) then
             v.itemid = 0;
             v.texture = nil;
@@ -249,21 +263,30 @@ local function render_editor()
     if (imgui.Begin('EquipMon', eqmon.editor.is_open, ImGuiWindowFlags_NoResize)) then
         imgui.BeginGroup();
             imgui.TextColored({ 1.0, 0.65, 0.26, 1.0 }, 'Main Settings');
-            imgui.BeginChild('settings_main', { 0, 135, }, true);
+            imgui.BeginChild('settings_main', { 0, 135, }, ImGuiChildFlags_Borders);
 
-                imgui.Checkbox('Visible', eqmon.settings.visible);
+                if (imgui.Checkbox('Visible', eqmon.settings.visible)) then
+                    settings.save();
+                end
                 imgui.ShowHelp('Toggles if EquipMon is visible or not.');
-                imgui.SliderFloat('Opacity', eqmon.settings.opacity, 0.125, 1.0, '%.3f');
+                if (imgui.SliderFloat('Opacity', eqmon.settings.opacity, 0.125, 1.0, '%.3f')) then
+                    settings.save();
+                end
                 imgui.ShowHelp('The opacity of the equipment slots and icons.');
-                imgui.DragFloat('Padding', eqmon.settings.padding, 0.1, 0.0, 200.0, '%.2f');
+                if (imgui.DragFloat('Padding', eqmon.settings.padding, 0.1, 0.0, 200.0, '%.2f')) then
+                    settings.save();
+                end
                 imgui.ShowHelp('The padding between equipment slots.\n\nClick and drag to change the value.\nOr double-click to edit directly.');
-                imgui.DragFloat('Scale', eqmon.settings.scale, 0.1, 0.1, 5.0, '%.2f');
+                if (imgui.DragFloat('Scale', eqmon.settings.scale, 0.1, 0.1, 5.0, '%.2f')) then
+                    settings.save();
+                end
                 imgui.ShowHelp('The scaling of the EquipMon object.\n\nClick and drag to change the value.\nOr double-click to edit directly.');
 
                 local pos = { eqmon.settings.x[1], eqmon.settings.y[1] };
                 if (imgui.InputInt2('Position', pos)) then
                     eqmon.settings.x[1] = pos[1];
                     eqmon.settings.y[1] = pos[2];
+                    settings.save();
                 end
                 imgui.ShowHelp('The position of EquipMon on screen.');
 
@@ -272,7 +295,7 @@ local function render_editor()
 
         imgui.BeginGroup();
             imgui.TextColored({ 1.0, 0.65, 0.26, 1.0 }, 'Slot Settings');
-            imgui.BeginChild('settings_slots', { 0, 110, }, true);
+            imgui.BeginChild('settings_slots', { 0, 110, }, ImGuiChildFlags_Borders);
 
                 if (imgui.InputInt('Theme', eqmon.settings.slots.theme)) then
                     eqmon.bg = load_asset_texture(eqmon.settings.slots.theme[1]);
@@ -290,7 +313,7 @@ local function render_editor()
 
         imgui.BeginGroup();
             imgui.TextColored({ 1.0, 0.65, 0.26, 1.0 }, 'Background Settings');
-            imgui.BeginChild('settings_bg', { 0, 65, }, true);
+            imgui.BeginChild('settings_bg', { 0, 65, }, ImGuiChildFlags_Borders);
 
                 -- Flips the R and B values of a color for translation between ImGui and D3D.
                 local function cflip(c)
@@ -302,6 +325,7 @@ local function render_editor()
 
                 if (imgui.Checkbox('Background Visible', { eqmon.settings.background.visible })) then
                     eqmon.settings.background.visible = not eqmon.settings.background.visible;
+                    settings.save();
                 end
                 imgui.ShowHelp('Toggles if the overall background is visible or not.');
 
@@ -313,6 +337,8 @@ local function render_editor()
                     if (eqmon.background ~= nil) then
                         eqmon.background.color = eqmon.settings.background.color;
                     end
+
+                    settings.save();
                 end
                 imgui.ShowHelp('The color of the overall background behind the EquipMon object.');
 
@@ -321,7 +347,7 @@ local function render_editor()
 
         imgui.BeginGroup();
             imgui.TextColored({ 1.0, 0.65, 0.26, 1.0 }, 'Ammo Font Settings');
-            imgui.BeginChild('settings_ammo_font', { 0, 185, }, true);
+            imgui.BeginChild('settings_ammo_font', { 0, 185, }, ImGuiChildFlags_Borders);
 
                 local need_font_update = false;
 
@@ -379,6 +405,7 @@ local function render_editor()
                 -- Apply any font changes..
                 if (need_font_update and eqmon.font ~= nil) then
                     eqmon.font:apply(eqmon.settings.ammo_font);
+                    settings.save();
                 end
 
             imgui.EndChild();
@@ -535,12 +562,14 @@ ashita.events.register('command', 'command_cb', function (e)
     -- Handle: /equipmon show - Shows the EquipMon object.
     if (#args >= 2 and args[2]:any('show')) then
         eqmon.settings.visible[1] = true;
+        settings.save();
         return;
     end
 
     -- Handle: /equipmon hide - Hides the EquipMon object.
     if (#args >= 2 and args[2]:any('hide')) then
         eqmon.settings.visible[1] = false;
+        settings.save();
         return;
     end
 
@@ -583,10 +612,6 @@ end);
 * desc : Event called when the Direct3D device is beginning a scene.
 --]]
 ashita.events.register('d3d_beginscene', 'beginscene_cb', function (isRenderingBackBuffer)
-    if ShouldHideUI() or (not eqmon.settings.visible[1] or not eqmon.settings.background.visible) then
-        eqmon.background.visible = false;
-        return;
-    end
     if (not isRenderingBackBuffer) then return; end
 
     -- Update the background object..
@@ -609,9 +634,6 @@ end);
 * desc : Event called when the Direct3D device is presenting a scene.
 --]]
 ashita.events.register('d3d_present', 'present_cb', function ()
-    if ShouldHideUI() then
-        return
-    end
     render_editor();
 
     if (eqmon.sprite == nil) then return; end
@@ -659,17 +681,14 @@ ashita.events.register('d3d_present', 'present_cb', function ()
         -- Update and render the slots ammo count..
         if (eqmon.settings.slots.show_ammo_count[1] and v.slot == 3) then
             local id, cnt = get_equipped_item(3);
-            if (id ~= nil and cnt ~= nil) then
-                local res = AshitaCore:GetResourceManager():GetItemById(id);
-                if (res ~= nil and res.StackSize ~= 1) then
-                    eqmon.font.text = cnt:str();
+            if (id ~= nil and cnt ~= nil and get_item_max_stack_size(id) > 1) then
+                eqmon.font.text = cnt:str();
 
-                    -- Align the text to the bottom right corner of the object..
-                    local w, h = eqmon.font:get_text_size();
-                    eqmon.font.position_x = eqmon.vec_position.x + (32 * eqmon.vec_scale.x) - w - 1;
-                    eqmon.font.position_y = eqmon.vec_position.y + (32 * eqmon.vec_scale.y) - h + 2;
-                    eqmon.font:render();
-                end
+                -- Align the text to the bottom right corner of the object..
+                local w, h = eqmon.font:get_text_size();
+                eqmon.font.position_x = eqmon.vec_position.x + (32 * eqmon.vec_scale.x) - w - 1;
+                eqmon.font.position_y = eqmon.vec_position.y + (32 * eqmon.vec_scale.y) - h + 2;
+                eqmon.font:render();
             end
         end
     end);
@@ -732,6 +751,8 @@ ashita.events.register('mouse', 'mouse_cb', function (e)
             if (eqmon.move.dragging) then
                 eqmon.move.dragging = false;
 
+                settings.save();
+
                 e.blocked = true;
             end
         end):cond(is_dragging),
@@ -739,6 +760,8 @@ ashita.events.register('mouse', 'mouse_cb', function (e)
         -- Event: Mouse Right Button Down
         [516] = (function ()
             eqmon.settings.slots.show_bg[1] = not eqmon.settings.slots.show_bg[1];
+
+            settings.save();
 
             e.blocked = true;
         end):cond(hit_test:bindn(e.x, e.y)),
@@ -756,6 +779,8 @@ ashita.events.register('mouse', 'mouse_cb', function (e)
                 eqmon.settings.opacity[1] = eqmon.settings.opacity[1] + 0.125;
             end
             eqmon.settings.opacity[1] = eqmon.settings.opacity[1]:clamp(0.125, 1);
+
+            settings.save();
 
             e.blocked = true;
         end):cond(hit_test:bindn(e.x, e.y)),

@@ -1,5 +1,5 @@
 --[[
-* Addons - Copyright (c) 2021 Ashita Development Team
+* Addons - Copyright (c) 2025 Ashita Development Team
 * Contact: https://www.ashitaxi.com/
 * Contact: https://discord.gg/Ashita
 *
@@ -21,12 +21,13 @@
 
 addon.name      = 'drawdistance';
 addon.author    = 'atom0s';
-addon.version   = '1.0';
+addon.version   = '1.2';
 addon.desc      = 'Adds slash commands to alter the games scene rendering distances.';
 addon.link      = 'https://ashitaxi.com/';
 
-require('common');
-local chat = require('chat');
+require 'common';
+
+local chat = require 'chat';
 
 -- DrawDistance Variables
 local drawdistance = T{
@@ -64,7 +65,7 @@ end
 --]]
 ashita.events.register('load', 'load_cb', function ()
     -- Find the draw distance pointer..
-    drawdistance.ptr = ashita.memory.find('FFXiMain.dll', 0, '8BC1487408D80D', 0, 0);
+    drawdistance.ptr = ashita.memory.find(0, 0, '8BC1487408D80D', 0, 0);
     if (drawdistance.ptr == 0) then
         error(chat.header('drawdistance'):append(chat.error('Error: Failed to locate draw distance pointer.')));
         return;
@@ -94,14 +95,14 @@ ashita.events.register('command', 'command_cb', function (e)
     -- Handle: /drawdistance (setentity | setmob | sete | setm) <n> - Sets the entity draw distance.
     if (#args == 3 and args[2]:any('setentity', 'setmob', 'sete', 'setm')) then
         local ptr = ashita.memory.read_uint32(drawdistance.ptr + 0x0F);
-        ashita.memory.write_float(ptr, tonumber(args[3]));
+        ashita.memory.write_float(ptr, tonumber(args[3]) or 1);
         return;
     end
 
     -- Handle: /drawdistance (setworld | setw) <n> - Sets the world draw distance.
     if (#args == 3 and args[2]:any('setworld', 'setw')) then
         local ptr = ashita.memory.read_uint32(drawdistance.ptr + 0x07);
-        ashita.memory.write_float(ptr, tonumber(args[3]));
+        ashita.memory.write_float(ptr, tonumber(args[3]) or 1);
         return;
     end
 

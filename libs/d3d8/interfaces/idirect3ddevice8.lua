@@ -1,5 +1,5 @@
 --[[
-* Addons - Copyright (c) 2021 Ashita Development Team
+* Addons - Copyright (c) 2025 Ashita Development Team
 * Contact: https://www.ashitaxi.com/
 * Contact: https://discord.gg/Ashita
 *
@@ -23,9 +23,9 @@
 * This file is created using the information from the d3d8.h header file of the Direct3D 8 SDK.
 --]]
 
-require('win32types');
+require 'win32types';
 
-local ffi   = require('ffi');
+local ffi   = require 'ffi';
 local C     = ffi.C;
 
 ffi.cdef[[
@@ -208,7 +208,7 @@ IDirect3DDevice8 = ffi.metatype('IDirect3DDevice8', {
 
             return res, swap;
         end,
-        Reset = function (self, pPresentationParameters)
+        Reset = function (self, pPresentationParameters) ---@diagnostic disable-line: unused-local
             -- Note: Reset calls are not valid for FFXI.
             error('Not implemented.');
         end,
@@ -500,7 +500,7 @@ IDirect3DDevice8 = ffi.metatype('IDirect3DDevice8', {
 
             return res, res == C.S_OK and passes[0] or nil;
         end,
-        GetInfo = function (self, DevInfoID, pDevInfoStruct, DevInfoStructSize)
+        GetInfo = function (self, DevInfoID, pDevInfoStruct, DevInfoStructSize) ---@diagnostic disable-line: unused-local
             error('Not implemented.');
         end,
         SetPaletteEntries = function (self, PaletteNumber, pEntries)
@@ -558,7 +558,7 @@ IDirect3DDevice8 = ffi.metatype('IDirect3DDevice8', {
             return self.lpVtbl.SetVertexShaderConstant(self, Register, pConstantData, ConstantCount);
         end,
         GetVertexShaderConstant = function (self, Register, ConstantCount)
-            local data  = ffi.new('float[?]', ConstantCount * 4 * 4);
+            local data  = ffi.new('float[?]', ConstantCount * 4);
             local res   = self.lpVtbl.GetVertexShaderConstant(self, Register, data, ConstantCount);
 
             return res, res == C.S_OK and data or nil;
@@ -601,7 +601,7 @@ IDirect3DDevice8 = ffi.metatype('IDirect3DDevice8', {
         end,
         CreatePixelShader = function (self, pFunction)
             local handle    = ffi.new('DWORD[1]');
-            local res       = self.lpVtbl.CreatePixelShader(self, pFunction);
+            local res       = self.lpVtbl.CreatePixelShader(self, pFunction, handle);
 
             return res, res == C.S_OK and handle[0] or nil;
         end,
@@ -621,7 +621,7 @@ IDirect3DDevice8 = ffi.metatype('IDirect3DDevice8', {
             return self.lpVtbl.SetPixelShaderConstant(self, Register, pConstantData, ConstantCount);
         end,
         GetPixelShaderConstant = function (self, Register, ConstantCount)
-            local data  = ffi.new('float[?]', ConstantCount * 4 * 4);
+            local data  = ffi.new('float[?]', ConstantCount * 4);
             local res   = self.lpVtbl.GetPixelShaderConstant(self, Register, data, ConstantCount);
 
             return res, res == C.S_OK and data or nil;

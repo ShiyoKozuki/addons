@@ -1,5 +1,5 @@
 --[[
-* Addons - Copyright (c) 2021 Ashita Development Team
+* Addons - Copyright (c) 2025 Ashita Development Team
 * Contact: https://www.ashitaxi.com/
 * Contact: https://discord.gg/Ashita
 *
@@ -21,13 +21,13 @@
 
 addon.name      = 'autojoin';
 addon.author    = 'atom0s & Thorny';
-addon.version   = '1.0';
+addon.version   = '1.2';
 addon.desc      = 'Automatically handles party invite related interactions.';
 addon.link      = 'https://ashitaxi.com/';
 
-require('common');
-local chat = require('chat');
-local settings = require('settings');
+require 'common';
+local chat      = require 'chat';
+local settings  = require 'settings';
 
 -- Default Settings
 local default_settings = T{
@@ -326,8 +326,6 @@ end);
 ashita.events.register('packet_in', 'packet_in_cb', function (e)
     -- Packet: Party Request
     if (e.id == 0x00DC) then
-        e.blocked = true;
-
         local n = struct.unpack('c16', e.data_modified, 0x0C + 0x01);
         local a = autojoin.settings.mode;
         local u = get_user_entry(n:trim('\0'));
@@ -338,6 +336,8 @@ ashita.events.register('packet_in', 'packet_in_cb', function (e)
 
         -- Handle the action for the user..
         if (a ~= 2) then
+            e.blocked = true;
+
             local packet = { 0x74, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, };
             packet[5] = a;
             AshitaCore:GetPacketManager():AddOutgoingPacket(0x74, packet);

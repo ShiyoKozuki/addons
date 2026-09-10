@@ -1,5 +1,5 @@
 --[[
-* Addons - Copyright (c) 2021 Ashita Development Team
+* Addons - Copyright (c) 2025 Ashita Development Team
 * Contact: https://www.ashitaxi.com/
 * Contact: https://discord.gg/Ashita
 *
@@ -19,11 +19,11 @@
 * along with Ashita.  If not, see <https://www.gnu.org/licenses/>.
 --]]
 
-require('common');
-require('win32types');
+require 'common';
+require 'win32types';
 
-local ffi = require('ffi');
-local C = ffi.C;
+local ffi   = require 'ffi';
+local C     = ffi.C;
 
 -- FFI Prototypes
 ffi.cdef[[
@@ -51,7 +51,7 @@ local dats = T{
 
     -- Predefined lists..
     lists = T{
-        npcs = require('ffxi.dats.npcs'),
+        npcs = require 'ffxi.dats.npcs',
     },
 };
 
@@ -141,12 +141,10 @@ do
     end
 end
 
---[[
-* Returns the path to a DAT file by its lookup id.
-*
-* @param {number} fileid - The DAT file id to lookup.
-* @return {string|nil} The path to the DAT on success, nil otherwise.
---]]
+---Returns the path to a DAT file by its lookup id.
+---@param fileid number
+---@return string|nil
+---@nodiscard
 dats.get_file_path = function (fileid)
     if (dats.ftable == nil or dats.vtable == nil) then
         return nil;
@@ -166,19 +164,15 @@ dats.get_file_path = function (fileid)
     return ('%s\\%s\\%s\\%s.DAT'):fmt(dats.path, (r == 1 and 'ROM' or ('ROM'):append(r)), bit.rshift(dats.ftable[fileid], 0x07), bit.band(dats.ftable[fileid], 0x7F));
 end
 
---[[
-* Returns the DAT id for the file containing the given zones npc list.
-*
-* @param {number} zid - The zone id.
-* @param {number} zsubid - The zone sub id.
-* @return {number|nil} The DAT file id on success, nil otherwise.
-*
-* @note
-*
-* The zone id and sub id can be obtained from the 'Zone Enter (0x000A)' packet.
-*   + 0x30 = zone id
-*   + 0x9E = zone sub id
---]]
+---Returns the DAT id for the file containing the given zones npc list.
+---
+---The zone id and sub id can be obtained from the `Zone Enter (0x000A)` packet.
+--- - Offset: `0x30` = Zone Id
+--- - Offset: `0x9E` = Zone Sub Id
+---@param zid number
+---@param zsubid number
+---@return number
+---@nodiscard
 dats.get_zone_npclist_id = function (zid, zsubid)
     if (zsubid < 1000 or zsubid > 1299) then
         if (zid < 256) then
@@ -191,18 +185,15 @@ dats.get_zone_npclist_id = function (zid, zsubid)
     return zsubid + 66911;
 end
 
---[[
-* Returns the path to the DAT file containing the given zones npc list.
-*
-* @param {number} zid - The zone id.
-* @param {number} zsubid - The zone sub id.
-* @return {string|nil} The path to the DAT file on success, nil otherwise.
-* @note
-*
-* The zone id and sub id can be obtained from the 'Zone Enter (0x000A)' packet.
-*   + 0x30 = zone id
-*   + 0x9E = zone sub id
---]]
+---Returns the path to the DAT file containing the given zones npc list.
+---
+---The zone id and sub id can be obtained from the `Zone Enter (0x000A)` packet.
+--- - Offset: `0x30` = Zone Id
+--- - Offset: `0x9E` = Zone Sub Id
+---@param zid number
+---@param zsubid number
+---@return string|nil
+---@nodiscard
 dats.get_zone_npclist = function (zid, zsubid)
     return dats.get_file_path(dats.get_zone_npclist_id(zid, zsubid));
 end

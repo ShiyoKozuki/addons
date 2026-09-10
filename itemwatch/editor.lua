@@ -1,5 +1,5 @@
 --[[
-* Addons - Copyright (c) 2021 Ashita Development Team
+* Addons - Copyright (c) 2025 Ashita Development Team
 * Contact: https://www.ashitaxi.com/
 * Contact: https://discord.gg/Ashita
 *
@@ -19,14 +19,15 @@
 * along with Ashita.  If not, see <https://www.gnu.org/licenses/>.
 --]]
 
-require('common');
-local chat = require('chat');
-local imgui = require('imgui');
+require 'common';
+
+local chat  = require 'chat';
+local imgui = require 'imgui';
 
 -- ItemWatch Editor Variables
 local editor = {
-    lstMgr = require('listmanager'),
-    settings = require('settings'),
+    lstMgr      = require 'listmanager',
+    settings    = require 'settings',
 
     -- Main Window
     is_open = { false, },
@@ -104,7 +105,7 @@ function editor.render_tab_items()
     -- Left Side (Many whelps, handle it!!)
     imgui.BeginGroup();
         imgui.TextColored(colors.header, 'Current Tracked Items');
-        imgui.BeginChild('leftpane', { 230, -imgui.GetFrameHeightWithSpacing(), }, true);
+        imgui.BeginChild('leftpane', { 230, -imgui.GetFrameHeightWithSpacing(), }, ImGuiChildFlags_Borders);
             -- Display watched items..
             local watched = editor.lstMgr.watched_items;
             for x = 0, #watched - 1 do
@@ -149,7 +150,7 @@ function editor.render_tab_items()
     -- Right Side (Item Lookup Editor)
     imgui.BeginGroup();
         imgui.TextColored(colors.header, 'Item Lookup Tool');
-        imgui.BeginChild('rightpane', { 0, -imgui.GetFrameHeightWithSpacing(), }, true);
+        imgui.BeginChild('rightpane', { 0, -imgui.GetFrameHeightWithSpacing(), }, ImGuiChildFlags_Borders);
             -- Item search..
             if (imgui.InputText('Item Name', editor.tab_items.search_buffer, editor.tab_items.search_buffer_size, ImGuiInputTextFlags_EnterReturnsTrue)) then
                 editor.tab_items.search_selected[1] = -1;
@@ -190,7 +191,7 @@ function editor.render_tab_keyitems()
     -- Left Side (Many whelps, handle it!!)
     imgui.BeginGroup();
         imgui.TextColored(colors.header, 'Current Tracked Key Items');
-        imgui.BeginChild('leftpane', { 230, -imgui.GetFrameHeightWithSpacing(), }, true);
+        imgui.BeginChild('leftpane', { 230, -imgui.GetFrameHeightWithSpacing(), }, ImGuiChildFlags_Borders);
             -- Display watched key items..
             local watched = editor.lstMgr.watched_keyitems;
             for x = 0, #watched - 1 do
@@ -235,7 +236,7 @@ function editor.render_tab_keyitems()
     -- Right Side (Key Item Lookup Editor)
     imgui.BeginGroup();
         imgui.TextColored(colors.header, 'Key Item Lookup Tool');
-        imgui.BeginChild('rightpane', { 0, -imgui.GetFrameHeightWithSpacing(), }, true);
+        imgui.BeginChild('rightpane', { 0, -imgui.GetFrameHeightWithSpacing(), }, ImGuiChildFlags_Borders);
             -- Key Item search..
             if (imgui.InputText('Key Item Name', editor.tab_keyitems.search_buffer, editor.tab_keyitems.search_buffer_size, ImGuiInputTextFlags_EnterReturnsTrue)) then
                 editor.tab_keyitems.search_selected[1] = -1;
@@ -276,7 +277,7 @@ function editor.render_tab_lists()
     -- Left Side (Many whelps, handle it!!)
     imgui.BeginGroup();
         imgui.TextColored(colors.header, 'Saved Lists');
-        imgui.BeginChild('leftpane', { 230, -imgui.GetFrameHeightWithSpacing(), }, true);
+        imgui.BeginChild('leftpane', { 230, -imgui.GetFrameHeightWithSpacing(), }, ImGuiChildFlags_Borders);
             -- Display saved lists..
             local lists = editor.lstMgr.saved_lists;
             for x = 0, #lists - 1 do
@@ -318,7 +319,7 @@ function editor.render_tab_lists()
     -- Right Side (Saved Lists Manager)
     imgui.BeginGroup();
         imgui.TextColored(colors.header, 'Saved Lists Manager');
-        imgui.BeginChild('rightpane', { -1, -imgui.GetFrameHeightWithSpacing() }, true);
+        imgui.BeginChild('rightpane', { -1, -imgui.GetFrameHeightWithSpacing() }, ImGuiChildFlags_Borders);
             imgui.PushItemWidth(225);
             imgui.InputText('Name', editor.tab_lists.name_buffer, editor.tab_lists.name_buffer_size);
             imgui.PopItemWidth();
@@ -390,7 +391,7 @@ function editor.render_tab_settings()
     -- Left Side (Many whelps, handle it!!)
     imgui.BeginGroup();
         imgui.TextColored(colors.header, 'Overlay Settings');
-        imgui.BeginChild('leftpane', { 0, -imgui.GetFrameHeightWithSpacing(), }, true);
+        imgui.BeginChild('leftpane', { 0, -imgui.GetFrameHeightWithSpacing(), }, ImGuiChildFlags_Borders);
             imgui.Checkbox('Show Overlay', editor.overlay.is_open);
             imgui.ShowHelp('Toggles if the overlay is visible or not.');
             imgui.Checkbox('Show Border', editor.overlay.show_border);

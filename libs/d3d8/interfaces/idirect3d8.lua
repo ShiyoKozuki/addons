@@ -1,5 +1,5 @@
 --[[
-* Addons - Copyright (c) 2021 Ashita Development Team
+* Addons - Copyright (c) 2025 Ashita Development Team
 * Contact: https://www.ashitaxi.com/
 * Contact: https://discord.gg/Ashita
 *
@@ -23,10 +23,10 @@
 * This file is created using the information from the d3d8.h header file of the Direct3D 8 SDK.
 --]]
 
-require('win32types');
-require('d3d8.d3d8types');
+require 'win32types';
+require 'd3d8.d3d8types';
 
-local ffi   = require('ffi');
+local ffi   = require 'ffi';
 local C     = ffi.C;
 
 ffi.cdef[[
@@ -69,7 +69,7 @@ IDirect3D8 = ffi.metatype('IDirect3D8', {
         Release         = IUnknown.Release,
 
         -- IDirect3D8 Methods
-        RegisterSoftwareDevice = function (self, pInitializeFunction)
+        RegisterSoftwareDevice = function (self, pInitializeFunction) ---@diagnostic disable-line: unused-local
             -- Direct3D8 marks this as a dead function:
             -- "Because the pluggable software device feature is no longer supported in Microsoft DirectX® 8.x, do not use this method."
             error('Not implemented.');

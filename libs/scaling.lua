@@ -1,5 +1,5 @@
 --[[
-* Addons - Copyright (c) 2021 Ashita Development Team
+* Addons - Copyright (c) 2025 Ashita Development Team
 * Contact: https://www.ashitaxi.com/
 * Contact: https://discord.gg/Ashita
 *
@@ -19,7 +19,7 @@
 * along with Ashita.  If not, see <https://www.gnu.org/licenses/>.
 --]]
 
-require('common');
+require 'common';
 
 --[[
 * Scaling Helper Library
@@ -48,7 +48,7 @@ local scaling = {
 
 do
     -- Find the CYmdb object which holds the current scaling information..
-    local ptr = ashita.memory.find('FFXiMain.dll', 0, 'A1????????85C05E74????80', 0x01, 0x00);
+    local ptr = ashita.memory.find(0, 0, 'A1????????85C05E74????80', 0x01, 0x00);
     if (ptr == 0) then
         error('[libs::scaling] Failed to find required CYmdb manager object! (1)');
     end
@@ -72,40 +72,32 @@ do
     scaling.scaled.h = scaling.window.h / scaling.menu.h;
 end
 
---[[
-* Scales a font size based on the users configurations.
-*
-* @param {number} height - The default font size to be scaled.
-* @return {number} The scaled height, floored to the nearest integer.
---]]
+---Scales a font size based on the users configurations.
+---@param height number The default font size to be scaled.
+---@return integer
+---@nodiscard
 scaling.scale_font = function (height)
     return math.floor(height * scaling.scaled.h);
 end
 
-scaling.scale_f = scaling.scale_font;
-
---[[
-* Scales a width based on the users configurations.
-*
-* @param {number} width - The width to be scaled.
-* @return {number} The scaled width.
---]]
+---Scales a width based on the users configurations.
+---@param width number The width to be scaled.
+---@return number
+---@nodiscard
 scaling.scale_width = function (width)
     return width * scaling.scaled.w;
 end
 
-scaling.scale_w = scaling.scale_width;
-
---[[
-* Scales a height based on the users configurations.
-*
-* @param {number} height - The height to be scaled.
-* @return {number} The scaled height.
---]]
+---Scales a height based on the users configurations.
+---@param height number The height to be scaled.
+---@return number
+---@nodiscard
 scaling.scale_height = function (height)
     return height * scaling.scaled.h;
 end
 
+scaling.scale_f = scaling.scale_font;
+scaling.scale_w = scaling.scale_width;
 scaling.scale_h = scaling.scale_height;
 
 -- Return the library table..

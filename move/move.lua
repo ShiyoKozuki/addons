@@ -1,5 +1,5 @@
 --[[
-* Addons - Copyright (c) 2021 Ashita Development Team
+* Addons - Copyright (c) 2025 Ashita Development Team
 * Contact: https://www.ashitaxi.com/
 * Contact: https://discord.gg/Ashita
 *
@@ -21,15 +21,15 @@
 
 addon.name      = 'move';
 addon.author    = 'atom0s';
-addon.version   = '1.0';
+addon.version   = '1.2';
 addon.desc      = 'Window helper to adjust position, size, border, etc.';
 addon.link      = 'https://ashitaxi.com/';
 
-require('common');
-require('win32types');
+require 'common';
+require 'win32types';
 
-local chat  = require('chat');
-local ffi   = require('ffi');
+local chat  = require 'chat';
+local ffi   = require 'ffi';
 local C     = ffi.C;
 
 --[[
@@ -39,6 +39,7 @@ ffi.cdef[[
     BOOL AttachThreadInput(DWORD idAttach, DWORD idAttachTo, BOOL fAttach);
     BOOL GetClientRect(HWND hWnd, LPRECT lpRect);
     DWORD GetCurrentThreadId();
+    HWND GetForegroundWindow();
     BOOL GetWindowRect(HWND hWnd, LPRECT lpRect);
     LONG_PTR GetWindowLongA(HWND hWnd, int nIndex);
     DWORD GetWindowThreadProcessId(HWND hWnd, LPDWORD lpdwProcessId);
@@ -126,7 +127,7 @@ ashita.events.register('command', 'command_cb', function (e)
 
         ashita.tasks.oncef(1, function ()
             -- Get the current thread with input on the system..
-            local hWndCurr = ffi.cast('HWND', AshitaCore:GetForegroundWindow());
+            local hWndCurr = ffi.cast('HWND', C.GetForegroundWindow());
             local tThis = C.GetCurrentThreadId();
             local tCurr = C.GetWindowThreadProcessId(hWndCurr, nil);
 

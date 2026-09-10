@@ -1,5 +1,5 @@
 --[[
-* Addons - Copyright (c) 2021 Ashita Development Team
+* Addons - Copyright (c) 2025 Ashita Development Team
 * Contact: https://www.ashitaxi.com/
 * Contact: https://discord.gg/Ashita
 *
@@ -21,12 +21,13 @@
 
 addon.name      = 'repeater';
 addon.author    = 'atom0s & Felgar';
-addon.version   = '1.0';
+addon.version   = '1.2';
 addon.desc      = 'Allows setting a command to be repeated automatically.';
 addon.link      = 'https://ashitaxi.com/';
 
-require('common');
-local chat = require('chat');
+require 'common';
+
+local chat = require 'chat';
 
 -- Repeater Variables
 local repeater = T{
@@ -88,8 +89,8 @@ ashita.events.register('command', 'command_cb', function (e)
     -- Handle: /repeater - Displays the current addon settings.
     if (#args == 1) then
         print(chat.header(addon.name):append(chat.message('Command set to: ')):append(chat.success(repeater.cmd)));
-        print(chat.header(addon.name):append(chat.message('Delay set to: ')):append(chat.success(repeater.delay)):append(chat.success('ms')));
-        print(chat.header(addon.name):append(chat.message('Jitter set to: ')):append(chat.success(repeater.jitter)):append(chat.success('ms')));
+        print(chat.header(addon.name):append(chat.message('Delay set to: ')):append(chat.success(tostring(repeater.delay))):append(chat.success('ms')));
+        print(chat.header(addon.name):append(chat.message('Jitter set to: ')):append(chat.success(tostring(repeater.jitter))):append(chat.success('ms')));
         return;
     end
 
@@ -111,10 +112,10 @@ ashita.events.register('command', 'command_cb', function (e)
         repeater.enabled = true;
 
         print(chat.header(addon.name):append(chat.message('Starting...')));
-            
+
         -- Execute the set command first run..
         AshitaCore:GetChatManager():QueueCommand(1, repeater.cmd);
-            
+
         return;
     end
 
@@ -138,7 +139,7 @@ ashita.events.register('command', 'command_cb', function (e)
     if (#args >= 3 and args[2]:any('delay', 'cycle')) then
         repeater.delay = math.max(args[3]:num_or(1000), 0);
 
-        print(chat.header(addon.name):append(chat.message('Delay set to: ')):append(chat.success(repeater.delay)):append(chat.success('ms')));
+        print(chat.header(addon.name):append(chat.message('Delay set to: ')):append(chat.success(tostring(repeater.delay))):append(chat.success('ms')));
         return;
     end
 
@@ -146,7 +147,7 @@ ashita.events.register('command', 'command_cb', function (e)
     if (#args >= 3 and args[2]:any('jitter')) then
         repeater.jitter = math.max(args[3]:num_or(1000), 0);
 
-        print(chat.header(addon.name):append(chat.message('Jitter set to: ')):append(chat.success(repeater.jitter)):append(chat.success('ms')));
+        print(chat.header(addon.name):append(chat.message('Jitter set to: ')):append(chat.success(tostring(repeater.jitter))):append(chat.success('ms')));
         return;
     end
 

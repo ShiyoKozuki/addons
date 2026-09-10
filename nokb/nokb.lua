@@ -1,5 +1,5 @@
 --[[
-* Addons - Copyright (c) 2022 Ashita Development Team
+* Addons - Copyright (c) 2025 Ashita Development Team
 * Contact: https://www.ashitaxi.com/
 * Contact: https://discord.gg/Ashita
 *
@@ -21,11 +21,11 @@
 
 addon.name      = 'nokb';
 addon.author    = 'atom0s';
-addon.version   = '1.0';
+addon.version   = '1.4';
 addon.desc      = 'Disables knockback effects applied to the local player.';
 addon.link      = 'https://ashitaxi.com/';
 
-require('common');
+require 'common';
 
 --[[
 * event: packet_in
@@ -36,32 +36,22 @@ ashita.events.register('packet_in', 'packet_in_cb', function (e)
     if (e.id == 0x0028) then
         -- Handle mob skills finishing..
         if (ashita.bits.unpack_be(e.data_modified_raw, 82, 4) == 0x0B) then
-            -- Obtain the local player entity..
-            local player = GetPlayerEntity();
-            if (player == nil) then
-                return;
-            end
-
             -- Read the target count affected by the action..
             local n = ashita.bits.unpack_be(e.data_modified_raw, 9, 0, 8);
             local b = 150;
 
             -- Loop the targets affected by the action..
-            for x = 0, n - 1 do
-                local id = ashita.bits.unpack_be(e.data_modified_raw, 0, b + 0, 32);
-
-                -- Prevent the local player from being knocked back..
-                if (id == player.ServerId) then
-                    ashita.bits.pack_be(e.data_modified_raw, 0, b + 60, 3);
-                end
+            for _ = 0, n - 1 do
+                -- Prevent the knock back from happening..
+                ashita.bits.pack_be(e.data_modified_raw, 0, b + 60, 3);
 
                 -- Skip over additional effect information if present..
-                if (bit.band(ashita.bits.unpack_be(e.data_modified_raw, b + 121, 1), 0x01)) then
+                if (bit.band(ashita.bits.unpack_be(e.data_modified_raw, b + 121, 1), 0x01) == 0x01) then
                     b = b + 37;
                 end
 
                 -- Skip over spike effect information if present..
-                if (bit.band(ashita.bits.unpack_be(e.data_modified_raw, b + 122, 1), 0x01)) then
+                if (bit.band(ashita.bits.unpack_be(e.data_modified_raw, b + 122, 1), 0x01) == 0x01) then
                     b = b + 34;
                 end
 

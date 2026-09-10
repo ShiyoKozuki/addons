@@ -1,5 +1,5 @@
 --[[
-* Addons - Copyright (c) 2021 Ashita Development Team
+* Addons - Copyright (c) 2025 Ashita Development Team
 * Contact: https://www.ashitaxi.com/
 * Contact: https://discord.gg/Ashita
 *
@@ -19,10 +19,11 @@
 * along with Ashita.  If not, see <https://www.gnu.org/licenses/>.
 --]]
 
-switch = require('switch');
+---@overload fun(value: any, cases: table<any, function>): nil|any
+switch = require 'switch';
 
 -- Extension Libraries
-local sugar = require('sugar');
+local sugar = require 'sugar';
 
 -- Return a table containing any common module forwards..
 return {

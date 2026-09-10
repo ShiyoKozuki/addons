@@ -1,5 +1,5 @@
 --[[
-* Addons - Copyright (c) 2023 Ashita Development Team
+* Addons - Copyright (c) 2025 Ashita Development Team
 * Contact: https://www.ashitaxi.com/
 * Contact: https://discord.gg/Ashita
 *
@@ -19,9 +19,10 @@
 * along with Ashita.  If not, see <https://www.gnu.org/licenses/>.
 --]]
 
-require('common');
-local imgui = require('imgui');
-local parser = require('parser');
+require 'common';
+
+local imgui     = require 'imgui';
+local parser    = require 'parser';
 
 -- actionparse ui variables..
 local ui = T{
@@ -139,11 +140,11 @@ function ui.render_action_info()
         imgui.TableHeadersRow();
 
         local idx = 1;
-        action.target:each(function (v, k)
+        action.target:each(function (v)
             imgui.PushID(idx);
             imgui.TableNextRow();
             imgui.TableSetColumnIndex(0);
-            if (imgui.Selectable(('%08X [%s]'):fmt(v.m_uID, v.target_name), idx == ui.packet.selected_target[1], bit.bor(ImGuiSelectableFlags_SpanAllColumns, ImGuiSelectableFlags_AllowItemOverlap), { 0, 0 })) then
+            if (imgui.Selectable(('%08X [%s]'):fmt(v.m_uID, v.target_name), idx == ui.packet.selected_target[1], bit.bor(ImGuiSelectableFlags_SpanAllColumns, ImGuiSelectableFlags_AllowOverlap), { 0, 0 })) then
                 ui.packet.selected_target[1] = idx;
             end
             imgui.TableNextColumn();
@@ -189,7 +190,7 @@ function ui.render_action_info()
         imgui.TableHeadersRow();
 
         local idx = 1;
-        target.result:each(function (v, k)
+        target.result:each(function (v)
             imgui.PushID(idx);
             imgui.TableNextRow();
             imgui.TableSetColumnIndex(0);
@@ -254,7 +255,7 @@ function ui.render()
     if (imgui.Begin('Action Parser - by atom0s', ui.is_open)) then
         imgui.BeginGroup();
             imgui.TextColored(T{ 1.0, 1.0, 1.0, 1.0, }, 'Recorded Actions');
-            imgui.BeginChild('leftpane', T{ 230, -imgui.GetFrameHeightWithSpacing(), }, true);
+            imgui.BeginChild('leftpane', T{ 230, -imgui.GetFrameHeightWithSpacing(), }, ImGuiChildFlags_Borders);
                 ui.render_action_list();
             imgui.EndChild();
             if (imgui.Button('Clear')) then
@@ -287,7 +288,7 @@ function ui.render()
         imgui.SameLine();
         imgui.BeginGroup();
             imgui.TextColored(T{ 1.0, 1.0, 1.0, 1.0, }, 'Action Information');
-            imgui.BeginChild('rightpane', T{ 0, -imgui.GetFrameHeightWithSpacing(), }, true);
+            imgui.BeginChild('rightpane', T{ 0, -imgui.GetFrameHeightWithSpacing(), }, ImGuiChildFlags_Borders);
                 ui.render_action_info();
             imgui.EndChild();
             imgui.Checkbox('Capture Injected Actions', ui.capture_injected);

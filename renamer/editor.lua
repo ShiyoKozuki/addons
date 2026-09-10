@@ -1,5 +1,5 @@
 --[[
-* Addons - Copyright (c) 2021 Ashita Development Team
+* Addons - Copyright (c) 2025 Ashita Development Team
 * Contact: https://www.ashitaxi.com/
 * Contact: https://discord.gg/Ashita
 *
@@ -19,14 +19,15 @@
 * along with Ashita.  If not, see <https://www.gnu.org/licenses/>.
 --]]
 
-require('common');
-local chat = require('chat');
-local dats = require('ffxi.dats');
-local imgui = require('imgui');
+require 'common';
+
+local chat  = require 'chat';
+local dats  = require 'ffxi.dats';
+local imgui = require 'imgui';
 
 -- Renamer Editor Variables
 local editor = T{
-    lstMgr = require('listmanager'),
+    lstMgr = require 'listmanager',
     npcs = T{ },
 
     -- Main Window
@@ -95,7 +96,7 @@ function editor.update_zone_npcs(zid, zsubid)
     end
 
     -- Parse the file for npc entries..
-    for x = 0, ((size / 0x20) - 0x01) do
+    for _ = 0, ((size / 0x20) - 0x01) do
         local data = f:read(0x20);
         local name, id = struct.unpack('c28L', data);
         table.insert(editor.npcs, { id, bit.band(id, 0x0FFF), name });
@@ -131,7 +132,7 @@ function editor.render_tab_zonerenames()
     -- Left Side (Many whelps, handle it!!)
     imgui.BeginGroup();
         imgui.TextColored(colors.header, 'Current Zone Renames');
-        imgui.BeginChild('leftpane', { 275, -imgui.GetFrameHeightWithSpacing(), }, true);
+        imgui.BeginChild('leftpane', { 275, -imgui.GetFrameHeightWithSpacing(), }, ImGuiChildFlags_Borders);
             for x = 0, #renames - 1 do
                 if (x < #renames) then
                     imgui.PushID(x);
@@ -171,7 +172,7 @@ function editor.render_tab_zonerenames()
                         imgui.EndPopup();
                     end
 
-                    imgui.PopID(x);
+                    imgui.PopID();
                 end
             end
         imgui.EndChild();
@@ -196,7 +197,7 @@ function editor.render_tab_zonerenames()
     -- Right Side (Zone Entity List)
     imgui.BeginGroup();
         imgui.TextColored(colors.header, 'Zone Entities List');
-        imgui.BeginChild('rightpane', { 0, -imgui.GetFrameHeightWithSpacing(), }, true);
+        imgui.BeginChild('rightpane', { 0, -imgui.GetFrameHeightWithSpacing(), }, ImGuiChildFlags_Borders);
             imgui.InputText('New Name', editor.tab_zone.name_buffer, editor.tab_zone.name_buffer_size, ImGuiInputTextFlags_EnterReturnsTrue);
             imgui.ShowHelp('Used to set the new name of the selected entity.\nAlso updates the existing name if the npc is being renamed already.');
             if (imgui.Button('Add / Update Selected', { -1, 0 })) then
@@ -259,7 +260,7 @@ end
 --]]
 function editor.render_tab_renames()
     imgui.TextColored(colors.header, 'Current List Renames');
-    imgui.BeginChild('leftpane', { 0, -imgui.GetFrameHeightWithSpacing(), }, false);
+    imgui.BeginChild('leftpane', { 0, -imgui.GetFrameHeightWithSpacing(), }, 0);
         if (imgui.BeginTable('##renamer_list', 4, bit.bor(ImGuiTableFlags_RowBg, ImGuiTableFlags_BordersH, ImGuiTableFlags_BordersV, ImGuiTableFlags_ContextMenuInBody, ImGuiTableFlags_ScrollX, ImGuiTableFlags_ScrollY, ImGuiTableFlags_SizingFixedFit))) then
             imgui.TableSetupColumn('Zone Id', ImGuiTableColumnFlags_WidthFixed, 50.0, 0);
             imgui.TableSetupColumn('Target Index', ImGuiTableColumnFlags_WidthFixed, 90.0, 0);
@@ -277,7 +278,7 @@ function editor.render_tab_renames()
                     imgui.TableSetColumnIndex(0);
 
                     -- Setup the whole row as selectable..
-                    if (imgui.Selectable(('%d##%d'):fmt(v, vv[1]), vv[1] == editor.tab_renames.selected[1], bit.bor(ImGuiSelectableFlags_SpanAllColumns, ImGuiSelectableFlags_AllowItemOverlap), { 0, 0 })) then
+                    if (imgui.Selectable(('%d##%d'):fmt(v, vv[1]), vv[1] == editor.tab_renames.selected[1], bit.bor(ImGuiSelectableFlags_SpanAllColumns, ImGuiSelectableFlags_AllowOverlap), { 0, 0 })) then
                         editor.tab_renames.selected[1] = vv[1];
                     end
 
@@ -340,7 +341,7 @@ function editor.render_tab_lists()
     -- Left Side (Many whelps, handle it!!)
     imgui.BeginGroup();
         imgui.TextColored(colors.header, 'Saved Renamer Lists');
-        imgui.BeginChild('leftpane', { 230, -imgui.GetFrameHeightWithSpacing(), }, true);
+        imgui.BeginChild('leftpane', { 230, -imgui.GetFrameHeightWithSpacing(), }, ImGuiChildFlags_Borders);
             local lists = editor.lstMgr.saved_lists;
             for x = 0, #lists - 1 do
                 if (x < #lists) then
@@ -381,7 +382,7 @@ function editor.render_tab_lists()
     -- Right Side (Saved Lists Manager)
     imgui.BeginGroup();
         imgui.TextColored(colors.header, 'Saved Lists Manager');
-        imgui.BeginChild('rightpane', { -1, -imgui.GetFrameHeightWithSpacing() }, true);
+        imgui.BeginChild('rightpane', { -1, -imgui.GetFrameHeightWithSpacing() }, ImGuiChildFlags_Borders);
             imgui.PushItemWidth(225);
             imgui.InputText('Name', editor.tab_lists.name_buffer, editor.tab_lists.name_buffer_size);
             imgui.PopItemWidth();
@@ -481,7 +482,7 @@ function editor.beginscene()
     end
 
     -- Rename entities..
-    T(renames):each(function (v, k)
+    T(renames):each(function (v)
         local idx = bit.band(v[1], 0x0FFF);
         AshitaCore:GetMemoryManager():GetEntity():SetName(idx, v[2]);
     end);

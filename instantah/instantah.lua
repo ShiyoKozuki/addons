@@ -1,5 +1,5 @@
 --[[
-* Addons - Copyright (c) 2021 Ashita Development Team
+* Addons - Copyright (c) 2025 Ashita Development Team
 * Contact: https://www.ashitaxi.com/
 * Contact: https://discord.gg/Ashita
 *
@@ -21,13 +21,14 @@
 
 addon.name      = 'instantah';
 addon.author    = 'atom0s';
-addon.version   = '1.0';
+addon.version   = '1.1';
 addon.desc      = 'Removes the delay from auction house interactions.';
 addon.link      = 'https://ashitaxi.com/';
 
-require('common');
-local chat = require('chat');
-local ffi = require('ffi');
+require 'common';
+
+local chat  = require 'chat';
+local ffi   = require 'ffi';
 
 -- InstantAH Variables
 local instantah = {
@@ -41,7 +42,7 @@ local instantah = {
 --]]
 ashita.events.register('load', 'load_cb', function ()
     -- Find the required pointer..
-    instantah.ptr = ashita.memory.find('FFXiMain.dll', 0, '668BC1B9????????0FAFC233D2F7F1', 0x00, 0x00);
+    instantah.ptr = ashita.memory.find(0, 0, '668BC1B9????????0FAFC233D2F7F1', 0x00, 0x00);
     if (instantah.ptr == 0) then
         error(chat.header(addon.name):append(chat.error('Error: Failed to locate required pointer.')));
         return;
@@ -53,8 +54,7 @@ ashita.events.register('load', 'load_cb', function ()
 end);
 
 -- Create a cleanup object to restore the pointers when the addon is unloaded..
-instantah.gc = ffi.new('uint8_t*');
-ffi.gc(instantah.gc, function ()
+instantah.gc = ffi.gc(ffi.cast('uint8_t*', 0), function ()
     if (instantah.ptr ~= 0) then
         ashita.memory.write_uint8(instantah.ptr + 0x27, 0x74);
     end

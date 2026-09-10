@@ -1,5 +1,5 @@
 --[[
-* Addons - Copyright (c) 2021 Ashita Development Team
+* Addons - Copyright (c) 2025 Ashita Development Team
 * Contact: https://www.ashitaxi.com/
 * Contact: https://discord.gg/Ashita
 *
@@ -19,9 +19,10 @@
 * along with Ashita.  If not, see <https://www.gnu.org/licenses/>.
 --]]
 
-require('common');
-local imgui = require('imgui');
-local json = require('json');
+require 'common';
+
+local imgui = require 'imgui';
+local json  = require 'json';
 
 -- blucheck UI Variables
 local ui = {
@@ -155,7 +156,7 @@ function ui.get_spell_counts()
         total   = 0,
     };
 
-    ui.spells:each(function (v, k)
+    ui.spells:each(function (v)
         counts.total = counts.total + 1;
 
         if (v.known) then
@@ -240,9 +241,9 @@ function ui.packet_in(e)
 
             -- Obtain the player entity..
             local player = GetPlayerEntity();
-            if (sender == player.TargetIndex and target == player.TargetIndex) then
+            if (player ~= nil and sender == player.TargetIndex and target == player.TargetIndex) then
                 -- Mark the spell as known..
-                ui.spells:each(function (v, k)
+                ui.spells:each(function (v)
                     if (v.index == spellId) then
                         v.known = true;
                     end
@@ -325,7 +326,7 @@ function ui.render_spell_info(lst, index)
 
             if (spell.zones:len() > 0) then
                 spell.zones:each(function (v, k)
-                    imgui.TextColored({ 1.0, 0.0, 1.0, 1.0 }, AshitaCore:GetResourceManager():GetString('zones.names', tonumber(k)));
+                    imgui.TextColored({ 1.0, 0.0, 1.0, 1.0 }, AshitaCore:GetResourceManager():GetString('zones.names', tonumber(k) or 0) or '(Unknown)');
                     imgui.Indent();
                     for _, vv in pairs(v) do
                         imgui.TextColored({ 1.0, 1.0, 1.0, 1.0 }, tostring(vv));
@@ -363,9 +364,9 @@ function ui.render_tab_spells()
     -- Left Side (Many whelps, handle it!!)
     imgui.BeginGroup();
         imgui.TextColored({ 1.0, 0.65, 0.26, 1.0 }, 'Blue Mage Spells');
-        imgui.BeginChild('leftpane', { 230, -imgui.GetFrameHeightWithSpacing(), }, true);
+        imgui.BeginChild('leftpane', { 230, -imgui.GetFrameHeightWithSpacing(), }, ImGuiChildFlags_Borders);
             local index = 1;
-            ui.spells:each(function (v, k)
+            ui.spells:each(function (v)
                 if (v.known) then
                     imgui.PushStyleColor(ImGuiCol_Text, { 0.0, 1.0, 0.0, 1.0 });
                 else
@@ -398,7 +399,7 @@ function ui.render_tab_spells()
     -- Right Side (Key Item Lookup Editor)
     imgui.BeginGroup();
         imgui.TextColored({ 1.0, 0.65, 0.26, 1.0 }, 'Spell Information');
-        imgui.BeginChild('rightpane', { 0, -imgui.GetFrameHeightWithSpacing(), }, true);
+        imgui.BeginChild('rightpane', { 0, -imgui.GetFrameHeightWithSpacing(), }, ImGuiChildFlags_Borders);
             ui.render_spell_info(ui.spells, ui.tab_spells.selected[1]);
         imgui.EndChild();
     imgui.EndGroup();
@@ -411,9 +412,9 @@ function ui.render_tab_zonehelper()
     -- Left Side (Many whelps, handle it!!)
     imgui.BeginGroup();
         imgui.TextColored({ 1.0, 0.65, 0.26, 1.0 }, 'Zone Spells');
-        imgui.BeginChild('leftpane', { 230, -imgui.GetFrameHeightWithSpacing(), }, true);
+        imgui.BeginChild('leftpane', { 230, -imgui.GetFrameHeightWithSpacing(), }, ImGuiChildFlags_Borders);
             local index = 1;
-            ui.zone:each(function (v, k)
+            ui.zone:each(function (v)
                 if (v.known) then
                     imgui.PushStyleColor(ImGuiCol_Text, { 0.0, 1.0, 0.0, 1.0 });
                 else
@@ -446,7 +447,7 @@ function ui.render_tab_zonehelper()
     -- Right Side (Key Item Lookup Editor)
     imgui.BeginGroup();
         imgui.TextColored({ 1.0, 0.65, 0.26, 1.0 }, 'Spell Information');
-        imgui.BeginChild('rightpane', { 0, -imgui.GetFrameHeightWithSpacing(), }, true);
+        imgui.BeginChild('rightpane', { 0, -imgui.GetFrameHeightWithSpacing(), }, ImGuiChildFlags_Borders);
             ui.render_spell_info(ui.zone, ui.tab_zonehelper.selected[1]);
         imgui.EndChild();
     imgui.EndGroup();

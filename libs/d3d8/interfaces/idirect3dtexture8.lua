@@ -1,5 +1,5 @@
 --[[
-* Addons - Copyright (c) 2021 Ashita Development Team
+* Addons - Copyright (c) 2025 Ashita Development Team
 * Contact: https://www.ashitaxi.com/
 * Contact: https://discord.gg/Ashita
 *
@@ -23,9 +23,9 @@
 * This file is created using the information from the d3d8.h header file of the Direct3D 8 SDK.
 --]]
 
-require('win32types');
+require 'win32types';
 
-local ffi   = require('ffi');
+local ffi   = require 'ffi';
 local C     = ffi.C;
 
 ffi.cdef[[
@@ -46,9 +46,9 @@ ffi.cdef[[
         D3DRESOURCETYPE __stdcall (*GetType)(IDirect3DTexture8* This);
 
         /*** IDirect3DBaseTexture8 methods ***/
-        DWORD           __stdcall (*SetLOD)(IDirect3DCubeTexture8* This, DWORD LODNew);
-        DWORD           __stdcall (*GetLOD)(IDirect3DCubeTexture8* This);
-        DWORD           __stdcall (*GetLevelCount)(IDirect3DCubeTexture8* This);
+        DWORD           __stdcall (*SetLOD)(IDirect3DTexture8* This, DWORD LODNew);
+        DWORD           __stdcall (*GetLOD)(IDirect3DTexture8* This);
+        DWORD           __stdcall (*GetLevelCount)(IDirect3DTexture8* This);
 
         /*** IDirect3DTexture8 methods ***/
         HRESULT         __stdcall (*GetLevelDesc)(IDirect3DTexture8* This, UINT Level, D3DSURFACE_DESC *pDesc);

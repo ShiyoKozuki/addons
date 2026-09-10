@@ -1,5 +1,5 @@
 --[[
-* Addons - Copyright (c) 2021 Ashita Development Team
+* Addons - Copyright (c) 2025 Ashita Development Team
 * Contact: https://www.ashitaxi.com/
 * Contact: https://discord.gg/Ashita
 *
@@ -21,13 +21,14 @@
 
 addon.name      = 'filterscan';
 addon.author    = 'atom0s';
-addon.version   = '1.0';
+addon.version   = '1.3';
 addon.desc      = 'Allows filtering widescan results for specific entities.';
 addon.link      = 'https://ashitaxi.com/';
 
-require('common');
-local chat = require('chat');
-local dats = require('ffxi.dats');
+require 'common';
+
+local chat = require 'chat';
+local dats = require 'ffxi.dats';
 
 -- FilterScan Variables
 local filterscan = T{
@@ -69,7 +70,7 @@ local function update_npcs(zid, zsubid)
     end
 
     -- Parse the file for npc entries..
-    for x = 0, ((size / 0x20) - 0x01) do
+    for _ = 0, ((size / 0x20) - 0x01) do
         local data = f:read(0x20);
         local name, id = struct.unpack('c28L', data);
         table.insert(filterscan.npcs, { bit.band(id, 0x0FFF), name });
@@ -171,7 +172,7 @@ ashita.events.register('packet_in', 'packet_in_cb', function (e)
     -- Packet: Widescan Entry
     if (e.id == 0x00F4) then
         -- Ensure a filter is set..
-        if (table.getn(filterscan.filter) == 0) then
+        if (#filterscan.filter == 0) then
             return;
         end
 

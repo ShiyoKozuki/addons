@@ -1,5 +1,5 @@
 --[[
-* Addons - Copyright (c) 2021 Ashita Development Team
+* Addons - Copyright (c) 2025 Ashita Development Team
 * Contact: https://www.ashitaxi.com/
 * Contact: https://discord.gg/Ashita
 *
@@ -21,14 +21,15 @@
 
 addon.name      = 'imguistyle';
 addon.author    = 'atom0s';
-addon.version   = '1.0';
+addon.version   = '1.2';
 addon.desc      = 'Allows per-character customizations to the ImGui style settings.';
 addon.link      = 'https://ashitaxi.com/';
 
-require('common');
-local chat      = require('chat');
-local imgui     = require('imgui');
-local settings  = require('settings');
+require 'common';
+
+local chat      = require 'chat';
+local imgui     = require 'imgui';
+local settings  = require 'settings';
 local style     = imgui.GetStyle();
 
 -- ImGui Style Property Names
@@ -42,9 +43,14 @@ local properties = T{
 
     -- Properties that are accessed as a number.
     n = T{
+        'FontSizeBase',
+        'FontScaleMain',
+        'FontScaleDpi',
         'Alpha',
+        'DisabledAlpha',
         'WindowRounding',
         'WindowBorderSize',
+        'WindowBorderHoverPadding',
         'WindowMenuButtonPosition',
         'ChildRounding',
         'ChildBorderSize',
@@ -56,16 +62,38 @@ local properties = T{
         'ColumnsMinSpacing',
         'ScrollbarSize',
         'ScrollbarRounding',
+        'ScrollbarPadding',
         'GrabMinSize',
         'GrabRounding',
         'LogSliderDeadzone',
+        'ImageRounding',
+        'ImageBorderSize',
         'TabRounding',
         'TabBorderSize',
-        'TabMinWidthForCloseButton',
+        'TabMinWidthBase',
+        'TabMinWidthShrink',
+        'TabCloseButtonMinWidthSelected',
+        'TabCloseButtonMinWidthUnselected',
+        'TabBarBorderSize',
+        'TabBarOverlineSize',
+        'TableAngledHeadersAngle',
+        'TreeLinesFlags',
+        'TreeLinesSize',
+        'TreeLinesRounding',
+        'DragDropTargetRounding',
+        'DragDropTargetBorderSize',
+        'DragDropTargetPadding',
+        'ColorMarkerSize',
         'ColorButtonPosition',
+        'SeparatorTextBorderSize',
         'MouseCursorScale',
         'CurveTessellationTol',
-        'CircleSegmentMaxError',
+        'CircleTessellationMaxError',
+        'HoverStationaryDelay',
+        'HoverDelayShort',
+        'HoverDelayNormal',
+        'HoverFlagsForTooltipMouse',
+        'HoverFlagsForTooltipNav',
     },
 
     -- Properties that are accessed as a ImVec2.
@@ -78,8 +106,11 @@ local properties = T{
         'ItemInnerSpacing',
         'CellPadding',
         'TouchExtraPadding',
+        'TableAngledHeadersTextAlign',
         'ButtonTextAlign',
         'SelectableTextAlign',
+        'SeparatorTextAlign',
+        'SeparatorTextPadding',
         'DisplayWindowPadding',
         'DisplaySafeAreaPadding',
     },
@@ -263,42 +294,43 @@ ashita.events.register('d3d_present', 'present_cb', function ()
         return;
     end
 
-    imgui.SetNextWindowSize({ 500, 600, });
-    imgui.SetNextWindowSizeConstraints({ 500, 600, }, { FLT_MAX, FLT_MAX, });
-    imgui.Begin('Style Editor (ImGuiStyle)');
-    imgui.TextColored({ 1.0, 1.0, 0.0, 1.0, }, 'Please Note: ');
-    imgui.ShowHelp([[
-The below editor is built into ImGui. However, saving settings requires manual usage due to how Ashita is setup.
+    imgui.SetNextWindowSize({ 600, 600 }, ImGuiCond_Once);
+    imgui.SetNextWindowSizeConstraints({ 600, 600, }, { FLT_MAX, FLT_MAX, });
+    if (imgui.Begin('Style Editor (ImGuiStyle)', imguistyle.is_open)) then
+        imgui.TextColored({ 1.0, 1.0, 0.0, 1.0, }, 'Please Note: ');
+        imgui.ShowHelp([[
+    The below editor is built into ImGui. However, saving settings requires manual usage due to how Ashita is setup.
 
-Because of this, the below editors buttons such as:
-  - Save Ref
-  - Export
+    Because of this, the below editors buttons such as:
+      - Save Ref
+      - Export
 
-Do nothing. You need to be sure to use the buttons below to save, reload, or reset your settings as desired.
+    Do nothing. You need to be sure to use the buttons below to save, reload, or reset your settings as desired.
 
-If you wish to revert changes, you can use the 'Revert Ref' button, but be sure to click 'Save Settings' afterward!]]);
+    If you wish to revert changes, you can use the 'Revert Ref' button, but be sure to click 'Save Settings' afterward!]]);
 
-    imgui.TextWrapped('After making any changes, be sure to use the \'Save Settings\' button below. Do not use the \'Save Ref\' or \'Export\' buttons as they WILL NOT save your changes!');
-    imgui.NewLine();
-    if (imgui.Button('Save Settings')) then
-        populate(imguistyle.settings);
-        settings.save();
+        imgui.TextWrapped('After making any changes, be sure to use the \'Save Settings\' button below. Do not use the \'Save Ref\' or \'Export\' buttons as they WILL NOT save your changes!');
+        imgui.NewLine();
+        if (imgui.Button('Save Settings')) then
+            populate(imguistyle.settings);
+            settings.save();
 
-        print(chat.header(addon.name):append(chat.message('Settings saved.')));
+            print(chat.header(addon.name):append(chat.message('Settings saved.')));
+        end
+        imgui.SameLine();
+        if (imgui.Button('Reload Settings')) then
+            settings.reload();
+
+            print(chat.header(addon.name):append(chat.message('Settings reloaded from disk.')));
+        end
+        imgui.SameLine();
+        if (imgui.Button('Reset Settings To Default')) then
+            settings.reset();
+
+            print(chat.header(addon.name):append(chat.message('Settings reset to defaults.')));
+        end
+        imgui.Separator();
+        imgui.ShowStyleEditor();
     end
-    imgui.SameLine();
-    if (imgui.Button('Reload Settings')) then
-        settings.reload();
-
-        print(chat.header(addon.name):append(chat.message('Settings reloaded from disk.')));
-    end
-    imgui.SameLine();
-    if (imgui.Button('Reset Settings To Default')) then
-        settings.reset();
-
-        print(chat.header(addon.name):append(chat.message('Settings reset to defaults.')));
-    end
-    imgui.Separator();
-    imgui.ShowStyleEditor();
     imgui.End();
 end);

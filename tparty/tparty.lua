@@ -1,5 +1,5 @@
 --[[
-* Addons - Copyright (c) 2021 Ashita Development Team
+* Addons - Copyright (c) 2025 Ashita Development Team
 * Contact: https://www.ashitaxi.com/
 * Contact: https://discord.gg/Ashita
 *
@@ -21,16 +21,16 @@
 
 addon.name      = 'tparty';
 addon.author    = 'atom0s';
-addon.version   = '1.0';
+addon.version   = '1.2';
 addon.desc      = 'Displays party member TP amounts and target health percent.';
 addon.link      = 'https://ashitaxi.com/';
 
-require('common');
-require('shiyolibs');
-local chat = require('chat');
-local fonts = require('fonts');
-local scaling = require('scaling');
-local settings = require('settings');
+require 'common';
+
+local chat      = require 'chat';
+local fonts     = require 'fonts';
+local scaling   = require 'scaling';
+local settings  = require 'settings';
 
 -- Default Settings
 local default_settings = T{
@@ -81,6 +81,7 @@ local function update_settings(s)
     -- Apply the font settings..
     if (tparty.font_target ~= nil) then
         tparty.font_target:apply(tparty.settings.target.font);
+        tparty.font_target.font_height = scaling.scale_f(8);
     end
     tparty.font_party:each(function (v, _)
         if (v ~= nil) then
@@ -145,6 +146,8 @@ end
 --]]
 ashita.events.register('load', 'load_cb', function ()
     tparty.font_target = fonts.new(tparty.settings.target.font);
+    tparty.font_target.font_height = scaling.scale_f(8);
+
     for x = 1, 18 do
         tparty.font_party[x] = fonts.new(tparty.settings.party.font);
 
@@ -231,13 +234,6 @@ ashita.events.register('d3d_present', 'present_cb', function ()
     if (tparty.font_target ~= nil) then
         local target = GetEntity(AshitaCore:GetMemoryManager():GetTarget():GetTargetIndex(0));
         if (target ~= nil) then
-                if ShouldHideUI(true) then
-                    tparty.font_target.visible = false
-                    tparty.font_target.text = '';
-                else
-                    tparty.font_target.visible = true
-                end
-
             tparty.font_target.position_x = scaling.scale_w(-102);
             tparty.font_target.position_y = scaling.scale_h(-50 - 20 * AshitaCore:GetMemoryManager():GetParty():GetAlliancePartyMemberCount1());
             tparty.font_target.text = tostring(target.HPPercent);
@@ -251,15 +247,7 @@ ashita.events.register('d3d_present', 'present_cb', function ()
     local zone = party:GetMemberZone(0);
 
     -- Update the party TP fonts..
-    if ShouldHideUI(true) then
-        for x = 1, 18 do
-            tparty.font_party[x].visible = false
-            tparty.font_party[x].text = ''
-        end
-        return
-    end
-
-    for x = 1, 18 do    
+    for x = 1, 18 do
         if (party:GetMemberIsActive(x - 1) == 0 or party:GetMemberZone(x - 1) ~= zone) then
             tparty.font_party[x].visible = false;
         else

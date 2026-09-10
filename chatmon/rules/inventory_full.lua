@@ -1,5 +1,5 @@
 --[[
-* Addons - Copyright (c) 2021 Ashita Development Team
+* Addons - Copyright (c) 2025 Ashita Development Team
 * Contact: https://www.ashitaxi.com/
 * Contact: https://discord.gg/Ashita
 *
@@ -19,7 +19,9 @@
 * along with Ashita.  If not, see <https://www.gnu.org/licenses/>.
 --]]
 
-require('common');
+require 'common';
+
+local imgui = require 'imgui';
 
 -- Ruleset Variables
 local ruleset = T{
@@ -75,7 +77,7 @@ end
 * event: packet_in
 * desc : Event called when the addon is processing incoming packets.
 --]]
-ruleset.callback = function (e)
+ruleset.callback = function ()
     -- Ensure inventory full alerts are enabled..
     if (not chatmon.settings.inventory_full.inventory.enabled) then
         return;

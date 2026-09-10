@@ -1,5 +1,5 @@
 --[[
-* Addons - Copyright (c) 2021 Ashita Development Team
+* Addons - Copyright (c) 2025 Ashita Development Team
 * Contact: https://www.ashitaxi.com/
 * Contact: https://discord.gg/Ashita
 *
@@ -21,13 +21,13 @@
 
 addon.name      = 'chatfix';
 addon.author    = 'atom0s & Thorny';
-addon.version   = '1.0';
+addon.version   = '1.2';
 addon.desc      = 'Fixes private server chat issues related to a client update.';
 addon.link      = 'https://ashitaxi.com/';
 
 -- Enable jitting..
-local ffi = require('ffi');
-local jit = require('jit');
+local ffi = require 'ffi';
+local jit = require 'jit';
 jit.on();
 
 --[[
@@ -53,9 +53,6 @@ ashita.events.register('packet_in', 'packet_in_cb', function (e)
     ffi.copy(buff + 23, ptr + 24, e.size - 24);
     if (flag) then buff[e.size - 1] = 0; end
     ffi.copy(e.data_modified_raw, buff, 512);
-
-    -- Cleanup..
-    buff = nil;
 end);
 
 --[[
@@ -73,7 +70,4 @@ ashita.events.register('packet_out', 'packet_out_cb', function (e)
     local ptr = ffi.cast('uint8_t*', e.data_modified_raw);
     ffi.copy(buff + 5, ptr + 6, e.size - 6);
     ffi.copy(e.data_modified_raw, buff, 512);
-
-    -- Cleanup..
-    buff = nil;
 end);
