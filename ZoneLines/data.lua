@@ -1,16 +1,18 @@
 --[[
-    ZoneLines v1.1.0 - Data Layer
+    ZoneLines v1.3.0 - Data Layer
     Loads pre-extracted zone line bounding boxes from zones_data.lua,
     supplemental trigger-area transitions from supplemental_zones.lua,
     and pre-computed terrain heights from terrain_heights.lua.
 
     Data sources (merged in order):
       1. zones_data.lua        — DAT-extracted zone line bounding boxes (auto-generated)
-      2. supplemental_zones.lua — Hand-curated trigger-area transitions (e.g. palace gates)
+      2. supplemental_zones.lua — Hand-added trigger-area transitions (e.g. palace gates)
       3. terrain_heights.lua   — Pre-computed ground heights from navmesh data
 ]]--
 
 require 'common';
+
+local chat = require 'chat';
 
 local data = {};
 
@@ -42,7 +44,6 @@ data.zone_cache_id = -1;
 -------------------------------------------------------------------------------
 
 function data.init(addon_path)
-    -- Load pre-extracted zone line data
     local addon_dir = addon_path:gsub('\\config\\addons\\zonelines$', '\\addons\\zonelines');
     local zones_file = addon_dir .. '\\zones_data.lua';
 
@@ -50,7 +51,7 @@ function data.init(addon_path)
     if (ok and static ~= nil) then
         data.static_data = static;
     else
-        print(string.format('[zonelines] WARNING: Failed to load %s', zones_file));
+        print(chat.header('zonelines'):append(chat.error('Zone line data file missing - no markers will be shown.')));
     end
 
     -- Filter out skip-listed entries (NPC interactions, not zone lines)
@@ -92,6 +93,8 @@ function data.init(addon_path)
                 end
             end
         end
+    else
+        print(chat.header('zonelines'):append(chat.message('Supplemental zone data missing - some trigger-based zone lines won\'t appear.')));
     end
 
     -- Load pre-computed terrain heights from navmesh data
@@ -99,9 +102,11 @@ function data.init(addon_path)
     local ok3, terrain = pcall(dofile, terrain_file);
     if (ok3 and terrain ~= nil) then
         data.terrain_data = terrain;
+    else
+        print(chat.header('zonelines'):append(chat.message('Terrain height data missing - dots will use estimated ground height.')));
     end
 
-    -- Count total static entries (DAT + supplemental)
+    -- total = DAT + supplemental
     data.static_total = 0;
     if (data.static_data ~= nil) then
         for _, entries in pairs(data.static_data) do
@@ -119,7 +124,6 @@ local function resolve_zone_name(zone_id)
     if (zone_id == nil or zone_id < 0) then return ''; end
     if (zone_id == 0) then return 'Mog House'; end
 
-    -- Check cache first
     if (zone_name_cache[zone_id] ~= nil) then
         return zone_name_cache[zone_id];
     end
@@ -133,7 +137,6 @@ local function resolve_zone_name(zone_id)
         return name;
     end
 
-    -- Fallback: generic label
     local fallback = string.format('Zone %d', zone_id);
     zone_name_cache[zone_id] = fallback;
     return fallback;
@@ -161,14 +164,13 @@ end
 -------------------------------------------------------------------------------
 
 function data.get_zone_lines(zone_id)
-    -- Return cached data if clean and same zone
     if (not data.cache_dirty and data.zone_cache_id == zone_id) then
         return data.zone_cache;
     end
 
     local results = T{};
 
-    -- Add pre-extracted static data (from DAT files)
+    -- static data (DAT)
     if (data.static_data ~= nil and data.static_data[zone_id] ~= nil) then
         -- Look up terrain height data for this zone
         local zone_terrain = nil;

@@ -1,5 +1,5 @@
 --[[
-    ZoneLines v1.1.0 - Zone Line Rendering via D3D8
+    ZoneLines v1.3.0 - Zone Line Rendering via D3D8
 
     Zone line bounding boxes have a thin dimension (depth you walk through)
     and a wide dimension (spanning the passage). The dotted line is drawn
@@ -17,7 +17,7 @@ local renderer = {};
 
 
 -------------------------------------------------------------------------------
--- D3D8 FFI: Vertex struct and constants (depth-tested rendering pipeline)
+-- D3D8 FFI: vertex structs and render constants
 -------------------------------------------------------------------------------
 
 ffi.cdef[[
@@ -55,6 +55,7 @@ local D3DRS_ALPHAFUNC        = 25;
 local D3DRS_ALPHABLENDENABLE = 27;
 local D3DRS_ZBIAS            = 47;
 local D3DRS_LIGHTING         = 137;
+local D3DRS_FOGENABLE        = 28;
 
 -- Depth / alpha comparison
 local D3DCMP_LESSEQUAL    = 4;
@@ -110,14 +111,7 @@ local function table_to_matrix(tbl, mat)
     return mat;
 end
 
--- Font atlas state (initialized from d3d_present where ImGui is ready)
-local font_atlas_tex_ptr = nil;
-local font_baked         = nil;
-local font_baked_size    = 0;
 
-
--- D3D text color (ARGB)
-local D3D_TEXT_WHITE  = 0xFFFFFFFF;
 
 -- Copy D3DMATRIX cdata fields into a plain Lua table (cdata refs go stale between frames)
 local function copy_matrix(m)
@@ -139,6 +133,8 @@ renderer.cached_proj       = nil;
 renderer.cached_vp_w       = 0;
 renderer.cached_vp_h       = 0;
 renderer.hide_behind_walls = true;
+-- The text/glow/label fields below are placeholders — sync_renderer() in
+-- zonelines.lua overwrites them at load from default_settings (single source).
 renderer.d3d_text_scale    = 1.0;   -- base font size multiplier
 renderer.d3d_label_offset  = 0.6;  -- world yalms above dots for label
 renderer.d3d_text_min_scale = 0.5; -- min font scale (far away)
@@ -153,105 +149,9 @@ renderer.dot_glow_intensity = 0.5;      -- glow brightness multiplier
 renderer.dot_glow_min       = 0.4;      -- pulse minimum (0-1)
 renderer.dot_glow_max       = 1.0;      -- pulse maximum (0-1)
 
--------------------------------------------------------------------------------
--- Font Atlas: Initialize from ImGui's baked font atlas for D3D text rendering
--------------------------------------------------------------------------------
-
-local font_init_fail_count = 0;  -- rate-limit failure logs
-
-function renderer.init_font_atlas()
-    local size = imgui.GetFontSize();
-
-    -- Already initialized
-    if (font_baked ~= nil and font_atlas_tex_ptr ~= nil and math.abs(size - font_baked_size) < 0.1) then
-        return true;
-    end
-
-    local font = imgui.GetFont();
-    if (font == nil) then return false; end
-
-    local atlas = font.ContainerAtlas;
-    if (atlas == nil) then return false; end
-
-    local tex_ref = atlas.TexRef;
-    if (tex_ref == nil) then return false; end
-
-    -- Try GetTexID method, fall back to _TexID field (matches mobhud)
-    local tex_id_ok, tex_id = pcall(function() return tex_ref:GetTexID(); end);
-    if (not tex_id_ok or tex_id == nil or tex_id == 0) then
-        local raw_ok, raw_id = pcall(function() return tex_ref._TexID; end);
-        if (raw_ok and raw_id ~= nil and raw_id ~= 0) then
-            tex_id = raw_id;
-        else
-            font_init_fail_count = font_init_fail_count + 1;
-            if (font_init_fail_count <= 1) then
-                print('[zonelines] font atlas: GetTexID failed — may need game restart to recover');
-            end
-            return false;
-        end
-    end
-
-    -- Get baked font data
-    local baked = nil;
-
-    -- Primary: imgui.GetFontBaked()
-    local baked1_ok, baked1 = pcall(function() return imgui.GetFontBaked(); end);
-    if (baked1_ok and baked1 ~= nil) then
-        local g_ok, g = pcall(function() return baked1:FindGlyph(65); end);
-        if (g_ok and g ~= nil) then
-            local u_ok, u1 = pcall(function() return g.U1; end);
-            if (u_ok and u1 ~= nil and u1 > 0) then
-                baked = baked1;
-            end
-        end
-    end
-
-    -- Fallback: font.LastBaked
-    if (baked == nil) then
-        local lb_ok, lb = pcall(function() return font.LastBaked; end);
-        if (lb_ok and lb ~= nil) then
-            local g_ok, g = pcall(function() return lb:FindGlyph(65); end);
-            if (g_ok and g ~= nil) then
-                local u_ok, u1 = pcall(function() return g.U1; end);
-                if (u_ok and u1 ~= nil and u1 > 0) then
-                    baked = lb;
-                end
-            end
-        end
-    end
-
-    if (baked == nil) then return false; end
-
-    -- Re-read TexID (atlas texture may have changed after bake)
-    local tex_id2_ok, tex_id2 = pcall(function() return tex_ref:GetTexID(); end);
-    if (tex_id2_ok and tex_id2 ~= nil and tex_id2 ~= 0) then
-        tex_id = tex_id2;
-    end
-
-    -- Cast ImGui texture ID to D3D8 pointer
-    local base_ok, base_ptr = pcall(function()
-        return ffi.cast('IDirect3DBaseTexture8*', ffi.cast('uintptr_t', tex_id));
-    end);
-    if (not base_ok or base_ptr == nil) then return false; end
-
-    font_atlas_tex_ptr = base_ptr;
-    font_baked = baked;
-
-    local sz_ok, sz = pcall(function() return baked.Size; end);
-    font_baked_size = (sz_ok and sz and sz > 0) and sz or size;
-
-    font_init_fail_count = 0;
-    return true;
-end
-
-function renderer.is_font_atlas_ready()
-    return font_atlas_tex_ptr ~= nil and font_baked ~= nil;
-end
 
 -------------------------------------------------------------------------------
--- D3D Text: Screen-space ortho text (pixel-perfect, matching mobhud approach)
--- Projects world position → screen coords, builds glyph quads in pixel space,
--- renders with ortho projection for depth-tested but pixel-crisp text.
+-- D3D Text: world position -> screen, drawn in an ortho pass for depth-tested labels.
 -------------------------------------------------------------------------------
 
 -- Project world → screen + NDC Z (for depth testing in ortho pass)
@@ -276,59 +176,6 @@ local function project_with_z(view, proj, vp_w, vp_h, wx, wy, wz)
     return sx, sy, true, ndcz;
 end
 
--- Measure text width in screen pixels at given scale
-local function measure_text_screen(text, scale)
-    local width = 0;
-    for i = 1, #text do
-        local g = font_baked:FindGlyph(string.byte(text, i));
-        if (g ~= nil) then
-            width = width + g.AdvanceX * scale;
-        end
-    end
-    return width;
-end
-
--- Build screen-space glyph quads into text_verts buffer.
--- Returns vertex count. sx/sy = screen anchor, z = NDC depth, scale = pixel scale.
-local function build_text_screen(text, color, sx, sy, z, scale)
-    local vi = 0;
-    local len = #text;
-    if (len > MAX_TEXT_CHARS) then len = MAX_TEXT_CHARS; end
-    local cursor_x = 0;
-
-    for i = 1, len do
-        local g = font_baked:FindGlyph(string.byte(text, i));
-        if (g ~= nil) then
-            if (g.X1 - g.X0 > 0 and g.Y1 - g.Y0 > 0) then
-                local x0 = sx + cursor_x + g.X0 * scale;
-                local y0 = sy + g.Y0 * scale;
-                local x1 = sx + cursor_x + g.X1 * scale;
-                local y1 = sy + g.Y1 * scale;
-
-                -- Triangle 1: TL, TR, BL
-                text_verts[vi].x = x0; text_verts[vi].y = y0; text_verts[vi].z = z;
-                text_verts[vi].color = color; text_verts[vi].tu = g.U0; text_verts[vi].tv = g.V0;
-                text_verts[vi+1].x = x1; text_verts[vi+1].y = y0; text_verts[vi+1].z = z;
-                text_verts[vi+1].color = color; text_verts[vi+1].tu = g.U1; text_verts[vi+1].tv = g.V0;
-                text_verts[vi+2].x = x0; text_verts[vi+2].y = y1; text_verts[vi+2].z = z;
-                text_verts[vi+2].color = color; text_verts[vi+2].tu = g.U0; text_verts[vi+2].tv = g.V1;
-
-                -- Triangle 2: TR, BR, BL
-                text_verts[vi+3].x = x1; text_verts[vi+3].y = y0; text_verts[vi+3].z = z;
-                text_verts[vi+3].color = color; text_verts[vi+3].tu = g.U1; text_verts[vi+3].tv = g.V0;
-                text_verts[vi+4].x = x1; text_verts[vi+4].y = y1; text_verts[vi+4].z = z;
-                text_verts[vi+4].color = color; text_verts[vi+4].tu = g.U1; text_verts[vi+4].tv = g.V1;
-                text_verts[vi+5].x = x0; text_verts[vi+5].y = y1; text_verts[vi+5].z = z;
-                text_verts[vi+5].color = color; text_verts[vi+5].tu = g.U0; text_verts[vi+5].tv = g.V1;
-
-                vi = vi + 6;
-            end
-            cursor_x = cursor_x + g.AdvanceX * scale;
-        end
-    end
-    return vi;
-end
-
 -------------------------------------------------------------------------------
 -- Dotted Line Tuning
 -------------------------------------------------------------------------------
@@ -344,6 +191,10 @@ local ZONELINE_OVERRIDES = {};
 
 -- D3D dot size in world units (yalms).
 local D3D_DOT_GLOW_SIZE = 0.35;
+
+-- Distance fade: size-based (alpha doesn't work in beginscene pass 2)
+local DISTANCE_FADE      = false;
+local DISTANCE_FADE_ZONE = 0.3;
 
 -- Reusable labels table (cleared each frame to avoid allocation)
 local frame_labels = {};
@@ -411,6 +262,8 @@ end
 
 -- Sync tuning from settings (called only when settings change, not every frame)
 local settings_applied = false;
+local settings_rev = 0;       -- bumped on any settings change; invalidates curtain_cache
+local curtain_cache = {};     -- [rect_id] = { sign, rev, data } — see compute_curtain_positions
 local function apply_settings(s)
     if (s == nil) then return; end
     DOT_SPACING          = s.dot_spacing or 0.3;
@@ -418,12 +271,21 @@ local function apply_settings(s)
     MAX_GRADIENT         = s.rise_distance or 0.9;
     D3D_DOT_GLOW_SIZE    = (s.dot_size or 1.4) * 0.05;
     ZONELINE_OVERRIDES   = s.zoneline_overrides or {};
+    DISTANCE_FADE        = (s.distance_fade == true);
+    DISTANCE_FADE_ZONE   = s.distance_fade_zone or 0.3;
     rebuild_colors(s);
     settings_applied = true;
 end
 
 function renderer.mark_settings_dirty()
     settings_applied = false;
+    settings_rev = settings_rev + 1;   -- invalidate the curtain position cache
+end
+
+-- Clear the curtain position cache. Call on zone change: zone lines and terrain
+-- differ per zone, and rect_ids are not guaranteed unique across zones.
+function renderer.invalidate_curtain_cache()
+    curtain_cache = {};
 end
 
 -------------------------------------------------------------------------------
@@ -467,15 +329,8 @@ local function distance_to_zoneline(px, pz, zl)
 end
 
 -------------------------------------------------------------------------------
--- Compute curtain positions (shared rendering logic)
--- Returns: { positions = {{wx,wy,wz}, ...}, hover_y = number,
---            label_x = number, label_z = number }
---
--- Visual improvements over the original dot logic:
---   - Label positioned at player-facing edge center
---   - Full-span dots (no edge trimming)
---   - Centered mode for ground line style
---   - Height from terrain MAX (same as original working code)
+-- Compute curtain dot positions along the wider box edge.
+-- Returns: { positions = {{wx,wy,wz}, ...}, hover_y, label_x, label_z }
 -------------------------------------------------------------------------------
 
 local function compute_curtain_positions(wx, wy, wz, half_sx, half_sy, half_sz,
@@ -503,14 +358,25 @@ local function compute_curtain_positions(wx, wy, wz, half_sx, half_sy, half_sz,
     local local_x_comp =  dx * cos_r + dz * sin_r;
     local local_z_comp = -dx * sin_r + dz * cos_r;
 
-    -- Push dots and label to the player-facing box edge.
-    local depth_offset;
+    -- Push dots and label to the player-facing box edge. The facing-edge SIGN is
+    -- the only player-dependent input to the result.
+    local depth_sign;
     if (along_x) then
-        local sign = (local_z_comp >= 0) and 1 or -1;
-        depth_offset = sign * depth_half;
+        depth_sign = (local_z_comp >= 0) and 1 or -1;
     else
-        local sign = (local_x_comp >= 0) and 1 or -1;
-        depth_offset = sign * depth_half;
+        depth_sign = (local_x_comp >= 0) and 1 or -1;
+    end
+    local depth_offset = depth_sign * depth_half;
+
+    -- Result cache: the output is a pure function of (rect_id, depth_sign, settings).
+    -- Geometry and terrain are static per zone line; only the facing edge and tuning
+    -- settings change. On a hit we skip the terrain interpolation, 3-pass smoothing,
+    -- gradient blend, and all per-dot allocations.
+    if (rect_id ~= nil) then
+        local c = curtain_cache[rect_id];
+        if (c ~= nil and c.sign == depth_sign and c.rev == settings_rev) then
+            return c.data;
+        end
     end
 
     -- Visual dot count
@@ -582,7 +448,6 @@ local function compute_curtain_positions(wx, wy, wz, half_sx, half_sy, half_sz,
         local wrx = lx * cos_r - lz * sin_r;
         local wrz = lx * sin_r + lz * cos_r;
 
-        -- Per-position terrain height via interpolation
         local pos_y = nil;
         if (th_n >= 2) then
             local th_t = t * (th_n - 1);      -- 0-based position in terrain array
@@ -634,8 +499,7 @@ local function compute_curtain_positions(wx, wy, wz, half_sx, half_sy, half_sz,
         end
     end
 
-    -- Smooth elevation: 3-pass moving average to remove jarring height changes.
-    -- Each pass averages each dot with its neighbors, creating gentle curves.
+    -- Smooth elevation: 3-pass neighbor moving average to remove jarring height jumps.
     if (n >= 3) then
         for pass = 1, 3 do
             local prev_y = positions[1].wy;
@@ -711,7 +575,7 @@ local function compute_curtain_positions(wx, wy, wz, half_sx, half_sy, half_sz,
     end
 
     -- Apply per-zone-line height override (positive = visually higher = subtract from wy)
-    local h_offset = entry_ovr.height or 0;
+    local h_offset = (type(entry_ovr.height) == 'number' and entry_ovr.height) or 0;
     if (h_offset ~= 0) then
         for i = 1, n do
             positions[i].wy = positions[i].wy - h_offset;
@@ -736,7 +600,11 @@ local function compute_curtain_positions(wx, wy, wz, half_sx, half_sy, half_sz,
     local label_wx = wx + label_lx * cos_r - label_lz * sin_r;
     local label_wz = wz + label_lx * sin_r + label_lz * cos_r;
 
-    return { positions = positions, hover_y = label_hover_y, label_x = label_wx, label_z = label_wz };
+    local result = { positions = positions, hover_y = label_hover_y, label_x = label_wx, label_z = label_wz };
+    if (rect_id ~= nil) then
+        curtain_cache[rect_id] = { sign = depth_sign, rev = settings_rev, data = result };
+    end
+    return result;
 end
 
 
@@ -809,21 +677,18 @@ local function draw_d3d_circle(device, wx, wy, wz, radius, color_argb)
         local a1 = i * angle_step;
         local a2 = (i + 1) * angle_step;
 
-        -- Center vertex
         circle_verts[vi].x = wx;
         circle_verts[vi].y = wy;
         circle_verts[vi].z = wz;
         circle_verts[vi].color = color_argb;
         vi = vi + 1;
 
-        -- Edge vertex 1
         circle_verts[vi].x = wx + math.cos(a1) * radius;
         circle_verts[vi].y = wy;
         circle_verts[vi].z = wz + math.sin(a1) * radius;
         circle_verts[vi].color = color_argb;
         vi = vi + 1;
 
-        -- Edge vertex 2
         circle_verts[vi].x = wx + math.cos(a2) * radius;
         circle_verts[vi].y = wy;
         circle_verts[vi].z = wz + math.sin(a2) * radius;
@@ -911,30 +776,197 @@ end
 -- limit on the main draw_d3d pcall closure)
 -------------------------------------------------------------------------------
 
+-- ============================================================================
+-- GdiFonts labels: GDI renders each string (+outline) into a texture WE own
+-- (stable, unlike the ImGui atlas), drawn as a depth-tested quad so terrain occludes it.
+-- ============================================================================
+local gdi = nil;
+local gdi_tried = false;
+local function ensure_gdi()
+    if (gdi ~= nil or gdi_tried) then return gdi; end
+    gdi_tried = true;
+    local ok, lib = pcall(require, 'gdifonts.include');
+    if (ok and lib ~= nil) then
+        gdi = lib;
+        pcall(function() gdi:set_auto_render(false); end);  -- we draw manually, occluded
+    end
+    return gdi;
+end
+
+renderer.gdi_font_family   = 'Arial';
+renderer.gdi_outline_width = 2;     -- label outline thickness (px at render res)
+renderer.gdi_bold          = true;  -- bold label text
+
+-- ----------------------------------------------------------------------------
+-- Font picker = common Windows fonts + bundled fonts/ the user has installed.
+-- Read-only: never installs fonts or writes the registry; only offers a bundled
+-- font once GdiFonts confirms it's installed (get_font_available).
+-- ----------------------------------------------------------------------------
+local COMMON_FONTS = { 'Arial', 'Calibri', 'Segoe UI', 'Consolas', 'Verdana', 'Tahoma', 'Trebuchet MS', 'Times New Roman' };
+renderer.font_list = COMMON_FONTS;     -- rebuilt (common + installed bundled) by scan_fonts
+
+-- Read a TTF/OTF family name (name table, nameID 1, Windows platform preferred).
+local function ttf_family(path)
+    local ok, fam = pcall(function()
+        local fh = io.open(path, 'rb');
+        if (fh == nil) then return nil; end
+        local d = fh:read('*a'); fh:close();
+        if (d == nil or #d < 12) then return nil; end
+        local function u16(o) local a,b = d:byte(o), d:byte(o+1); if (a == nil or b == nil) then return 0; end return a*256 + b; end
+        local function u32(o) local a,b,c,e = d:byte(o), d:byte(o+1), d:byte(o+2), d:byte(o+3); if (a == nil or e == nil) then return 0; end return ((a*256+b)*256+c)*256+e; end
+        local ntab = u16(5);
+        local rec, noff = 13, nil;
+        for _ = 1, ntab do
+            if (d:sub(rec, rec+3) == 'name') then noff = u32(rec+8) + 1; break; end
+            rec = rec + 16;
+        end
+        if (noff == nil) then return nil; end
+        local count = u16(noff+2);
+        local storage = noff + u16(noff+4);
+        local best = nil;
+        for i = 0, count-1 do
+            local r = noff + 6 + i*12;
+            local pid, nid, len, off = u16(r), u16(r+6), u16(r+8), u16(r+10);
+            if (nid == 1 and len > 0) then
+                local str = d:sub(storage+off, storage+off+len-1);
+                if (pid == 3 or pid == 0) then       -- Windows/Unicode = UTF-16BE
+                    local out = {};
+                    for j = 1, #str, 2 do out[#out+1] = string.char(str:byte(j+1) or 32); end
+                    best = table.concat(out);
+                    if (pid == 3) then break; end
+                elseif (pid == 1 and best == nil) then  -- Mac = ASCII
+                    best = str;
+                end
+            end
+        end
+        return best;
+    end);
+    return ok and fam or nil;
+end
+
+-- Build the picker list: common fonts + any bundled font the user has installed.
+function renderer.scan_fonts()
+    local list = {};
+    for _, f in ipairs(COMMON_FONTS) do list[#list+1] = f; end
+
+    -- gdifonts renders via GDI+, which only sees INSTALLED fonts. Offer a bundled
+    -- font only once it's installed, so we never show one that renders blank.
+    local g = nil;
+    pcall(function() local ok, lib = pcall(require, 'gdifonts.include'); if (ok) then g = lib; end end);
+    local function usable(name)
+        if (g == nil) then return false; end
+        local ok, r = pcall(function() return g:get_font_available(name); end);
+        return (ok and r == true);
+    end
+
+    local dir = nil;
+    pcall(function() dir = addon.path:append('\\fonts\\'); end);
+    if (dir == nil) then pcall(function() dir = addon.path .. '\\fonts\\'; end); end
+    if (dir ~= nil) then
+        local files = nil;
+        pcall(function() files = ashita.fs.get_dir(dir, '.*', false); end);
+        if (files ~= nil) then
+            for _, fn in ipairs(files) do
+                local lower = tostring(fn):lower();
+                if (lower:match('%.ttf$') or lower:match('%.otf$')) then
+                    local fam = ttf_family(dir .. fn);
+                    if (fam ~= nil and fam ~= '' and usable(fam)) then
+                        local dup = false;
+                        for _, x in ipairs(list) do if (x == fam) then dup = true; break; end end
+                        if (not dup) then list[#list+1] = fam; end
+                    end
+                end
+            end
+        end
+    end
+    renderer.font_list = list;
+    return list;
+end
+
+local GDI_FONT_HEIGHT = 30;     -- render resolution (downscaled at draw time = clean)
+local gdi_cache = {};           -- text -> { obj=, frame= }
+local gdi_frame = 0;
+
+local function gdi_get(text)
+    if (gdi == nil or text == nil or text == '') then return nil, nil; end
+    local e = gdi_cache[text];
+    if (e == nil) then
+        local ok, obj = pcall(function()
+            return gdi:create_object({
+                font_family   = renderer.gdi_font_family or 'Arial',
+                font_height   = GDI_FONT_HEIGHT,
+                font_flags    = (renderer.gdi_bold ~= false) and 1 or 0,
+                font_color    = 0xFFFFFFFF,
+                outline_color = 0xFF000000,
+                outline_width = renderer.gdi_outline_width or 2,
+                text          = text,
+            }, true);  -- manual = not added to gdifonts' own 2D auto-render
+        end);
+        if (not ok or obj == nil) then return nil, nil; end
+        e = { obj = obj };
+        gdi_cache[text] = e;
+    end
+    e.frame = gdi_frame;
+    local tex, rect = nil, nil;
+    pcall(function() tex, rect = e.obj:get_texture(); end);
+    return tex, rect;
+end
+
+local function gdi_evict()
+    if (gdi == nil) then return; end
+    for k, e in pairs(gdi_cache) do
+        if (gdi_frame - (e.frame or 0) > 60) then
+            pcall(function() gdi:destroy_object(e.obj); end);
+            gdi_cache[k] = nil;
+        end
+    end
+end
+
+function renderer.cleanup_gdi()
+    if (gdi == nil) then return; end
+    for k, e in pairs(gdi_cache) do
+        pcall(function() gdi:destroy_object(e.obj); end);
+        gdi_cache[k] = nil;
+    end
+end
+
+-- Draw one gdifonts texture as a depth-tested screen quad (pixel-snapped).
+local function draw_label_tex(device, tex, w, h, x, y, z)
+    local x0 = math.floor(x + 0.5);
+    local y0 = math.floor(y + 0.5);
+    local x1 = x0 + math.floor(w + 0.5);
+    local y1 = y0 + math.floor(h + 0.5);
+    local col = 0xFFFFFFFF;  -- white; texture carries the real color + outline
+    local v = text_verts;
+    v[0].x=x0; v[0].y=y0; v[0].z=z; v[0].color=col; v[0].tu=0.0; v[0].tv=0.0;
+    v[1].x=x1; v[1].y=y0; v[1].z=z; v[1].color=col; v[1].tu=1.0; v[1].tv=0.0;
+    v[2].x=x0; v[2].y=y1; v[2].z=z; v[2].color=col; v[2].tu=0.0; v[2].tv=1.0;
+    v[3].x=x1; v[3].y=y0; v[3].z=z; v[3].color=col; v[3].tu=1.0; v[3].tv=0.0;
+    v[4].x=x1; v[4].y=y1; v[4].z=z; v[4].color=col; v[4].tu=1.0; v[4].tv=1.0;
+    v[5].x=x0; v[5].y=y1; v[5].z=z; v[5].color=col; v[5].tu=0.0; v[5].tv=1.0;
+    device:SetTexture(0, ffi.cast('IDirect3DBaseTexture8*', tex));
+    device:DrawPrimitiveUP(D3DPT_TRIANGLELIST, 2, text_verts, TEXTURED_VERTEX_SIZE);
+end
+
 local function draw_text_pass(device, view, text_scale)
     local vp_w = renderer.cached_vp_w;
     local vp_h = renderer.cached_vp_h;
     local cached_proj = renderer.cached_proj;
 
-    if (frame_labels_n <= 0 or font_baked == nil or font_atlas_tex_ptr == nil
-        or vp_w <= 0 or vp_h <= 0 or cached_proj == nil) then
+    if (frame_labels_n <= 0 or vp_w <= 0 or vp_h <= 0 or cached_proj == nil or view == nil) then
         return;
     end
+    if (ensure_gdi() == nil) then return; end
+    gdi_frame = gdi_frame + 1;
 
-    -- Use the view matrix already obtained at the top of draw_d3d (same frame)
-    if (view == nil) then return; end
-
-    -- Switch to textured vertex format
-    device:SetTexture(0, font_atlas_tex_ptr);
     device:SetVertexShader(D3DFVF_XYZ_DIFFUSE_TEX1);
 
-    -- Texture stage: color from vertex (flat text), alpha from texture (glyph shape)
+    -- Texture stage: color AND alpha straight from the gdifonts texture
     device:SetTextureStageState(0, D3DTSS_COLOROP, 2);    -- SELECTARG1
-    device:SetTextureStageState(0, D3DTSS_COLORARG1, 0);  -- DIFFUSE
+    device:SetTextureStageState(0, D3DTSS_COLORARG1, 2);  -- TEXTURE
     device:SetTextureStageState(0, D3DTSS_ALPHAOP, 2);    -- SELECTARG1
     device:SetTextureStageState(0, D3DTSS_ALPHAARG1, 2);  -- TEXTURE
 
-    -- LINEAR filtering
     device:SetTextureStageState(0, D3DTSS_MAGFILTER, D3DTEXF_LINEAR);
     device:SetTextureStageState(0, D3DTSS_MINFILTER, D3DTEXF_LINEAR);
     device:SetTextureStageState(0, D3DTSS_ADDRESSU, D3DTADDRESS_CLAMP);
@@ -947,7 +979,7 @@ local function draw_text_pass(device, view, text_scale)
 
     -- Alpha test: discard transparent glyph background pixels
     device:SetRenderState(D3DRS_ALPHATESTENABLE, 1);
-    device:SetRenderState(D3DRS_ALPHAREF, 0x40);
+    device:SetRenderState(D3DRS_ALPHAREF, 0x80);   -- cut faint white-on-transparent edge bleed
     device:SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATEREQUAL);
 
     -- Set up ortho projection: screen pixels map 1:1, Z passes through for depth
@@ -983,6 +1015,12 @@ local function draw_text_pass(device, view, text_scale)
                 local dist_factor = ref_dist / math.max(lbl.dist, 1.0);
                 dist_factor = math.max(min_s, math.min(max_s, dist_factor));
                 local fs = base_s * dist_factor;
+                -- Scale text with distance fade so labels shrink with dots
+                if (lbl.fade ~= nil and lbl.fade < 1.0) then
+                    fs = fs * lbl.fade;
+                end
+                -- Scale gdifonts texture px (rendered at GDI_FONT_HEIGHT) to screen px.
+                local q = fs * 14.0 / GDI_FONT_HEIGHT;
                 local line_height = fs * 14;
                 local dpos = renderer.d3d_dist_position or 'bottom';
                 local spacing = renderer.d3d_label_spacing or 2;
@@ -997,13 +1035,21 @@ local function draw_text_pass(device, view, text_scale)
                     end
                 end
 
-                local name_tw = (lbl.name ~= nil) and measure_text_screen(lbl.name, fs) or 0;
-                local dist_tw = (draw_dist_text ~= nil) and measure_text_screen(draw_dist_text, fs) or 0;
+                local name_tex, name_rect = nil, nil;
+                local name_tw, name_th = 0, 0;
+                if (lbl.name ~= nil) then
+                    name_tex, name_rect = gdi_get(lbl.name);
+                    if (name_rect ~= nil) then name_tw = name_rect.right * q; name_th = name_rect.bottom * q; end
+                end
+                local dist_tex, dist_rect = nil, nil;
+                local dist_tw, dist_th = 0, 0;
+                if (draw_dist_text ~= nil) then
+                    dist_tex, dist_rect = gdi_get(draw_dist_text);
+                    if (dist_rect ~= nil) then dist_tw = dist_rect.right * q; dist_th = dist_rect.bottom * q; end
+                end
 
-                -- Bottom-anchored text: grows UPWARD from sy so it doesn't
-                -- collide with dots below when scaling up at close range.
-                -- sy = projected label anchor (just above the dots).
-                -- All text lines are placed above sy.
+                -- Bottom-anchored: text grows UPWARD from sy (label anchor just
+                -- above the dots) so close-range scaling doesn't collide with them.
 
                 local has_both = (lbl.name ~= nil and draw_dist_text ~= nil);
 
@@ -1033,18 +1079,12 @@ local function draw_text_pass(device, view, text_scale)
                     dy = sy - line_height;
                 end
 
-                -- Draw name
-                if (lbl.name ~= nil and ny ~= nil) then
+                if (name_tex ~= nil and ny ~= nil) then
                     nx = sx - name_tw / 2;
-                    local mv = build_text_screen(lbl.name, D3D_TEXT_WHITE,
-                        nx, ny, ndcz, fs);
-                    if (mv > 0) then
-                        device:DrawPrimitiveUP(D3DPT_TRIANGLELIST, mv / 3, text_verts, TEXTURED_VERTEX_SIZE);
-                    end
+                    draw_label_tex(device, name_tex, name_tw, name_th, nx, ny, ndcz);
                 end
 
-                -- Draw distance
-                if (draw_dist_text ~= nil and dy ~= nil) then
+                if (dist_tex ~= nil and dy ~= nil) then
                     if (dpos == 'bottom' or dpos == 'top') then
                         dx = sx - dist_tw / 2;
                     elseif (dpos == 'right') then
@@ -1054,15 +1094,13 @@ local function draw_text_pass(device, view, text_scale)
                     else
                         dx = sx - dist_tw / 2;
                     end
-                    local mv = build_text_screen(draw_dist_text, D3D_TEXT_WHITE,
-                        dx, dy, ndcz, fs);
-                    if (mv > 0) then
-                        device:DrawPrimitiveUP(D3DPT_TRIANGLELIST, mv / 3, text_verts, TEXTURED_VERTEX_SIZE);
-                    end
+                    draw_label_tex(device, dist_tex, dist_tw, dist_th, dx, dy, ndcz);
                 end
             end
         end
     end
+
+    gdi_evict();
 end
 
 function renderer.draw_d3d(zone_lines, player_x, player_y, player_z, s)
@@ -1111,7 +1149,6 @@ function renderer.draw_d3d(zone_lines, player_x, player_y, player_z, s)
     local ux, uy, uz = view._12, view._22, view._32;
     if (type(rx) ~= 'number' or type(uy) ~= 'number') then return; end
 
-    -- Normalize
     local rlen = math.sqrt(rx * rx + ry * ry + rz * rz);
     if (rlen > 0.001) then rx = rx / rlen; ry = ry / rlen; rz = rz / rlen; end
     local ulen = math.sqrt(ux * ux + uy * uy + uz * uz);
@@ -1128,6 +1165,9 @@ function renderer.draw_d3d(zone_lines, player_x, player_y, player_z, s)
     local _, save_dstblend = device:GetRenderState(D3DRS_DESTBLEND);
     local _, save_cull     = device:GetRenderState(D3DRS_CULLMODE);
     local _, save_atest    = device:GetRenderState(D3DRS_ALPHATESTENABLE);
+    local _, save_aref     = device:GetRenderState(D3DRS_ALPHAREF);   -- text pass sets these (0x40 / GREATEREQUAL);
+    local _, save_afunc    = device:GetRenderState(D3DRS_ALPHAFUNC);  -- save so we don't leak them into the world draw
+    local _, save_fog      = device:GetRenderState(D3DRS_FOGENABLE);  -- zone fog tints our text/markers if left on
     local _, save_fvf      = device:GetVertexShader();
     local _, save_tex      = device:GetTexture(0);
     local _, save_ps       = device:GetPixelShader();
@@ -1158,6 +1198,7 @@ function renderer.draw_d3d(zone_lines, player_x, player_y, player_z, s)
     -- active that overrides all TextureStageState settings, producing garbled output.
     device:SetPixelShader(0);
     device:SetRenderState(D3DRS_LIGHTING, 0);
+    device:SetRenderState(D3DRS_FOGENABLE, 0);           -- no zone fog tinting our markers/text
     device:SetRenderState(D3DRS_CULLMODE, 1);             -- D3DCULL_NONE
     device:SetRenderState(D3DRS_ALPHABLENDENABLE, 1);
     device:SetRenderState(D3DRS_SRCBLEND, 5);             -- D3DBLEND_SRCALPHA
@@ -1207,12 +1248,21 @@ function renderer.draw_d3d(zone_lines, player_x, player_y, player_z, s)
             -- Cache override lookup once per zone line
             local rect_key = tostring(zl.rect_id);
             local ovr = ZONELINE_OVERRIDES[rect_key] or {};
-            if (dist <= render_dist and not ovr.hide) then
+            if (dist <= render_dist and ovr.hide ~= true) then
                 local label_y = zl.y;
                 local label_x = zl.x;
                 local label_z = zl.z;
                 -- Display distance measures to nearest box edge, not center
                 local display_dist = distance_to_zoneline(player_x, player_z, zl);
+
+                -- Distance fade: shrink geometry near render_distance edge
+                local fade = 1.0;
+                if (DISTANCE_FADE and DISTANCE_FADE_ZONE > 0.001) then
+                    local fade_near = render_dist * (1.0 - DISTANCE_FADE_ZONE);
+                    if (display_dist > fade_near) then
+                        fade = math.clamp((render_dist - display_dist) / (render_dist - fade_near), 0.0, 1.0);
+                    end
+                end
 
                 if (is_curtain_zoneline(zl)) then
                     -- Curtain zone line: compute dot positions along the wider edge
@@ -1229,14 +1279,14 @@ function renderer.draw_d3d(zone_lines, player_x, player_y, player_z, s)
                         glow_col = ga * 0x1000000 + gr * 0x10000 + gg * 0x100 + gb;
                     end
 
-                    local zl_trim = ovr.trim or 0;
+                    local zl_trim = (type(ovr.trim) == 'number' and ovr.trim) or 0;
                     local cdata = compute_curtain_positions(zl.x, zl.y, zl.z,
                         zl.sx / 2, zl.sy / 2, zl.sz / 2,
                         zl.ry or 0, player_x, player_z, zl.terrain_heights, zl.rect_id, zl_trim);
                     label_y = cdata.hover_y;
                     label_x = cdata.label_x;
                     label_z = cdata.label_z;
-                    local dot_sz = D3D_DOT_GLOW_SIZE * glow_size_mult;
+                    local dot_sz = D3D_DOT_GLOW_SIZE * glow_size_mult * fade;
                     draw_d3d_style_dots(device, cdata, rx, ry, rz, ux, uy, uz, core_col, glow_col, dot_sz);
                 else
                     -- Non-curtain: circle marker (portals)
@@ -1248,18 +1298,20 @@ function renderer.draw_d3d(zone_lines, player_x, player_y, player_z, s)
                     else
                         r = zl.sx or 8.0;
                     end
-                    draw_d3d_circle(device, zl.x, zl.y, zl.z, r, fill_col);
+                    draw_d3d_circle(device, zl.x, zl.y, zl.z, r * fade, fill_col);
 
                     -- Draw vertical pole from circle center up to label height
                     local pole_h = (type(ovr.pole_height) == 'number' and ovr.pole_height > 0)
                         and ovr.pole_height or 4.0;
+                    pole_h = pole_h * fade;
                     local core_col = get_d3d_dot_colors(display_dist);
                     draw_d3d_pole(device, zl.x, zl.y, zl.z, pole_h, rx, ry, rz, core_col);
                     label_y = zl.y - pole_h;  -- move label to top of pole
                 end
 
                 -- Collect labels for text pass (name + distance stacked in screen space)
-                if (want_labels or want_dist) then
+                -- Skip labels when fade is too small (unreadable specks)
+                if ((want_labels or want_dist) and fade >= 0.15) then
                     local text_y = label_y - renderer.d3d_label_offset;
                     local name = nil;
                     local dist_text = nil;
@@ -1275,6 +1327,7 @@ function renderer.draw_d3d(zone_lines, player_x, player_y, player_z, s)
                     if (lbl == nil) then lbl = {}; frame_labels[frame_labels_n] = lbl; end
                     lbl.x = label_x; lbl.y = text_y; lbl.z = label_z;
                     lbl.name = name; lbl.dist_text = dist_text; lbl.dist = display_dist;
+                    lbl.fade = fade;
                 end
             end
         end
@@ -1289,7 +1342,13 @@ function renderer.draw_d3d(zone_lines, player_x, player_y, player_z, s)
     if (save_view ~= nil) then device:SetTransform(2, table_to_matrix(save_view, restore_view)); end
     if (save_proj ~= nil) then device:SetTransform(3, table_to_matrix(save_proj, restore_proj)); end
     device:SetTexture(0, save_tex);
+    -- GetTexture(0) AddRef'd this texture (Ashita's wrapper returns the raw
+    -- pointer, no ffi.gc). Release the reference we own or its refcount climbs
+    -- every frame, pinning zone textures alive across zone changes (VRAM creep).
+    -- A NULL cdata pointer compares == nil, so this also covers "nothing bound".
+    if (save_tex ~= nil) then save_tex:Release(); end
     device:SetRenderState(D3DRS_LIGHTING, save_light);
+    device:SetRenderState(D3DRS_FOGENABLE, save_fog);
     device:SetRenderState(D3DRS_ZENABLE, save_zenable);
     device:SetRenderState(D3DRS_ZWRITEENABLE, save_zwrite);
     device:SetRenderState(D3DRS_ZFUNC, save_zfunc);
@@ -1299,6 +1358,8 @@ function renderer.draw_d3d(zone_lines, player_x, player_y, player_z, s)
     device:SetRenderState(D3DRS_DESTBLEND, save_dstblend);
     device:SetRenderState(D3DRS_CULLMODE, save_cull);
     device:SetRenderState(D3DRS_ALPHATESTENABLE, save_atest);
+    device:SetRenderState(D3DRS_ALPHAREF, save_aref);    -- restore so foliage/fence/hair
+    device:SetRenderState(D3DRS_ALPHAFUNC, save_afunc);  -- alpha-test isn't disturbed this frame
     device:SetVertexShader(save_fvf);
     if (save_ps ~= nil) then device:SetPixelShader(save_ps); end
     device:SetTextureStageState(0, D3DTSS_COLOROP, save_colorop);
@@ -1313,7 +1374,7 @@ function renderer.draw_d3d(zone_lines, player_x, player_y, player_z, s)
     device:SetTextureStageState(1, D3DTSS_COLOROP, save_s1_colorop);
     device:SetTextureStageState(1, D3DTSS_ALPHAOP, save_s1_alphaop);
 
-    -- Log drawing errors (previously silently swallowed by outer pcall)
+    -- Log drawing errors (once)
     if (not draw_ok) then
         if (not renderer._draw_err_logged) then
             print(chat.header('zonelines') .. chat.error('draw_d3d error: ' .. tostring(draw_err)));
@@ -1325,19 +1386,5 @@ function renderer.draw_d3d(zone_lines, player_x, player_y, player_z, s)
 end
 
 
-
--------------------------------------------------------------------------------
--- render: Called from d3d_present — syncs settings and initializes font atlas.
--- Marker drawing happens in draw_d3d (d3d_beginscene).
--------------------------------------------------------------------------------
-
-function renderer.render(zone_lines, player_x, player_y, player_z, s)
-    if (zone_lines == nil or #zone_lines == 0) then return; end
-
-    -- Initialize font atlas for D3D text (uses default ImGui font)
-    if (renderer.hide_behind_walls and not renderer.is_font_atlas_ready()) then
-        pcall(renderer.init_font_atlas);
-    end
-end
 
 return renderer;
