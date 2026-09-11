@@ -32,6 +32,7 @@ addon.link      = "https://github.com/Shinzaku/Ashita4-Addons/points";
 require "common";
 require "globals";
 require "helpers";
+require "shiyolibs";
 local images = require("images");
 local ffi = require("ffi");
 local imgui = require("imgui");
@@ -479,8 +480,10 @@ ashita.events.register("d3d_present", "present_cb", function ()
     ------------------------------------------------
     -- Points info bars --
     ------------------------------------------------
-    DrawPointsBar(currJob);
-    UpdateCompactBar(currJob);
+    if not ShouldHideUI(true) then
+        DrawPointsBar(currJob)
+        UpdateCompactBar(currJob)
+    end
 
     -------------------
     -- Config window --

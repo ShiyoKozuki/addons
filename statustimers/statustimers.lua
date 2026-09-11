@@ -27,6 +27,7 @@ addon.link    = 'https://github.com/HealsCodes/statustimers';
 -- imports
 -------------------------------------------------------------------------------
 require('common');
+require "shiyolibs";
 local settings = require('settings');
 local chat = require('chat');
 -- local modules
@@ -118,6 +119,10 @@ ashita.events.register('unload', 'statustimers_unload', function ()
 end)
 
 ashita.events.register('d3d_present', 'statustimers_present', function()
+    if ShouldHideUI(true) then
+        return
+    end
+
     main_ui.render_main_ui(st.settings, try_cancel, toggle_settings);
     conf_ui.render_config_ui(st.settings, st.toggle_settings);
 

@@ -26,6 +26,7 @@ addon.desc      = 'Displays the distance between you and your target.';
 addon.link      = 'https://ashitaxi.com/';
 
 require 'common';
+require 'shiyolibs';
 
 local chat      = require 'chat';
 local fonts     = require 'fonts';
@@ -195,7 +196,11 @@ ashita.events.register('d3d_present', 'present_cb', function ()
     if (distance.font == nil) then
         return;
     end
-
+    
+    if ShouldHideUI(true) then
+        distance.font.text = '';
+        return;
+    end
     -- Update the current settings font position..
     distance.settings.font.position_x = distance.font.position_x;
     distance.settings.font.position_y = distance.font.position_y;

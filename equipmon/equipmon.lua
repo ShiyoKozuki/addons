@@ -26,6 +26,7 @@ addon.desc      = 'Displays the players equipment onscreen at all times.';
 addon.link      = 'https://ashitaxi.com/';
 
 require 'common';
+require "shiyolibs";
 
 local chat      = require 'chat';
 local d3d       = require 'd3d8';
@@ -612,6 +613,11 @@ end);
 * desc : Event called when the Direct3D device is beginning a scene.
 --]]
 ashita.events.register('d3d_beginscene', 'beginscene_cb', function (isRenderingBackBuffer)
+    if ShouldHideUI() or (not eqmon.settings.visible[1] or not eqmon.settings.background.visible) then
+        eqmon.background.visible = false;
+        return;
+    end
+    
     if (not isRenderingBackBuffer) then return; end
 
     -- Update the background object..
@@ -634,6 +640,10 @@ end);
 * desc : Event called when the Direct3D device is presenting a scene.
 --]]
 ashita.events.register('d3d_present', 'present_cb', function ()
+    if ShouldHideUI() then
+        return
+    end
+    
     render_editor();
 
     if (eqmon.sprite == nil) then return; end
