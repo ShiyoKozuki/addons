@@ -30,8 +30,11 @@ ashita.events.register('packet_in', 'HandleIncomingPacket', function (e)
 end);
 
 ashita.events.register('d3d_present', 'present_cb', function ()
-    RegisterGlobalCommands()
 end);
+
+ashita.events.register('load', 'load_cb', function()
+    RegisterGlobalCommands()
+end)
 
 ashita.events.register('unload', 'fancy_unload', function ()
 end)
