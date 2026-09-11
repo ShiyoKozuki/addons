@@ -3163,11 +3163,10 @@ local function AllTalk()
     for _,mule in ipairs(mules) do
         if (mule ~= myName) then
             if not first then
-                print("Sleep for 2s")
                 coroutine.sleep(2);
             end
             first = false;
-            print(string.format(myName .. " sending alltalk command to " .. mule))
+            -- print(string.format(myName .. " sending alltalk command to " .. mule))
             AshitaCore:GetChatManager():QueueCommand(-1, string.format("/mst %s /global talk %u", mule, target));
         end
     end
