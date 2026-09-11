@@ -1,7 +1,7 @@
 ---@diagnostic disable: lowercase-global
 addon.name      = 'ShiyoGlobalCommands';
 addon.author    = 'Shiyo';
-addon.version   = '2.0.10.0';
+addon.version   = '1.0.0.1';
 addon.desc      = 'Does melee DD and tank things';
 addon.link      = 'https://ashitaxi.com/';
 require('common')
