@@ -3163,7 +3163,7 @@ local function AllTalk()
     for _,mule in ipairs(mules) do
         if (mule ~= myName) then
             if not first then
-                coroutine.sleep(1);
+                coroutine.sleep(5);
             end
             first = false;
             print(string.format(myName .. " sending alltalk command to " .. mule))
