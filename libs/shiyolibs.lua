@@ -3204,6 +3204,10 @@ local function VolumeMuteMeCommand()
 end
 
 -- Global in game slash (/) commands
+local function BoundCall(inputFunction, args)
+    inputFunction(table.unpack(args, 3))
+end
+
 function RegisterGlobalCommands()
     ashita.events.register('command', 'command_cb', function (e)
         local args = e.command:args()
@@ -3225,7 +3229,7 @@ function RegisterGlobalCommands()
         local command = commands[args[2]]
 
         if command then
-            command(args[3])
+            BoundCall:bind1(command):bind1(args):oncef(1);
             return
         end
 
