@@ -40,7 +40,7 @@ local default_settings = T{
             visible = true,
             locked = true,
             font_family = 'Arial',
-            font_height = scaling.scale_f(8),
+            font_height = scaling.scale_f(10),
             bold = true,
             italic = true,
             right_justified = true,
@@ -82,7 +82,7 @@ local function update_settings(s)
     -- Apply the font settings..
     if (tparty.font_target ~= nil) then
         tparty.font_target:apply(tparty.settings.target.font);
-        tparty.font_target.font_height = scaling.scale_f(8);
+        tparty.font_target.font_height = scaling.scale_f(10);
     end
     tparty.font_party:each(function (v, _)
         if (v ~= nil) then
@@ -97,11 +97,11 @@ local function update_settings(s)
             tparty.font_party[x].position_x     = scaling.scale_w(-95);
             tparty.font_party[x].position_y     = scaling.scale_h(-34 - 20 * (6 - x));
         elseif (x <= 12) then
-            tparty.font_party[x].font_height    = scaling.scale_f(8);
+            tparty.font_party[x].font_height    = scaling.scale_f(10);
             tparty.font_party[x].position_x     = scaling.scale_w(-100);
             tparty.font_party[x].position_y     = scaling.scale_h(-388 + 16 * ((x - 1) % 6));
         elseif (x <= 18) then
-            tparty.font_party[x].font_height    = scaling.scale_f(8);
+            tparty.font_party[x].font_height    = scaling.scale_f(10);
             tparty.font_party[x].position_x     = scaling.scale_w(-100);
             tparty.font_party[x].position_y     = scaling.scale_h(-287 + 16 * ((x - 1) % 6));
         end
@@ -147,7 +147,7 @@ end
 --]]
 ashita.events.register('load', 'load_cb', function ()
     tparty.font_target = fonts.new(tparty.settings.target.font);
-    tparty.font_target.font_height = scaling.scale_f(8);
+    tparty.font_target.font_height = scaling.scale_f(10);
 
     for x = 1, 18 do
         tparty.font_party[x] = fonts.new(tparty.settings.party.font);
@@ -157,11 +157,11 @@ ashita.events.register('load', 'load_cb', function ()
             tparty.font_party[x].position_x     = scaling.scale_w(-95);
             tparty.font_party[x].position_y     = scaling.scale_h(-34 - 20 * (6 - x));
         elseif (x <= 12) then
-            tparty.font_party[x].font_height    = scaling.scale_f(8);
+            tparty.font_party[x].font_height    = scaling.scale_f(10);
             tparty.font_party[x].position_x     = scaling.scale_w(-100);
             tparty.font_party[x].position_y     = scaling.scale_h(-388 + 16 * ((x - 1) % 6));
         elseif (x <= 18) then
-            tparty.font_party[x].font_height    = scaling.scale_f(8);
+            tparty.font_party[x].font_height    = scaling.scale_f(10);
             tparty.font_party[x].position_x     = scaling.scale_w(-100);
             tparty.font_party[x].position_y     = scaling.scale_h(-287 + 16 * ((x - 1) % 6));
         end
