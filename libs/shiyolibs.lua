@@ -2329,6 +2329,9 @@ function IsAsleep(entityIndex)
 end
 
 function IsZombie(entityIndex)
+    if IsTrust(entityIndex) then
+        return false
+    end
     if HasStatusEffectByTargetIndex(entityIndex, statusEffect.CURSE_II) then
         return true
     end
@@ -2956,7 +2959,7 @@ function BuildSongSpellList()
                 local name = res.Name[1];
 
                 if (skill == 40) then -- Singing
-                    if name then
+                    if name and CheckJobLevels(name) then
                         song:append(name);
                     end
                 end
@@ -2986,7 +2989,7 @@ function BuildBuffSongSpellList()
 
                 if (skill == 40) then -- Singing
                     if bit.band(res.Targets, 0x20) ~= 0x20 then -- Non-enemy target songs
-                        if name then
+                        if name and CheckJobLevels(name) then
                             song:append(name);
                         end
                     end
@@ -2998,6 +3001,10 @@ function BuildBuffSongSpellList()
     if #song == 0 then
         song:append('None');
     end
+
+    -- Always add Honor March and Aria
+    song:append('Honor March')
+    song:append('Aria of Passion')
 
     return song;
 end
@@ -3014,7 +3021,7 @@ function BuildIndiSpellList()
             if res and res.Name[1] then
                 local name = res.Name[1];
 
-                if string.find(name, 'Indi') then
+                if string.find(name, 'Indi') and CheckJobLevels(name) then
                     indi:append(name);
                 end
             end
@@ -3039,7 +3046,7 @@ function BuildGeoSpellList()
             if res and res.Name[1] then
                 local name = res.Name[1];
 
-                if string.sub(name, 1, 4) == 'Geo-' then
+                if string.sub(name, 1, 4) == 'Geo-' and CheckJobLevels(name) then
                     geo:append(name);
                 end
             end
@@ -3149,7 +3156,7 @@ local function GetCurrentTargetIndex()
     return targetMgr:GetTargetIndex(targetMgr:GetIsSubTargetActive());
 end
 
-local mules = T { "Kaeren", "Faeyris", } -- My mules (Missing "Raenko")
+local mules = T { "Kaeren", "Faeyris", "Raenko" }
 
 local function AllTalk()
     local target = GetCurrentTargetIndex();
