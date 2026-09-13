@@ -3002,10 +3002,6 @@ function BuildBuffSongSpellList()
         song:append('None');
     end
 
-    -- Always add Honor March and Aria
-    song:append('Honor March')
-    song:append('Aria of Passion')
-
     return song;
 end
 
