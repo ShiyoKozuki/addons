@@ -584,9 +584,6 @@ data.GetPetAction = function()
     elseif (action.Type == 'MobSkill') then
         actionTable.Id = action.Id;
         actionTable.Name = action.Name;
-        if type(actionTable.Name) == 'string'then
-            actionTable.Name = encoding:ShiftJIS_To_UTF8(actionTable.Name:trimend('\x00'));
-        end
     end
 
     return actionTable;

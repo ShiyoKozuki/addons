@@ -12,7 +12,7 @@ ffi.cdef[[
 ]];
 ffi.cdef[[
     typedef struct GearListEvent_t {
-        uint8_t ReturnEventPrefix[256];
+        char ReturnEventPrefix[256];
         int32_t EntryCount;
         GearListEntry_t Entries[1000];
     } GearListEvent_t;
@@ -233,12 +233,19 @@ local function CreateOrderStruct()
     for _,v in ipairs(allOrders) do
         AddToStructure(structure, v);
     end
-    return ffi.string(structure, ffi.sizeof(structure)):totable();
+    return structure;
 end
 
 local function HandleEvent(eventName)
     local eventStruct = CreateOrderStruct();
-    AshitaCore:GetPluginManager():RaiseEvent(eventName, eventStruct);
+    if ashita.addons_version >= 4.2 then
+        AshitaCore:GetPluginManager():RaiseEvent(eventName,
+            tonumber(ffi.cast('uint32_t', ffi.cast('uint32_t*', eventStruct))),
+            ffi.sizeof('GearListEvent_t'));
+    else
+        local structAsTable = ffi.string(eventStruct, ffi.sizeof(eventStruct)):totable();
+        AshitaCore:GetPluginManager():RaiseEvent(eventName, structAsTable);
+    end
 end
 
 local exports = {
