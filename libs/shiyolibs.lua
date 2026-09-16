@@ -3056,6 +3056,58 @@ function BuildGeoSpellList()
     return geo;
 end
 
+function BuildEnspellList()
+    local enspell = T{};
+    local player = AshitaCore:GetMemoryManager():GetPlayer();
+    local resMgr = AshitaCore:GetResourceManager();
+
+    for i = 1, 1024 do
+        if player:HasSpell(i) then
+            local res = resMgr:GetSpellById(i);
+
+            if res and res.Name[1] then
+                local name = res.Name[1];
+
+                if string.find(name, '^En') and CheckJobLevels(name) then
+                    enspell:append(name);
+                end
+            end
+        end
+    end
+
+    if #enspell == 0 then
+        enspell:append('None');
+    end
+
+    return enspell;
+end
+
+function BuildGainSpellList()
+    local gain = T{};
+    local player = AshitaCore:GetMemoryManager():GetPlayer();
+    local resMgr = AshitaCore:GetResourceManager();
+
+    for i = 1, 1024 do
+        if player:HasSpell(i) then
+            local res = resMgr:GetSpellById(i);
+
+            if res and res.Name[1] then
+                local name = res.Name[1];
+
+                if string.find(name, 'Gain') and CheckJobLevels(name) then
+                    gain:append(name);
+                end
+            end
+        end
+    end
+
+    if #gain == 0 then
+        gain:append('None');
+    end
+
+    return gain;
+end
+
 function GetAbilityIdByName(Name)
     local abilityId = nil
     local playMgr = AshitaCore:GetMemoryManager():GetPlayer();
