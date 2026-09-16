@@ -179,8 +179,8 @@ local function RenderInterface()
             bit.rshift(bit.band(look.Sub, 0xFF00), 8),
             bit.band(look.Ranged, 0xFF),
             bit.rshift(bit.band(look.Ranged, 0xFF00), 8),
-            look.Unknown0000[1],
-            look.Unknown0000[2]);
+            look.unknown0012[1],
+            look.unknown0012[2]);
             imgui.Text(output);
         end
 

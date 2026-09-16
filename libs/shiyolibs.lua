@@ -263,6 +263,12 @@ function CheckJobLevels(spell)
         return false
     end
 
+    -- Check if the spell is unlocked via Job Points
+    -- local jobMask = spell.JobPointMask;
+
+    -- if bit.band(bit.rshift(jobMask, mJob), 1) == 1 then
+    -- end
+
     if (resource.LevelRequired[mJob + 1] > 0) and (resource.LevelRequired[mJob + 1] <= mJobLevel) then
         if HasSpellByName(spell) then
             return true;
@@ -3106,6 +3112,32 @@ function BuildGainSpellList()
     end
 
     return gain;
+end
+
+function BuildThrenodySpellList()
+    local threnody = T{};
+    local player = AshitaCore:GetMemoryManager():GetPlayer();
+    local resMgr = AshitaCore:GetResourceManager();
+
+    for i = 1, 1024 do
+        if player:HasSpell(i) then
+            local res = resMgr:GetSpellById(i);
+
+            if res and res.Name[1] then
+                local name = res.Name[1];
+
+                if string.find(name, 'Threnody') and CheckJobLevels(name) then
+                    threnody:append(name);
+                end
+            end
+        end
+    end
+
+    if #threnody == 0 then
+        threnody:append('None');
+    end
+
+    return threnody;
 end
 
 function GetAbilityIdByName(Name)
