@@ -84,18 +84,19 @@ local function getRegionIDByZoneID(zoneID)
     return nil
 end
 
-local function onZoneChange()
-    local currentZoneID = AshitaCore:GetMemoryManager():GetParty():GetMemberZone(0)
-    local currentZoneName = encoding:ShiftJIS_To_UTF8(AshitaCore:GetResourceManager():GetString('zones.names', currentZoneID), true)  -- Get the current zone name
-    local regionID = getRegionIDByZoneID(currentZoneID)  -- Get the region ID based on the zone ID
+local function onZoneChange(currentZoneId)
+    if currentZoneId == nil then
+        currentZoneId = AshitaCore:GetMemoryManager():GetParty():GetMemberZone(0)
+    end
+    local currentZoneName = encoding:ShiftJIS_To_UTF8(AshitaCore:GetResourceManager():GetString('zones.names', currentZoneId), true)  -- Get the current zone name
+    local regionID = getRegionIDByZoneID(currentZoneId)  -- Get the region ID based on the zone ID
     local currentRegionName = getRegionNameById(regionID)  -- Get the region name based on the region ID
     if currentRegionName then
         zonename.visible = true
-
         zonename.zone_name_text:set_text(currentZoneName)
         zonename.region_name_text:set_text(currentRegionName)
     else
-        print(chat.header(addon.name):append(chat.error('Unrecognised region. RegionZones data may need to be updated. Region ID: "%s", Zone ID: "%s"'):format(regionID, currentZoneID)))
+        print(chat.header(addon.name):append(chat.error('Unrecognised region. RegionZones data may need to be updated. Region ID: "%s", Zone ID: "%s"'):format(regionID, currentZoneId)))
     end
 end
 
@@ -169,10 +170,16 @@ ashita.events.register('load', 'zonename_load', function()
     zonename.lang_id = 'en'
     if lang == 1 then
         zonename.lang_id = 'ja'
-
     end
 
     initialise()
+
+    settings.register('settings', 'settings_update', function(s)
+        if (s ~= nil) then
+            zonename.settings = s
+            initialise()
+        end
+    end)
 end)
 
 ashita.events.register('unload', 'zonename_unload', function()
@@ -184,8 +191,8 @@ ashita.events.register('packet_in', 'zonename_packet_in', function(event)
     if event.id == 0x0A then  -- Check if it's a zone change packet
         local moghouse = struct.unpack('b', event.data, 0x80 + 1)
         if moghouse ~= 1 then
-            coroutine.sleep(1)
-            onZoneChange()
+            local zone = struct.unpack('H', event.data, 0x30 + 1);
+            onZoneChange(zone)
         end
     end
 end)
@@ -217,18 +224,14 @@ end)
 
 -- Register a d3d_present event to display the OSD elements
 ashita.events.register('d3d_present', 'zonename_present', function()
+    -- Don't display unless we have a player entity and we've finished zoning
+    local player = AshitaCore:GetMemoryManager():GetPlayer()
+    local player_ent = GetPlayerEntity()
+    if (player == nil or player.isZoning or player_ent == nil) then
+		return
+	end
+
     if zonename.visible then
         updateFade()
     end
 end)
-
-local function update_settings(s)
-    if (s ~= nil) then
-        zonename.settings = s
-    end
-    settings.save()
-    initialise()
-end
-
--- Registers a callback for the settings to monitor for character switches.
-settings.register('settings', 'settings_update', update_settings)
