@@ -92,54 +92,6 @@ ashita.events.register('command', 'command_cb', function (e)
     LacDisabled = true;
       end
   end
-  -- Load KozumiBot
-  if (#args > 0) and string.lower(args[1]) == '/kozumibot' then
-    if KozumiBot then
-      AshitaCore:GetChatManager():QueueCommand(1, '/ms send /echo KozumiBot off.');
-      AshitaCore:GetChatManager():QueueCommand(1, '/ms sendto Kozumi /addon unload KozumiBot');
-      KozumiBot = false;
-    else
-      AshitaCore:GetChatManager():QueueCommand(1, '/ms send /echo KozumiBot on.');
-      AshitaCore:GetChatManager():QueueCommand(1, '/ms sendto Kozumi /addon load KozumiBot');
-      KozumiBot = true;
-        end
-    end
-  -- Load THFBot
-  if (#args > 0) and string.lower(args[1]) == '/thfbot' then
-    if THFBot then
-      AshitaCore:GetChatManager():QueueCommand(1, '/ms send /echo THFBot off.');
-      AshitaCore:GetChatManager():QueueCommand(1, '/ms sendto kitori /addon unload THFBot');
-      THFBot = false;
-    else
-      AshitaCore:GetChatManager():QueueCommand(1, '/ms send /echo THFBot on.');
-      AshitaCore:GetChatManager():QueueCommand(1, '/ms sendto kitori /addon load THFBot');
-      THFBot = true;
-        end
-    end
-  -- Load BLMBot
-  if (#args > 0) and string.lower(args[1]) == '/blmbot' then
-    if BLMBot then
-      AshitaCore:GetChatManager():QueueCommand(1, '/ms send /echo BLMBot off.');
-      AshitaCore:GetChatManager():QueueCommand(1, '/ms sendto kitori /addon unload BLMBot');
-      BLMBot = false;
-    else
-      AshitaCore:GetChatManager():QueueCommand(1, '/ms send /echo BLMBot on.');
-      AshitaCore:GetChatManager():QueueCommand(1, '/ms sendto kitori /addon load BLMBot');
-      BLMBot = true;
-      end
-    end
-    -- Load RNGBot
-    if (#args > 0) and string.lower(args[1]) == '/rngbot' then
-      if RNGBot then
-        AshitaCore:GetChatManager():QueueCommand(1, '/ms send /echo RNGBot off.');
-        AshitaCore:GetChatManager():QueueCommand(1, '/ms sendto kitori /addon unload RNGBot');
-        RNGBot = false;
-      else
-        AshitaCore:GetChatManager():QueueCommand(1, '/ms send /echo RNGBot on.');
-        AshitaCore:GetChatManager():QueueCommand(1, '/ms sendto kitori /addon load RNGBot');
-        RNGBot = true;
-        end
-      end
 end);
 
 ashita.events.register('d3d_present', 'present_cb', function ()
