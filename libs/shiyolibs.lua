@@ -264,10 +264,20 @@ function CheckJobLevels(spell)
     end
 
     -- Check if the spell is unlocked via Job Points
-    -- local jobMask = spell.JobPointMask;
+    local jobMask = resource.JobPointMask;
 
-    -- if bit.band(bit.rshift(jobMask, mJob), 1) == 1 then
-    -- end
+    if bit.band(bit.rshift(jobMask, mJob), 1) == 1 then
+        local jobPoints = Player.JobPoints[mJob] and Player.JobPoints[mJob].Total or 0
+
+        if resource.Index >= 871 and resource.Index <= 878 then -- T2 Thernodies
+            if jobPoints >= 100 then
+                if HasSpellByName(spell) then
+                    return true;
+                end
+            end
+        end
+        -- print(string.format("Job point total %d", Player.JobPoints[mJob].Total or 0))
+    end
 
     if (resource.LevelRequired[mJob + 1] > 0) and (resource.LevelRequired[mJob + 1] <= mJobLevel) then
         if HasSpellByName(spell) then
@@ -280,6 +290,98 @@ function CheckJobLevels(spell)
     end
 
     return false
+end
+
+Player = {}
+Player.JobPoints = T{}
+
+Player.JobPointInit = {}
+Player.JobPointInit.Timer = 0
+Player.JobPointInit = { Categories = false, Totals = false, Timer = os.clock() + 3 }
+
+function RegisterInjectJobPointsMenu()
+    ashita.events.register('packet_out', 'injectJobPointsMenu', function (e)
+        if (e.id == 0x61) or (e.id == 0xC0) then
+            Player.JobPointInit.Timer = os.clock() + 3;
+        end
+        
+        if (e.id == 0x15) and (os.clock() > Player.JobPointInit.Timer) and (AshitaCore:GetMemoryManager():GetPlayer():GetMainJobLevel() == 99) then
+            if (Player.JobPointInit.Totals == false) then
+                local packet = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+                AshitaCore:GetPacketManager():AddOutgoingPacket(0x61, packet);        
+                print('Sending main menu packet to initialize job point totals.');
+            end
+            if (Player.JobPointInit.Categories == false) then
+                local packet = { 0x00, 0x00, 0x00, 0x00 };
+                AshitaCore:GetPacketManager():AddOutgoingPacket(0xC0, packet);
+                print('Sending job point menu packet to initialize job point categories.');
+            end
+            Player.JobPointInit.Timer = os.clock() + 15;
+        end
+    end)
+end
+
+function UnRegisterInjectJobPointsMenu()
+    ashita.events.unregister('packet_in', 'injectJobPointsMenu');
+end
+
+function RegisterJobPointsCheck()
+    ashita.events.register('packet_in', 'jp_packet_cb', function(e)
+        if e.id == 0x63 then
+            local subtype = struct.unpack('B', e.data, 0x04 + 1)
+
+            -- print(string.format('[JP] Received 0x63. Size: %u Subtype: %u', e.size, subtype))
+
+            if subtype == 5 then
+                -- print('[JP] Reading Job Point totals...')
+
+                for i = 1, 22 do
+                    local total = struct.unpack('H', e.data, 0x0C + 0x04 + (6 * i) + 1)
+
+                    if Player.JobPoints[i] == nil then
+                        Player.JobPoints[i] = T{}
+                    end
+
+                    Player.JobPoints[i].Total = total
+
+                    -- print(string.format('[JP] Job %u Total: %u', i, total))
+                end
+            end
+            Player.JobPointInit.Totals = true
+        elseif e.id == 0x08D then
+            -- print(string.format('[JP] Received 0x08D. Size: %u', e.size))
+
+            local jobPointCount = (e.size / 4) - 1
+
+            for i = 1, jobPointCount do
+                local offset = i * 4
+                local index = ashita.bits.unpack_be(e.data_raw, offset, 0, 5)
+                local job = ashita.bits.unpack_be(e.data_raw, offset, 5, 11)
+                local count = ashita.bits.unpack_be(e.data_raw, offset + 3, 2, 6)
+
+                -- print(string.format('[JP] Job=%u Category=%u Count=%u', job, index + 1, count))
+
+                if job ~= 0 then
+                    if Player.JobPoints[job] == nil then
+                        Player.JobPoints[job] = T{}
+                    end
+
+                    if Player.JobPoints[job].Categories == nil then
+                        Player.JobPoints[job].Categories = T{}
+                    end
+
+                    Player.JobPoints[job].Categories[index + 1] = count
+
+                    -- print(string.format('[JP] Stored: Job %u Category %u = %u', job, index + 1, count))
+                end
+            end
+            Player.JobPointInit.Categories = true
+        end
+    end)
+end
+
+function UnregisterJobPointsCheck()
+    ashita.events.unregister('packet_in', 'jp_packet_cb');
 end
 
 function TryCastSpell(spell, target)
@@ -1778,10 +1880,6 @@ function BrachyuraCheck()
     end
 end
 
-function UnregisterBrachryuaCheck()
-    ashita.events.unregister('packet_in', 'brachyura_packet_cb');
-end
-
 function RepublicCircletCheck()
     local region = GetRegion()
     if (region == 'Zilart') then
@@ -1876,6 +1974,10 @@ function RegisterBrachyuraCheck()
             end
         end
     end);
+end
+
+function UnregisterBrachryuaCheck()
+    ashita.events.unregister('packet_in', 'brachyura_packet_cb');
 end
 
 function CheckCurrentMP(mp)
@@ -3289,6 +3391,52 @@ local function VolumeMuteMeCommand()
     end
 end
 
+botsEnabled = false
+local function ToggleBotsCommand()
+
+    if botsEnabled then
+        AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /meleebot enabled off");
+        AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /rdmbot enabled off");
+        AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /kozumibot enabled off");
+        AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /yukibot enabled off");
+        AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /bubblebot enabled off");
+        AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /rollbot enable off");
+        botsEnabled = false
+    else
+        AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /meleebot enabled on");
+        AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /rdmbot enabled on");
+        AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /kozumibot enabled on");
+        AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /yukibot enabled on");
+        AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /bubblebot enabled on");
+        AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /rollbot enabled on");
+        botsEnabled = true
+    end
+end
+
+followAndBotsDualCommand = false
+local function ToggleFollowAndBotsCommand()
+
+    if followAndBotsDualCommand then
+        AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /meleebot enabled off");
+        AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /rdmbot enabled off");
+        AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /kozumibot enabled off");
+        AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /yukibot enabled off");
+        AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /bubblebot enabled off");
+        AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /rollbot enable off");
+        AshitaCore:GetChatManager():QueueCommand(-1, "/ms followme on");
+        followAndBotsDualCommand = false
+    else
+        AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /meleebot enabled on");
+        AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /rdmbot enabled on");
+        AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /kozumibot enabled on");
+        AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /yukibot enabled on");
+        AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /bubblebot enabled on");
+        AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /rollbot enabled on");
+        AshitaCore:GetChatManager():QueueCommand(-1, "/ms followme off");
+        followAndBotsDualCommand = true
+    end
+end
+
 -- Global in game slash (/) commands
 local function BoundCall(inputFunction, args)
     inputFunction(table.unpack(args, 3))
@@ -3306,10 +3454,12 @@ function RegisterGlobalCommands()
 
         local commands =
         {
-            ['alltalk']  = AllTalk,
-            ['followme'] = FollowMeCommand,
-            ['volume']   = VolumeMuteMeCommand,
-            ['mount']    = MountCommand,
+            ['alltalk']              = AllTalk,
+            ['followme']             = FollowMeCommand,
+            ['volume']               = VolumeMuteMeCommand,
+            ['mount']                = MountCommand,
+            ['togglebots']           = ToggleBotsCommand,
+            ['followAndBotsEnabled'] = ToggleFollowAndBotsCommand,
         }
 
         local command = commands[args[2]]
