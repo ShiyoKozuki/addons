@@ -3507,6 +3507,51 @@ function TryEngage(engageData)
     end
 end
 
+function TryCurePartyMembers(hpthreshold, highestcure, memberhpp, memberID)
+local cureLists =
+{
+    ['Cure VI']     = {'Cure VI', 'Cure V', 'Cure IV', 'Cure III', 'Cure II', 'Cure'},
+    ['Cure V']      = {'Cure V', 'Cure IV', 'Cure III', 'Cure II', 'Cure'},
+    ['Cure IV']     = {'Cure IV', 'Cure III', 'Cure II', 'Cure'},
+    ['Cure III']    = {'Cure III', 'Cure II', 'Cure'},
+    ['Cure II']     = {'Cure II', 'Cure'},
+}
+    local targetName = AshitaCore:GetMemoryManager():GetEntity():GetName(memberID)
+
+    if memberhpp < hpthreshold and memberhpp > 0 then
+        -- Make sure targets in range of cures
+		if not IsInCastRange(memberID) then
+			if targetName and os.time() > mChatTimer and IsInVisionRange(memberID) then
+				AshitaCore:GetChatManager():QueueCommand(0, ('/p %s is too far away to cure!'):fmt(targetName))
+				mChatTimer = os.time() + 5;
+			end
+			return false
+		end
+
+        if CheckIfStand(25) then
+            return true
+        end
+
+        local cures = cureLists[highestcure]
+
+        if cures then
+            return TryCastCure(cures, memberID)
+        end
+    end
+
+    return false
+end
+
+function TryCastCure(cureTable, memberID)
+    for _, cure in ipairs(cureTable) do
+        if CheckJobLevels(cure) and (TryCastSpell(cure, memberID)) then
+            return true
+        end
+    end
+
+    return false
+end
+
 -- Draw Status icons. Unused, untested
 -- local statusCache = {};
 -- local function GetStatusIcon(id)
