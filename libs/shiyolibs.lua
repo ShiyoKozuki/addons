@@ -269,16 +269,16 @@ function CheckJobLevels(spell)
     if bit.band(bit.rshift(jobMask, mJob), 1) == 1 then
         local jobPoints = Player.JobPoints[mJob] and Player.JobPoints[mJob].Total or 0
 
-        if resource.Index >= 871 and resource.Index <= 878 then -- T2 Thernodies
-            if jobPoints >= 100 then
-                if HasSpellByName(spell) then
-                    return true;
-                end
+        -- When job point mask is set, the level required changes to number of job points for that job
+        if (resource.LevelRequired[mJob + 1] > 0) and (resource.LevelRequired[mJob + 1] <= jobPoints) then
+            if HasSpellByName(spell) then
+                return true;
             end
+            -- print(string.format("Job point total %d", Player.JobPoints[mJob].Total or 0))
         end
-        -- print(string.format("Job point total %d", Player.JobPoints[mJob].Total or 0))
     end
 
+    -- Check if the spell is unlocked via normal levels
     if (resource.LevelRequired[mJob + 1] > 0) and (resource.LevelRequired[mJob + 1] <= mJobLevel) then
         if HasSpellByName(spell) then
             return true;
