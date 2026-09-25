@@ -787,6 +787,61 @@ function GetBuffsByTargetIndex(targetIndex)
     return T{};
 end
 
+function HasBarEleSpell(flags)
+	if GetAnyBuffActive({statusEffect.BARFIRE, statusEffect.BARBLIZZARD, statusEffect.BARAERO, statusEffect.BARSTONE, statusEffect.BARTHUNDER, statusEffect.BARWATER}) then
+		return true
+	end
+	if not CheckJobLevels(flags.bar_ele_active) then
+		return true
+	end
+
+	return false
+end
+
+function HasBarStatusSpell(flags)
+	if GetAnyBuffActive({statusEffect.BARSLEEP, statusEffect.BARPOISON, statusEffect.BARPARALYZE, statusEffect.BARBLIND, statusEffect.BARSILENCE, statusEffect.BARPETRIFY, statusEffect.BARVIRUS, statusEffect.BARAMNESIA}) then
+		return true
+	end
+	if not CheckJobLevels(flags.bar_status_active) then
+		return true
+	end
+
+	return false
+end
+
+function HasEnspell(flags)
+	if GetAnyBuffActive({statusEffect.ENFIRE, statusEffect.ENBLIZZARD, statusEffect.ENAERO, statusEffect.ENSTONE, statusEffect.ENTHUNDER, statusEffect.ENWATER}) then
+		return true
+	end
+	if not CheckJobLevels(flags.enspell_active) then
+		return true
+	end
+
+	return false
+end
+
+function HasGainSpell(flags)
+	if GetAnyBuffActive({statusEffect.STR_BOOST, statusEffect.DEX_BOOST, statusEffect.VIT_BOOST, statusEffect.AGI_BOOST, statusEffect.INT_BOOST, statusEffect.MND_BOOST, statusEffect.CHR_BOOST}) then
+		return true
+	end
+	if not CheckJobLevels(flags.gain_active) then
+		return true
+	end
+
+	return false
+end
+
+function HasBoostSpell(flags)
+	if GetAnyBuffActive({statusEffect.STR_BOOST, statusEffect.DEX_BOOST, statusEffect.VIT_BOOST, statusEffect.AGI_BOOST, statusEffect.INT_BOOST, statusEffect.MND_BOOST, statusEffect.CHR_BOOST}) then
+		return true
+	end
+	if not CheckJobLevels(flags.boost_active) then
+		return true
+	end
+
+	return false
+end
+
 function TryUseStatusCureItem(statusCures)
     local consumableEffects = {
         Poison = {
@@ -3041,7 +3096,9 @@ function BuildCorsairRollList()
             local name = res.Name[1];
 
             if name and string.find(name, 'Roll') and not string.find(name, 'Phantom Roll') then
-                roll:append(name);
+                if CanUseAbility(name) then
+                    roll:append(name);
+                end
             end
         end
     end
@@ -3214,6 +3271,84 @@ function BuildGainSpellList()
     end
 
     return gain;
+end
+
+function BuildBoostSpellList()
+    local boost = T{};
+    local player = AshitaCore:GetMemoryManager():GetPlayer();
+    local resMgr = AshitaCore:GetResourceManager();
+
+    for i = 1, 1024 do
+        if player:HasSpell(i) then
+            local res = resMgr:GetSpellById(i);
+
+            if res and res.Name[1] then
+                local name = res.Name[1];
+
+                if string.find(name, 'Boost') and CheckJobLevels(name) then
+                    boost:append(name);
+                end
+            end
+        end
+    end
+
+    if #boost == 0 then
+        boost:append('None');
+    end
+
+    return boost;
+end
+
+function BuildBarEleSpellList()
+    local barEle = T{};
+    local player = AshitaCore:GetMemoryManager():GetPlayer();
+    local resMgr = AshitaCore:GetResourceManager();
+
+    for i = 60, 71 do -- Ids of bar element spells
+        if player:HasSpell(i) then
+            local res = resMgr:GetSpellById(i);
+
+            if res and res.Name[1] then
+                local name = res.Name[1];
+
+                if CheckJobLevels(name) then
+                    barEle:append(name);
+                end
+            end
+        end
+    end
+
+    if #barEle == 0 then
+        barEle:append('None');
+    end
+
+    return barEle;
+end
+
+function BuildBarStatusSpellList()
+    local barStatus = T{};
+    local player = AshitaCore:GetMemoryManager():GetPlayer();
+    local resMgr = AshitaCore:GetResourceManager();
+
+    for i = 72, 92 do -- Ids of bar status spells (some non-status inbetween)
+        if player:HasSpell(i) then
+            local res = resMgr:GetSpellById(i);
+
+            if res and res.Name[1] then
+                local name = res.Name[1];
+
+                if string.find(name, '^Bar') and CheckJobLevels(name) then
+                    barStatus:append(name);
+                end
+            end
+        end
+    end
+
+    if #barStatus == 0 then
+        barStatus:append('None');
+    end
+
+    return barStatus;
 end
 
 function BuildThrenodySpellList()
