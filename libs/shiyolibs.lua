@@ -957,6 +957,14 @@ function HasStatusEffectByTargetIndex(target, effect)
     return false
 end
 
+function TooFarAwayMsg(targetIndex, msgName, timer)
+    if (os.time() > mChatTimer) and (IsInVisionRange(targetIndex)) then
+        local TargetName = AshitaCore:GetMemoryManager():GetEntity():GetName(targetIndex)
+        AshitaCore:GetChatManager():QueueCommand(0, ('/p %s is too far away to ' .. msgName .. '!'):fmt(TargetName))
+        mChatTimer = os.time() + timer;
+    end
+end
+
 function TryCastNa()
     local naList = {
         { statusEffect.PETRIFICATION, 'Stona'},
@@ -994,17 +1002,24 @@ function TryCastNa()
                 for v,effect in pairs(naList) do
                     if HasStatusEffectByTargetIndex(targetIndex,effect[1]) then
                         spell = effect[2]
+
+                        if not CheckJobLevels(spell) then
+                            return false
+                        end
+
                         if not IsInCastRange(targetIndex) then
                             if (os.time() > mChatTimer) and (IsInVisionRange(targetIndex)) then
                                 local TargetName = AshitaCore:GetMemoryManager():GetEntity():GetName(targetIndex)
                                 AshitaCore:GetChatManager():QueueCommand(0, ('/p %s is too far away to na!'):fmt(TargetName))
-                                mChatTimer = os.time() + 5;
-                                return false
+                                mChatTimer = os.time() + 15;
                             end
+                            return false
                         end
+
                         if (CheckIfStand(50)) then
                             return true
                         end
+
                         if (IsCharmed(targetIndex) == false) then
                             if CheckJobLevels(spell) and (TryCastSpell(spell, targetIndex)) then
                                 return true
@@ -1049,17 +1064,24 @@ function TryCastNaMiyu()
     for i,effect in pairs(naList) do
         if HasStatusEffectByTargetIndex(miyuIndex,effect[1]) then
             spell = effect[2]
+
+            if not CheckJobLevels(spell) then
+                return false
+            end
+  
             if not IsInCastRange(miyuIndex) then
                 if (os.time() > mChatTimer) and (IsInVisionRange(miyuIndex)) then
                     local TargetName = AshitaCore:GetMemoryManager():GetEntity():GetName(miyuIndex)
                     AshitaCore:GetChatManager():QueueCommand(0, ('/p %s is too far away to na!'):fmt(TargetName))
-                    mChatTimer = os.time() + 5;
+                    mChatTimer = os.time() + 15;
                 end
                 return false
             end
+  
             if (CheckIfStand(50)) then
                 return true
             end
+
             if (IsCharmed(miyuIndex) == false) then
                 if CheckJobLevels(spell) and (TryCastSpell(spell, miyuIndex)) then
                     return true
@@ -2425,16 +2447,15 @@ function SendSpellMsg(target, spell)
     AshitaCore:GetChatManager():QueueCommand(-1, ('/ms sendto %s /ma "%s" Kitori'):fmt(target, spell));
 end
 
-function IsInCastRange(target) -- Needs to be "if not IsInCastRange(Target)" to work properly
+function IsInCastRange(target)
     local TargetDistance = math.sqrt(AshitaCore:GetMemoryManager():GetEntity():GetDistance(target))
-    if (TargetDistance > 20.4) and (TargetDistance < 50) then
-        return false
-    end
-    return true
+
+    return TargetDistance <= 20.4
 end
 
 function IsInVisionRange(target)
-    if (target ~= 0) then
+    local TargetDistance = math.sqrt(AshitaCore:GetMemoryManager():GetEntity():GetDistance(target))
+    if target ~= 0 and TargetDistance < 50 then
         return true
     end
     return false
@@ -3643,35 +3664,39 @@ function TryEngage(engageData)
 end
 
 function TryCurePartyMembers(hpthreshold, highestcure, memberhpp, memberID)
-local cureLists =
-{
-    ['Cure VI']     = {'Cure VI', 'Cure V', 'Cure IV', 'Cure III', 'Cure II', 'Cure'},
-    ['Cure V']      = {'Cure V', 'Cure IV', 'Cure III', 'Cure II', 'Cure'},
-    ['Cure IV']     = {'Cure IV', 'Cure III', 'Cure II', 'Cure'},
-    ['Cure III']    = {'Cure III', 'Cure II', 'Cure'},
-    ['Cure II']     = {'Cure II', 'Cure'},
-}
-    local targetName = AshitaCore:GetMemoryManager():GetEntity():GetName(memberID)
+    local cureLists =
+    {
+        ['Cure VI']  = {'Cure VI', 'Cure V', 'Cure IV', 'Cure III', 'Cure II', 'Cure'},
+        ['Cure V']   = {'Cure V', 'Cure IV', 'Cure III', 'Cure II', 'Cure'},
+        ['Cure IV']  = {'Cure IV', 'Cure III', 'Cure II', 'Cure'},
+        ['Cure III'] = {'Cure III', 'Cure II', 'Cure'},
+        ['Cure II']  = {'Cure II', 'Cure'},
+    }
 
-    if memberhpp < hpthreshold and memberhpp > 0 then
-        -- Make sure targets in range of cures
-		if not IsInCastRange(memberID) then
-			if targetName and os.time() > mChatTimer and IsInVisionRange(memberID) then
-				AshitaCore:GetChatManager():QueueCommand(0, ('/p %s is too far away to cure!'):fmt(targetName))
-				mChatTimer = os.time() + 5;
-			end
-			return false
-		end
+    if memberhpp >= hpthreshold or memberhpp <= 0 then
+        return false
+    end
 
-        if CheckIfStand(25) then
-            return true
+    -- Make sure target is in cure range
+    if not IsInCastRange(memberID) then
+        local targetName = AshitaCore:GetMemoryManager():GetEntity():GetName(memberID)
+
+        if targetName and os.time() > mChatTimer and IsInVisionRange(memberID) then
+            AshitaCore:GetChatManager():QueueCommand(0, ('/p %s is too far away to cure!'):fmt(targetName))
+            mChatTimer = os.time() + 15
         end
 
-        local cures = cureLists[highestcure]
+        return false
+    end
 
-        if cures then
-            return TryCastCure(cures, memberID)
-        end
+    if CheckIfStand(25) then
+        return true
+    end
+
+    local cures = cureLists[highestcure]
+
+    if cures then
+        return TryCastCure(cures, memberID)
     end
 
     return false
