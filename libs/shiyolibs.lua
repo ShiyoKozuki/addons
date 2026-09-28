@@ -252,6 +252,30 @@ function HasSpellByName(spell)
     return hasSpell
 end
 
+function HasCureSpell()
+    local cures = {'Cure VI', 'Cure V', 'Cure IV', 'Cure III', 'Cure II', 'Cure'}
+
+    for _, cureSpell in pairs(cures) do
+        if CheckJobLevels(cureSpell) then
+            return true
+        end
+    end 
+
+    return false
+end
+
+function HasNaSpell()
+    local nas = {'Poisona', 'Paralyna', 'Bindna', 'Silena', 'Stona', 'Viruna', 'Cursna' }
+
+    for _, naSpell in pairs(nas) do
+        if CheckJobLevels(naSpell) then
+            return true
+        end
+    end 
+
+    return false
+end
+
 function CheckJobLevels(spell)
     local mJob = AshitaCore:GetMemoryManager():GetPlayer():GetMainJob();
     local sJob = AshitaCore:GetMemoryManager():GetPlayer():GetSubJob();
@@ -965,64 +989,57 @@ function TooFarAwayMsg(targetIndex, msgName, timer)
     end
 end
 
-function TryCastNa()
-    local naList = {
-        { statusEffect.PETRIFICATION, 'Stona'},
-        { statusEffect.DEFENSE_DOWN, 'Erase'},
-        { statusEffect.MAGIC_DEF_DOWN, 'Erase'},
-        { statusEffect.MAX_HP_DOWN, 'Erase'},
-        { statusEffect.SLOW, 'Erase'},
-        { statusEffect.ELEGY, 'Erase'},
-		{ statusEffect.PARALYSIS, 'Paralyna'},
-		{ statusEffect.SILENCE, 'Silena'},
-		{ statusEffect.CURSE_I, 'Cursna'},
-        { statusEffect.DOOM, 'Cursna'},
-        { statusEffect.BLINDNESS, 'Blindna'},
-        { statusEffect.POISON, 'Poisona'},
-		{ statusEffect.VIRUS, 'Viruna'},
-        { statusEffect.PLAGUE, 'Viruna'},
-        { statusEffect.BIO, 'Erase'},
-        { statusEffect.WEIGHT, 'Erase'},
-        { statusEffect.ATTACK_DOWN, 'Erase'},
-        { statusEffect.MAX_MP_DOWN, 'Erase'},
-        { statusEffect.SLEEP_I, 'Cure'},
-        { statusEffect.SLEEP_II, 'Cure'},
-        { statusEffect.LULLABY, 'Cure'},
-        { statusEffect.ACCURACY_DOWN, 'Erase'},
-        { statusEffect.REQUIEM, 'Erase'},
-	}
-	-- for i = 1, 4 do
+local naList = {
+    { statusEffect.PETRIFICATION, 'Stona'},
+    { statusEffect.DEFENSE_DOWN, 'Erase'},
+    { statusEffect.MAGIC_DEF_DOWN, 'Erase'},
+    { statusEffect.MAX_HP_DOWN, 'Erase'},
+    { statusEffect.SLOW, 'Erase'},
+    { statusEffect.ELEGY, 'Erase'},
+    { statusEffect.PARALYSIS, 'Paralyna'},
+    { statusEffect.SILENCE, 'Silena'},
+    { statusEffect.CURSE_I, 'Cursna'},
+    { statusEffect.DOOM, 'Cursna'},
+    { statusEffect.BLINDNESS, 'Blindna'},
+    { statusEffect.POISON, 'Poisona'},
+    { statusEffect.VIRUS, 'Viruna'},
+    { statusEffect.PLAGUE, 'Viruna'},
+    { statusEffect.BIO, 'Erase'},
+    { statusEffect.WEIGHT, 'Erase'},
+    { statusEffect.ATTACK_DOWN, 'Erase'},
+    { statusEffect.MAX_MP_DOWN, 'Erase'},
+    { statusEffect.SLEEP_I, 'Cure'},
+    { statusEffect.SLEEP_II, 'Cure'},
+    { statusEffect.LULLABY, 'Cure'},
+    { statusEffect.ACCURACY_DOWN, 'Erase'},
+    { statusEffect.REQUIEM, 'Erase'},
+}
+
+function TryCastNa(assistName)
     for i = 0, 5 do
 		local targetIndex = AshitaCore:GetMemoryManager():GetParty():GetMemberTargetIndex(i);
-		if (targetIndex ~= 0) and (IsCharmed(targetIndex) == false) then
+		if (targetIndex ~= 0) and not IsCharmed(targetIndex) then
 			local playerName = AshitaCore:GetMemoryManager():GetParty():GetMemberName(i)
-			if (playerName ~= 'Miyu') then
+			if not assistName or playerName ~= assistName then
                 local spell = ''
                 -- Use -na spell for corresponding status effect
                 for v,effect in pairs(naList) do
                     if HasStatusEffectByTargetIndex(targetIndex,effect[1]) then
                         spell = effect[2]
 
-                        if not CheckJobLevels(spell) then
-                            return false
-                        end
+                        if CheckJobLevels(spell) then
+                            if not IsInCastRange(targetIndex) then
+                                if HasNaSpell() then
+                                    TooFarAwayMsg(targetIndex, 'Na', 15)
+                                end
+                            else
+                                if (CheckIfStand(50)) then
+                                    return true
+                                end
 
-                        if not IsInCastRange(targetIndex) then
-                            if (os.time() > mChatTimer) and (IsInVisionRange(targetIndex)) then
-                                local TargetName = AshitaCore:GetMemoryManager():GetEntity():GetName(targetIndex)
-                                AshitaCore:GetChatManager():QueueCommand(0, ('/p %s is too far away to na!'):fmt(TargetName))
-                                mChatTimer = os.time() + 15;
-                            end
-                            return false
-                        end
-
-                        if (CheckIfStand(50)) then
-                            return true
-                        end
-
-                        if (IsCharmed(targetIndex) == false) then
-                            if CheckJobLevels(spell) and (TryCastSpell(spell, targetIndex)) then
-                                return true
+                                if TryCastSpell(spell, targetIndex) then
+                                    return true
+                                end
                             end
                         end
                     end
@@ -1030,65 +1047,38 @@ function TryCastNa()
 			end
 		end
 	end
+
     return false
 end
 
-function TryCastNaMiyu()
-    local naList = {
-        { statusEffect.PETRIFICATION, 'Stona'},
-        { statusEffect.DEFENSE_DOWN, 'Erase'}, 
-        { statusEffect.MAGIC_DEF_DOWN, 'Erase'},
-        { statusEffect.MAX_HP_DOWN, 'Erase'},
-        { statusEffect.SLOW, 'Erase'},
-        { statusEffect.ELEGY, 'Erase'},
-        { statusEffect.PARALYSIS, 'Paralyna'},
-        { statusEffect.SILENCE, 'Silena'},
-        { statusEffect.CURSE_I, 'Cursna'},
-        { statusEffect.DOOM, 'Cursna'},
-        { statusEffect.VIRUS, 'Viruna'},
-        { statusEffect.PLAGUE, 'Viruna'},
-        { statusEffect.BIO, 'Erase'},
-        { statusEffect.WEIGHT, 'Erase'},
-        { statusEffect.ATTACK_DOWN, 'Erase'},
-        { statusEffect.MAX_MP_DOWN, 'Erase'},
-		{ statusEffect.ENMITY_DOWN, 'Erase'},
-        { statusEffect.SLEEP_I, 'Cure'},
-        { statusEffect.SLEEP_II, 'Cure'},
-        { statusEffect.LULLABY, 'Cure'},
-        { statusEffect.ACCURACY_DOWN, 'Erase'},
-        { statusEffect.REQUIEM, 'Erase'},
-    }
-    local miyuIndex = GetPlayerIndex('Miyu')
+function TryCastNaTank(assistName)
+    local assistIndex = GetPlayerIndex(assistName)
     -- Use -na spell for corresponding status effect
 	local spell = ''
     for i,effect in pairs(naList) do
-        if HasStatusEffectByTargetIndex(miyuIndex,effect[1]) then
-            spell = effect[2]
+        if (assistIndex ~= 0) and not IsCharmed(assistIndex) then
+            if HasStatusEffectByTargetIndex(assistIndex,effect[1]) then
+                spell = effect[2]
 
-            if not CheckJobLevels(spell) then
-                return false
-            end
-  
-            if not IsInCastRange(miyuIndex) then
-                if (os.time() > mChatTimer) and (IsInVisionRange(miyuIndex)) then
-                    local TargetName = AshitaCore:GetMemoryManager():GetEntity():GetName(miyuIndex)
-                    AshitaCore:GetChatManager():QueueCommand(0, ('/p %s is too far away to na!'):fmt(TargetName))
-                    mChatTimer = os.time() + 15;
-                end
-                return false
-            end
-  
-            if (CheckIfStand(50)) then
-                return true
-            end
+                if CheckJobLevels(spell) then
+                    if not IsInCastRange(assistIndex) then
+                        if HasNaSpell() then
+                            TooFarAwayMsg(assistIndex, 'Na', 15)
+                        end
+                    else
+                        if (CheckIfStand(50)) then
+                            return true
+                        end
 
-            if (IsCharmed(miyuIndex) == false) then
-                if CheckJobLevels(spell) and (TryCastSpell(spell, miyuIndex)) then
-                    return true
+                        if TryCastSpell(spell, assistIndex) then
+                            return true
+                        end
+                    end
                 end
             end
         end
     end
+
 	return false
 end
 
@@ -3682,8 +3672,10 @@ function TryCurePartyMembers(hpthreshold, highestcure, memberhpp, memberID)
         local targetName = AshitaCore:GetMemoryManager():GetEntity():GetName(memberID)
 
         if targetName and os.time() > mChatTimer and IsInVisionRange(memberID) then
-            AshitaCore:GetChatManager():QueueCommand(0, ('/p %s is too far away to cure!'):fmt(targetName))
-            mChatTimer = os.time() + 15
+            if HasCureSpell() then
+                AshitaCore:GetChatManager():QueueCommand(0, ('/p %s is too far away to cure!'):fmt(targetName))
+                mChatTimer = os.time() + 15
+            end
         end
 
         return false
