@@ -21,11 +21,13 @@
 
 addon.name      = 'sneakvis';
 addon.author    = 'Thorny';
-addon.version   = '1.0';
+addon.version   = '1.1';
 addon.desc      = 'Cancels sneak and invisible when someone casts them on you while they are already active.';
 addon.link      = 'https://ashitaxi.com/';
 
 require('common');
+
+local packetTimer = {}
 
 local function GetBuffActive(matchBuff)
   local buffs = AshitaCore:GetMemoryManager():GetPlayer():GetBuffs();    
@@ -111,9 +113,14 @@ ashita.events.register('packet_out', 'packet_out_cb', function (e)
         local category = struct.unpack('H', e.data, 0x0A + 0x01);
         local actionId = struct.unpack('H', e.data, 0x0C + 0x01);
         local targetIndex = struct.unpack('H', e.data, 0x08 + 0x01);
-        if (category == 0x09) and (actionId == 196) then  -- Spectral Jig
-            CancelBuff(69);
-            CancelBuff(71);
+
+        -- Add 5s timer to stop flooding (Instances spam send the packet, for example)
+        if os.time() > (packetTimer[actionId] or 0) then
+            if (category == 0x09) and (actionId == 196) then  -- Spectral Jig
+                CancelBuff(69);
+                CancelBuff(71);
+            end
+            packetTimer[actionId] = os.time() + 5
         end
     end
 end);
