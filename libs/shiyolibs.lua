@@ -84,6 +84,28 @@ function TryUseHealingItem(EntityIndex)
     return false;
 end
 
+function TryUseMPRestoreItem(MyIndex, flags)
+    local MPP = AshitaCore:GetMemoryManager():GetParty():GetMemberMPPercent(0)
+
+    if flags.AutoEther then
+        if (MPP <= 50) then
+            for _, itemName in pairs(mpRestoreItems) do
+                if itemName then
+                    if (CheckIfStand(1)) then
+                        return true
+                    end
+
+                    if TryUseItem(itemName, MyIndex) then
+                        return true
+                    end
+                end
+            end
+        end
+    end
+
+    return false
+end
+
 function GetAbilityRecast(abilityId)
     for i = 0,31,1
     do
