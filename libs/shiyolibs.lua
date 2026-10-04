@@ -867,7 +867,7 @@ function HasEnspell(flags)
 end
 
 function HasGainSpell(flags)
-	if GetAnyBuffActive({statusEffect.STR_BOOST, statusEffect.DEX_BOOST, statusEffect.VIT_BOOST, statusEffect.AGI_BOOST, statusEffect.INT_BOOST, statusEffect.MND_BOOST, statusEffect.CHR_BOOST}) then
+	if GetAnyBuffActive({statusEffect.STR_BOOST_II, statusEffect.DEX_BOOST_II, statusEffect.VIT_BOOST_II, statusEffect.AGI_BOOST_II, statusEffect.INT_BOOST_II, statusEffect.MND_BOOST_II, statusEffect.CHR_BOOST_II}) then
 		return true
 	end
 	if not CheckJobLevels(flags.gain_active) then
@@ -878,7 +878,7 @@ function HasGainSpell(flags)
 end
 
 function HasBoostSpell(flags)
-	if GetAnyBuffActive({statusEffect.STR_BOOST, statusEffect.DEX_BOOST, statusEffect.VIT_BOOST, statusEffect.AGI_BOOST, statusEffect.INT_BOOST, statusEffect.MND_BOOST, statusEffect.CHR_BOOST}) then
+	if GetAnyBuffActive({statusEffect.STR_BOOST_II, statusEffect.DEX_BOOST_II, statusEffect.VIT_BOOST_II, statusEffect.AGI_BOOST_II, statusEffect.INT_BOOST_II, statusEffect.MND_BOOST_II, statusEffect.CHR_BOOST_II}) then
 		return true
 	end
 	if not CheckJobLevels(flags.boost_active) then
@@ -942,6 +942,21 @@ function TryUseStatusCureItem(statusCures)
 
         Elegy = {
             statusEffect.ELEGY,
+            { 'Vicar\'s Drink', 'Cleric\'s Drink', 'Catholicon', 'Catholicon +1', 'Panacea' },
+        },
+
+        Slow = {
+            statusEffect.SLOW,
+            { 'Vicar\'s Drink', 'Cleric\'s Drink', 'Catholicon', 'Catholicon +1', 'Panacea' },
+        },
+
+        Weight = {
+            statusEffect.WEIGHT,
+            { 'Vicar\'s Drink', 'Cleric\'s Drink', 'Catholicon', 'Catholicon +1', 'Panacea' },
+        },
+
+        Bind = {
+            statusEffect.BIND,
             { 'Vicar\'s Drink', 'Cleric\'s Drink', 'Catholicon', 'Catholicon +1', 'Panacea' },
         },
 
@@ -1690,11 +1705,41 @@ T{
     }
 }
 
+for _,entry in ipairs(WeaponskillGorgets) do
+    local newTable = {};
+    for _,ws in ipairs(entry.Weaponskills) do
+        newTable[ws] = true;
+    end
+    entry.Weaponskills = newTable;
+end
+
+local SEARCHABLE_INVENTORY = {}
+function UpdateInventory()
+    local containers = {0, 8, 10, 11, 12, 13, 14, 15, 16} -- Containers to iterate through
+    local output = {}
+    for _, containerId in ipairs(containers) do
+        for slot = 1, 80 do
+            local item = AshitaCore:GetMemoryManager():GetInventory():GetContainerItem(containerId, slot)
+            if (item ~= nil) and (item.Id > 0) then
+                output[item.Id] = true;
+            end
+        end
+    end
+    SEARCHABLE_INVENTORY = output;
+end
+
+local gorgetByWeaponskill = {};
+
 function GetMatchingGorget(weaponskillName)
+    if gorgetByWeaponskill[weaponskillName] then
+        return gorgetByWeaponskill[weaponskillName]
+    end
+
     for _,v in pairs(WeaponskillGorgets) do
-        if v.Weaponskills:contains(weaponskillName) then
+        if v.Weaponskills[weaponskillName] then
             if (v.Gorget ~= nil) then
-                if HasItemInEquippableInventory(GetItemByName(v.Gorget)) then
+                if SEARCHABLE_INVENTORY[GetItemByName(v.Gorget)] then
+                    gorgetByWeaponskill[weaponskillName] = v.Gorget;
                     return v.Gorget;
                 end
             end
@@ -1705,14 +1750,10 @@ function GetMatchingGorget(weaponskillName)
 end
 
 function CheckWSGorget()
-    -- Handle ele gorgets
     local action = gData.GetAction()
-    for _,v in pairs(WeaponskillGorgets) do
-        if (v.Weaponskills:contains(action.Name)) then
-            if HasItemInEquippableInventory(GetItemByName(GetMatchingGorget(action.Name))) then
-                gFunc.Equip('Neck', GetMatchingGorget(action.Name))
-            end
-        end
+    local matchingGorget = GetMatchingGorget(action.Name);
+    if matchingGorget ~= "Unknown" then
+        gFunc.Equip('Neck', matchingGorget)
     end
 end
 
@@ -3430,6 +3471,7 @@ function GetAbilityIdByName(Name)
     return abilityId;
 end
 
+-- Returns the first result found, thus table given should be sorted highest to lowest
 function GetBestSpell(spellTable)
     for _, spell in ipairs(spellTable) do
         if CheckJobLevels(spell) then
