@@ -888,6 +888,14 @@ function HasBoostSpell(flags)
 	return false
 end
 
+function HasHasteEffect()
+	if GetAnyBuffActive({statusEffect.HASTE, statusEffect.SLOW}) then
+		return true
+	end
+
+    return false
+end
+
 function TryUseStatusCureItem(statusCures)
     local consumableEffects = {
         Poison = {
@@ -1024,6 +1032,26 @@ function TooFarAwayMsg(targetIndex, msgName, timer)
         AshitaCore:GetChatManager():QueueCommand(0, ('/p %s is too far away to ' .. msgName .. '!'):fmt(TargetName))
         mChatTimer = os.time() + timer;
     end
+end
+
+function TryCastUtsusemi(myIndex)
+    if GetBuffActive(66) then
+        if CheckJobLevels('Utsusemi: Ichi') and TryCastSpell('Utsusemi: Ichi', myIndex) then
+            return true
+        elseif CheckJobLevels('Utsusemi: Ni') and TryCastSpell('Utsusemi: Ni', myIndex) then
+            return true
+        end
+    end
+
+    if not GetAnyBuffActive({66, 444, 445, 446}) then
+        if CheckJobLevels('Utsusemi: Ni') and TryCastSpell('Utsusemi: Ni', myIndex) then
+            return true
+        elseif CheckJobLevels('Utsusemi: Ichi') and TryCastSpell('Utsusemi: Ichi', myIndex) then
+            return true
+        end
+    end
+
+    return false
 end
 
 local naList = {
