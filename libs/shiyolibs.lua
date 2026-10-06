@@ -3786,6 +3786,23 @@ function TryCurePartyMembers(hpthreshold, highestcure, memberhpp, memberID)
     return false
 end
 
+function CanCurePartyMembers(cureThreshold, cure)
+    for i = 0,5,1 do
+		local memberIndex = AshitaCore:GetMemoryManager():GetParty():GetMemberTargetIndex(i);
+		local memberHpPercent = AshitaCore:GetMemoryManager():GetParty():GetMemberHPPercent(i);
+		local buffs = GetBuffsByPartyIndex(memberIndex)
+
+		if (memberIndex ~= 0) and not IsCharmed(memberIndex) and not buffs:contains(statusEffect.CURSE_II) then
+
+			if TryCurePartyMembers((cureThreshold), cure, memberHpPercent, memberIndex) then
+				return true
+			end
+		end
+	end
+
+    return false
+end
+
 function TryCastCure(cureTable, memberID)
     for _, cure in ipairs(cureTable) do
         if CheckJobLevels(cure) and (TryCastSpell(cure, memberID)) then
