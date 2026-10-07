@@ -64,6 +64,11 @@ function HasItem(itemId)
     return false;
 end
 
+function HasItemByName(itemName)
+    local itemResource = AshitaCore:GetResourceManager():GetItemByName(itemName , 0);
+    return HasItem(itemResource.Id) 
+end
+
 function TryUseItem(item, target)
     local itemResource = AshitaCore:GetResourceManager():GetItemByName(item , 0);
     if HasItem(itemResource.Id) then
@@ -90,7 +95,7 @@ function TryUseMPRestoreItem(MyIndex, flags)
     if flags.AutoEther then
         if (MPP <= 50) then
             for _, itemName in pairs(mpRestoreItems) do
-                if itemName then
+                if itemName and HasItemByName(itemName) then
                     if (CheckIfStand(1)) then
                         return true
                     end
@@ -3725,7 +3730,7 @@ function TryEngage(engageData)
         -- Swap targets if I'm not on the tanks target
         if (engageData.meEngaged) then
             if (IsMonster(engageData.EnemyIndex) and engageData.myTarget ~= engageData.EnemyIndex and engageData.assistTargetDistance <= 25) then
-                if (CheckIfStand(50)) then
+                if (engageData.checkIfStand and CheckIfStand(engageData.checkIfStandPct)) then
                     return true
                 end
                 
@@ -3734,10 +3739,6 @@ function TryEngage(engageData)
             end
         else
 
-        if (engageData.checkIfStand and CheckIfStand(engageData.checkIfStandPct)) then
-            return true
-        end
-
         AshitaCore:GetChatManager():QueueCommand(0, ('/attack %u'):fmt(AshitaCore:GetMemoryManager():GetEntity():GetServerId(engageData.EnemyIndex)));
         mActionTimer = os.time() + 2;
             return true
@@ -3745,7 +3746,24 @@ function TryEngage(engageData)
     end
 end
 
-function TryCurePartyMembers(hpthreshold, highestcure, memberhpp, memberID)
+function TryCurePartyMembers(cureThreshold, cure)
+    for i = 0,5,1 do
+		local memberIndex = AshitaCore:GetMemoryManager():GetParty():GetMemberTargetIndex(i);
+		local memberHpPercent = AshitaCore:GetMemoryManager():GetParty():GetMemberHPPercent(i);
+		local buffs = GetBuffsByPartyIndex(memberIndex)
+
+		if (memberIndex ~= 0) and not IsCharmed(memberIndex) and not buffs:contains(statusEffect.CURSE_II) then
+
+			if CanCurePartyMembers((cureThreshold), cure, memberHpPercent, memberIndex) then
+				return true
+			end
+		end
+	end
+
+    return false
+end
+
+function CanCurePartyMembers(hpthreshold, highestcure, memberhpp, memberID)
     local cureLists =
     {
         ['Cure VI']  = {'Cure VI', 'Cure V', 'Cure IV', 'Cure III', 'Cure II', 'Cure'},
@@ -3782,23 +3800,6 @@ function TryCurePartyMembers(hpthreshold, highestcure, memberhpp, memberID)
     if cures then
         return TryCastCure(cures, memberID)
     end
-
-    return false
-end
-
-function CanCurePartyMembers(cureThreshold, cure)
-    for i = 0,5,1 do
-		local memberIndex = AshitaCore:GetMemoryManager():GetParty():GetMemberTargetIndex(i);
-		local memberHpPercent = AshitaCore:GetMemoryManager():GetParty():GetMemberHPPercent(i);
-		local buffs = GetBuffsByPartyIndex(memberIndex)
-
-		if (memberIndex ~= 0) and not IsCharmed(memberIndex) and not buffs:contains(statusEffect.CURSE_II) then
-
-			if TryCurePartyMembers((cureThreshold), cure, memberHpPercent, memberIndex) then
-				return true
-			end
-		end
-	end
 
     return false
 end
