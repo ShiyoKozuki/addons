@@ -3814,6 +3814,103 @@ function TryCastCure(cureTable, memberID)
     return false
 end
 
+function TryRefreshCycle(flags)
+    for playerName, enabled in pairs(flags.refreshCycle) do
+        if enabled then
+            local Target = GetPlayerIndex(playerName)
+
+            if Target and Target > 0 then
+                local targetBuffs = GetBuffsByTargetIndex(Target)
+
+                if not IsDead(playerName) and not targetBuffs:contains(statusEffect.REFRESH) and not targetBuffs:contains(statusEffect.SUBLIMATION_ACTIVATED) and not targetBuffs:contains(statusEffect.SUBLIMATION_COMPLETE) then
+                    if not IsInCastRange(Target) then
+                        if os.time() > mChatTimer and IsInVisionRange(Target) then
+                            AshitaCore:GetChatManager():QueueCommand(0, ('/p %s is too far away to Refresh!'):fmt(playerName))
+                            mChatTimer = os.time() + 15
+                        end
+                    else
+                        if CheckIfStand(33) then
+                            return true
+                        end
+
+                        local refresh = GetBestSpell({'Refresh III', 'Refresh II', 'Refresh'})
+                        if CheckJobLevels(refresh) and TryCastSpell(refresh, Target) then
+                            return true
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    return false
+end
+
+function TryHasteCycle(flags)
+    for playerName, enabled in pairs(flags.hasteCycle) do
+        if enabled then
+            local Target = GetPlayerIndex(playerName)
+
+
+            if Target and Target > 0 then
+            local targetBuffs = GetBuffsByTargetIndex(Target)
+
+                if not IsDead(playerName) and not targetBuffs:contains(statusEffect.HASTE) and not targetBuffs:contains(statusEffect.SLOW) then
+                    if not IsInCastRange(Target) then
+                        if (os.time() > mChatTimer) and IsInVisionRange(Target) then
+                            AshitaCore:GetChatManager():QueueCommand(0, ('/p %s is too far away to Haste!'):fmt(playerName))
+                            mChatTimer = os.time() + 15;
+                        end
+                    else
+                        if (CheckIfStand(33)) then
+                            return true
+                        end
+
+                        local haste = GetBestSpell({'Haste II', 'Haste'})
+                        if CheckJobLevels(haste) and (TryCastSpell(haste, Target)) then
+                            return true;
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    return false
+end
+
+function TryPhalanxCycle(flags)
+    for playerName, enabled in pairs(flags.phalanxCycle) do
+        if enabled then
+            local Target = GetPlayerIndex(playerName)
+
+
+            if Target and Target > 0 then
+            local targetBuffs = GetBuffsByTargetIndex(Target)
+
+                if not IsDead(playerName) and not targetBuffs:contains(statusEffect.PHALANX) then
+                    if not IsInCastRange(Target) then
+                        if (os.time() > mChatTimer) and IsInVisionRange(Target) then
+                            AshitaCore:GetChatManager():QueueCommand(0, ('/p %s is too far away to Phalanx!'):fmt(playerName))
+                            mChatTimer = os.time() + 15;
+                        end
+                    else
+                        if (CheckIfStand(33)) then
+                            return true
+                        end
+
+                        if CheckJobLevels('Phalanx II') and (TryCastSpell('Phalanx II', Target)) then
+                            return true;
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    return false
+end
+
 -- Draw Status icons. Unused, untested
 -- local statusCache = {};
 -- local function GetStatusIcon(id)
