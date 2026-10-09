@@ -111,6 +111,28 @@ function TryUseMPRestoreItem(MyIndex, flags)
     return false
 end
 
+function TryUseSelfPoisonItem(MyIndex, flags)
+    local poisonItems = { 'Poison Potion', 'El. Pachira Fruit'}
+    
+    if GetBuffActive(statusEffect.POISON) then return false end
+
+    if flags.PoisonPotion then
+        for _, itemName in pairs(poisonItems) do
+            if itemName and HasItemByName(itemName) then
+                if (CheckIfStand(1)) then
+                    return true
+                end
+
+                if TryUseItem(itemName, MyIndex) then
+                    return true
+                end
+            end
+        end
+    end
+
+    return false
+end
+
 function GetAbilityRecast(abilityId)
     for i = 0,31,1
     do
@@ -769,50 +791,6 @@ function GetBuffsByPartyIndex(partyIndex)
 
     for i = 0,4,1 do
         if (party:GetStatusIconsServerId(i) == memberId) then
-            local icons_lo = party:GetStatusIcons(i);
-            local icons_hi = party:GetStatusIconsBitMask(i);
-            local buffs = T{};
-
-            for j = 0,31,1 do
-                local high_bits;
-                if j < 16 then
-                    high_bits = bit.lshift(bit.band(bit.rshift(icons_hi, 2 * j), 3), 8);
-                else
-                    local buffer = math.floor(icons_hi / 0xFFFFFFFF);
-                    high_bits = bit.lshift(bit.band(bit.rshift(buffer, 2 * (j - 16)), 3), 8);
-                end
-                local buffId = icons_lo[j+1] + high_bits;
-                if (buffId ~= 255) then
-                    buffs[#buffs + 1] = buffId;
-                end
-            end
-
-            return buffs;
-        end
-    end
-
-    return T{};
-end
-
-function GetBuffsByTargetIndex(targetIndex)
-    local party = AshitaCore:GetMemoryManager():GetParty()
-    if (targetIndex == AshitaCore:GetMemoryManager():GetParty():GetMemberTargetIndex(0)) then
-        local buffs = T{};
-        local myBuffs = AshitaCore:GetMemoryManager():GetPlayer():GetBuffs();
-        for _,buff in pairs(myBuffs) do
-            if buff ~= -1 then
-                buffs:append(buff);
-            end
-        end
-        return buffs; 
-    end
-
-    if (targetIndex == 0) then
-        return T{};
-    end
-
-    for i = 0,4,1 do
-        if (party:GetStatusIconsTargetIndex(i) == targetIndex) then
             local icons_lo = party:GetStatusIcons(i);
             local icons_hi = party:GetStatusIconsBitMask(i);
             local buffs = T{};
@@ -3504,6 +3482,39 @@ function GetAbilityIdByName(Name)
     return abilityId;
 end
 
+function GetBestAbility(abilityTable)
+    for _, ability in ipairs(abilityTable) do
+        if CanUseAbility(ability) then
+            return ability
+        end
+    end
+
+    return 'None'
+end
+
+function GetBestWaltz()
+    local waltzList = T{'Curing Waltz VI', 'Curing Waltz V', 'Curing Waltz IV', 'Curing Waltz III', 'Curing Waltz II', 'Curing Waltz'}
+    local waltz = 'None'
+    local playMgr = AshitaCore:GetMemoryManager():GetPlayer();
+    local resMgr = AshitaCore:GetResourceManager();
+    local playerTp = AshitaCore:GetMemoryManager():GetParty():GetMemberTP(0)
+
+    for i = 1, 1792 do
+        local res = resMgr:GetAbilityById(i);
+
+        if res and playMgr:HasAbility(res.Id) then
+            if waltzList:contains(res.Name[1]) then
+                if playerTp >= res.ManaCost then
+                    abilityId = res.Id
+                    break
+                end
+            end
+        end
+    end
+
+    return waltz
+end
+
 -- Returns the first result found, thus table given should be sorted highest to lowest
 function GetBestSpell(spellTable)
     for _, spell in ipairs(spellTable) do
@@ -3773,6 +3784,8 @@ function CanCurePartyMembers(hpthreshold, highestcure, memberhpp, memberID)
         ['Cure II']  = {'Cure II', 'Cure'},
     }
 
+    local waltzList = {}
+
     if memberhpp >= hpthreshold or memberhpp <= 0 then
         return false
     end
@@ -3814,6 +3827,94 @@ function TryCastCure(cureTable, memberID)
     return false
 end
 
+-- TODO: Healing Waltz added to Na Logic
+function TryWaltz(waltzTable, memberID)
+
+    return false
+end
+
+partyBuffTable = {};
+do
+    partyBuffTable = {};
+    local basePtr = ashita.memory.find('FFXiMain.dll', 0, 'B93C0000008D7004BF????????F3A5', 9, 0);
+    if basePtr then
+        basePtr = ashita.memory.read_uint32(basePtr)
+        for memberIndex = 0,4 do
+            local memberPtr = basePtr + (0x30 * memberIndex);
+            local playerIndex = ashita.memory.read_uint16(memberPtr + 4);
+            local buffs = T{};
+            local empty = false;
+            for buffIndex = 0,31 do
+                if empty then
+                    buffs[buffIndex + 1] = -1;
+                else
+                    local highBits = ashita.memory.read_uint8(memberPtr + 8 + (math.floor(buffIndex / 4)));
+                    local fMod = math.fmod(buffIndex, 4) * 2;
+                    highBits = bit.lshift(bit.band(bit.rshift(highBits, fMod), 0x03), 8);
+                    local lowBits = ashita.memory.read_uint8(memberPtr + 16 + buffIndex);
+                    local buff = highBits + lowBits;
+                    if buff == 255 then
+                        empty = true;
+                        buffs[buffIndex + 1] = -1;
+                    else
+                        buffs[buffIndex + 1] = buff;
+                    end
+                end
+            end
+            partyBuffTable[playerIndex] = buffs;
+        end
+    end
+end
+ 
+function GetBuffsByTargetIndex(index)
+    local match = partyBuffTable[index];
+    if match then return match end
+
+    local buffs = T{};
+    local pMgr = AshitaCore:GetMemoryManager():GetParty();
+    local myIndex = pMgr:GetMemberTargetIndex(0);
+    if myIndex == index then
+        for _,buff in pairs(AshitaCore:GetMemoryManager():GetPlayer():GetBuffs()) do
+            if buff ~= -1 then
+                buffs:append(buff);
+            end
+        end       
+    end
+    return buffs;
+end
+
+function RegisterPartyBuffsPacket()
+    ashita.events.register('packet_in', 'Update_Party_Buffs', function (e)
+        if (e.id == 0x076) then
+            partyBuffTable = {};
+            for i = 0,4 do
+                local memberOffset = 0x04 + (0x30 * i) + 1;
+                local memberIndex = struct.unpack('H', e.data, memberOffset + 4);
+                if memberIndex > 0 then
+                    local buffs = T{};
+                    local empty = false;
+                    for j = 0,31 do
+                        if empty then
+                            buffs[j + 1] = -1;
+                        else
+                            local highBits = bit.lshift(ashita.bits.unpack_be(e.data_raw, memberOffset + 7, j * 2, 2), 8);
+                            local lowBits = struct.unpack('B', e.data, memberOffset + 0x10 + j);
+                            local buff = highBits + lowBits;
+                            if (buff == 255) then
+                                buffs[j + 1] = -1;
+                                empty = true;
+                            else
+                                buffs[j + 1] = buff;
+                            end
+                        end
+                    end
+                    partyBuffTable[memberIndex] = buffs;
+                end
+            end
+        end
+    end);
+end
+
 function TryRefreshCycle(flags)
     for playerName, enabled in pairs(flags.refreshCycle) do
         if enabled then
@@ -3853,7 +3954,7 @@ function TryHasteCycle(flags)
 
 
             if Target and Target > 0 then
-            local targetBuffs = GetBuffsByTargetIndex(Target)
+                local targetBuffs = GetBuffsByTargetIndex(Target)
 
                 if not IsDead(playerName) and not targetBuffs:contains(statusEffect.HASTE) and not targetBuffs:contains(statusEffect.SLOW) then
                     if not IsInCastRange(Target) then
