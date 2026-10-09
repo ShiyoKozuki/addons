@@ -522,6 +522,12 @@ function CanUseAbility(ability)
         return false
     end
 
+    local playerTp = AshitaCore:GetMemoryManager():GetParty():GetMemberTP(0)
+
+    if playerTp < abilityResource.TPCost then
+        return false
+    end
+
     if (abilityResource.RecastTimerId == 231) then
         if (GetStratagemCount() == 0) then
             return false;
@@ -1042,6 +1048,8 @@ local naList = {
     { statusEffect.DEFENSE_DOWN, 'Erase'},
     { statusEffect.MAGIC_DEF_DOWN, 'Erase'},
     { statusEffect.MAX_HP_DOWN, 'Erase'},
+    { statusEffect.MAX_MP_DOWN, 'Erase'},
+    { statusEffect.MAX_TP_DOWN, 'Erase'},
     { statusEffect.SLOW, 'Erase'},
     { statusEffect.ELEGY, 'Erase'},
     { statusEffect.PARALYSIS, 'Paralyna'},
@@ -1055,11 +1063,11 @@ local naList = {
     { statusEffect.BIO, 'Erase'},
     { statusEffect.WEIGHT, 'Erase'},
     { statusEffect.ATTACK_DOWN, 'Erase'},
-    { statusEffect.MAX_MP_DOWN, 'Erase'},
     { statusEffect.SLEEP_I, 'Cure'},
     { statusEffect.SLEEP_II, 'Cure'},
     { statusEffect.LULLABY, 'Cure'},
     { statusEffect.ACCURACY_DOWN, 'Erase'},
+    { statusEffect.MAGIC_EVASION_DOWN, 'Erase'},
     { statusEffect.REQUIEM, 'Erase'},
 }
 
@@ -3492,27 +3500,20 @@ function GetBestAbility(abilityTable)
     return 'None'
 end
 
-function GetBestWaltz()
-    local waltzList = T{'Curing Waltz VI', 'Curing Waltz V', 'Curing Waltz IV', 'Curing Waltz III', 'Curing Waltz II', 'Curing Waltz'}
-    local waltz = 'None'
-    local playMgr = AshitaCore:GetMemoryManager():GetPlayer();
-    local resMgr = AshitaCore:GetResourceManager();
+cureWaltzList = T{};
+for _,entry in ipairs(T{'Curing Waltz VI', 'Curing Waltz V', 'Curing Waltz IV', 'Curing Waltz III', 'Curing Waltz II', 'Curing Waltz'}) do
+    cureWaltzList:append(AshitaCore:GetResourceManager():GetAbilityByName(entry, 0));
+end
+
+function GetBestCureWaltz()
+    local playMgr = AshitaCore:GetMemoryManager():GetPlayer()
     local playerTp = AshitaCore:GetMemoryManager():GetParty():GetMemberTP(0)
 
-    for i = 1, 1792 do
-        local res = resMgr:GetAbilityById(i);
-
-        if res and playMgr:HasAbility(res.Id) then
-            if waltzList:contains(res.Name[1]) then
-                if playerTp >= res.ManaCost then
-                    abilityId = res.Id
-                    break
-                end
-            end
+    for _, waltz in ipairs(cureWaltzList) do
+        if waltz and playMgr:HasAbility(waltz.Id) and playerTp >= waltz.TPCost then
+            return waltz.Name[1]
         end
     end
-
-    return waltz
 end
 
 -- Returns the first result found, thus table given should be sorted highest to lowest
@@ -3784,8 +3785,6 @@ function CanCurePartyMembers(hpthreshold, highestcure, memberhpp, memberID)
         ['Cure II']  = {'Cure II', 'Cure'},
     }
 
-    local waltzList = {}
-
     if memberhpp >= hpthreshold or memberhpp <= 0 then
         return false
     end
@@ -3796,7 +3795,7 @@ function CanCurePartyMembers(hpthreshold, highestcure, memberhpp, memberID)
 
         if targetName and os.time() > mChatTimer and IsInVisionRange(memberID) then
             if HasCureSpell() then
-                AshitaCore:GetChatManager():QueueCommand(0, ('/p %s is too far away to cure!'):fmt(targetName))
+                AshitaCore:GetChatManager():QueueCommand(0, ('/p %s is too far away to Cure!'):fmt(targetName))
                 mChatTimer = os.time() + 15
             end
         end
@@ -3827,11 +3826,145 @@ function TryCastCure(cureTable, memberID)
     return false
 end
 
--- TODO: Healing Waltz added to Na Logic
-function TryWaltz(waltzTable, memberID)
+
+function TryCureWaltzPartyMembers(cureThreshold)
+    for i = 0,5,1 do
+		local memberIndex = AshitaCore:GetMemoryManager():GetParty():GetMemberTargetIndex(i);
+		local memberHpPercent = AshitaCore:GetMemoryManager():GetParty():GetMemberHPPercent(i);
+		local buffs = GetBuffsByPartyIndex(memberIndex)
+
+		if (memberIndex ~= 0) and not IsCharmed(memberIndex) and not buffs:contains(statusEffect.CURSE_II) then
+
+			if CanCureWaltzPartyMembers((cureThreshold), memberHpPercent, memberIndex) then
+				return true
+			end
+		end
+	end
 
     return false
 end
+
+function CanCureWaltzPartyMembers(hpthreshold, memberhpp, memberID)
+    if memberhpp >= hpthreshold or memberhpp <= 0 then
+        return false
+    end
+
+    if CheckIfStand(25) then
+        return true
+    end
+
+    local curingWaltz = GetBestCureWaltz()
+
+    -- Make sure target is in Curing Waltz range
+    if not IsInCastRange(memberID) then
+        local targetName = AshitaCore:GetMemoryManager():GetEntity():GetName(memberID)
+
+        if targetName and os.time() > mChatTimer and IsInVisionRange(memberID) then
+            if curingWaltz then
+                AshitaCore:GetChatManager():QueueCommand(0, ('/p %s is too far away to Curing Waltz!'):fmt(targetName))
+                mChatTimer = os.time() + 15
+            end
+        end
+
+        return false
+    end
+
+    if curingWaltz then
+        return TryCureWaltz(curingWaltz, memberID)
+    end
+
+    return false
+end
+
+function TryCureWaltz(curingWaltz, memberID)
+    if TryUseAbility(curingWaltz, memberID) then
+        return true
+    end
+
+    return false
+end
+
+local waltzableList = {
+    { statusEffect.DEFENSE_DOWN },
+    { statusEffect.MAGIC_DEF_DOWN },
+    { statusEffect.MAX_HP_DOWN },
+    { statusEffect.SLOW },
+    { statusEffect.PARALYSIS },
+    { statusEffect.SILENCE },
+    { statusEffect.CURSE_I },
+    { statusEffect.BLINDNESS },
+    { statusEffect.POISON },
+    { statusEffect.VIRUS },
+    { statusEffect.PLAGUE },
+    { statusEffect.BIO },
+    { statusEffect.WEIGHT },
+    { statusEffect.ATTACK_DOWN },
+    { statusEffect.MAX_MP_DOWN },
+    { statusEffect.ACCURACY_DOWN },
+    { statusEffect.MAGIC_ACC_DOWN },
+    { statusEffect.MAGIC_ATK_DOWN },
+    { statusEffect.MAX_TP_DOWN },
+    { statusEffect.MAGIC_EVASION_DOWN },
+}
+
+function TryHealingWaltz(assistName)
+    for i = 0, 5 do
+		local targetIndex = AshitaCore:GetMemoryManager():GetParty():GetMemberTargetIndex(i);
+		if (targetIndex ~= 0) and not IsCharmed(targetIndex) then
+			local playerName = AshitaCore:GetMemoryManager():GetParty():GetMemberName(i)
+			if not assistName or playerName ~= assistName then
+                -- Use -na spell for corresponding status effect
+                for v,effect in pairs(waltzableList) do
+                    if HasStatusEffectByTargetIndex(targetIndex,effect[1]) then
+                        if CanUseAbility('Healing Waltz') then
+                            if not IsInCastRange(targetIndex) then
+                                TooFarAwayMsg(targetIndex, 'Healing Waltz', 15)
+                            else
+                                if (CheckIfStand(50)) then
+                                    return true
+                                end
+
+                                if TryUseAbility('Healing Waltz', targetIndex) then
+                                    return true
+                                end
+                            end
+                        end
+                    end
+                end
+			end
+		end
+	end
+
+    return false
+end
+
+function TryHealingWaltzTank(assistName)
+    local assistIndex = GetPlayerIndex(assistName)
+    -- Use -na spell for corresponding status effect
+    for i,effect in pairs(waltzableList) do
+        if (assistIndex ~= 0) and not IsCharmed(assistIndex) then
+            if HasStatusEffectByTargetIndex(assistIndex,effect[1]) then
+                if CanUseAbility('Healing Waltz') then
+                    if not IsInCastRange(assistIndex) then
+                        TooFarAwayMsg(assistIndex, 'Healing Waltz', 15)
+                    else
+                        if (CheckIfStand(50)) then
+                            return true
+                        end
+
+                        if TryUseAbility('Healing Waltz', assistIndex) then
+                            return true
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+	return false
+end
+
+-- TODO: Divine waltz / curing waltz 1 slept/lullabied players
 
 partyBuffTable = {};
 do
