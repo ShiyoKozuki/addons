@@ -2550,6 +2550,7 @@ function IsCharmed(targetIndex)
     if (bit.band(RenderFlag, 0x2000) ~= 0) then
         return true
     end
+
     return false
 end
 
@@ -3869,14 +3870,6 @@ function CanCureWaltzPartyMembers(hpthreshold, memberhpp, memberID)
         return false
     end
 
-    if curingWaltz then
-        return TryCureWaltz(curingWaltz, memberID)
-    end
-
-    return false
-end
-
-function TryCureWaltz(curingWaltz, memberID)
     if TryUseAbility(curingWaltz, memberID) then
         return true
     end
@@ -3913,21 +3906,10 @@ function TryHealingWaltz(assistName)
 		if (targetIndex ~= 0) and not IsCharmed(targetIndex) then
 			local playerName = AshitaCore:GetMemoryManager():GetParty():GetMemberName(i)
 			if not assistName or playerName ~= assistName then
-                -- Use -na spell for corresponding status effect
                 for v,effect in pairs(waltzableList) do
-                    if HasStatusEffectByTargetIndex(targetIndex,effect[1]) then
-                        if CanUseAbility('Healing Waltz') then
-                            if not IsInCastRange(targetIndex) then
-                                TooFarAwayMsg(targetIndex, 'Healing Waltz', 15)
-                            else
-                                if (CheckIfStand(50)) then
-                                    return true
-                                end
-
-                                if TryUseAbility('Healing Waltz', targetIndex) then
-                                    return true
-                                end
-                            end
+                    if HasStatusEffectByTargetIndex(targetIndex, effect[1]) then
+                        if TryUseWaltz('Healing Waltz', targetIndex) then
+                            return true
                         end
                     end
                 end
@@ -3940,22 +3922,12 @@ end
 
 function TryHealingWaltzTank(assistName)
     local assistIndex = GetPlayerIndex(assistName)
-    -- Use -na spell for corresponding status effect
+    
     for i,effect in pairs(waltzableList) do
         if (assistIndex ~= 0) and not IsCharmed(assistIndex) then
-            if HasStatusEffectByTargetIndex(assistIndex,effect[1]) then
-                if CanUseAbility('Healing Waltz') then
-                    if not IsInCastRange(assistIndex) then
-                        TooFarAwayMsg(assistIndex, 'Healing Waltz', 15)
-                    else
-                        if (CheckIfStand(50)) then
-                            return true
-                        end
-
-                        if TryUseAbility('Healing Waltz', assistIndex) then
-                            return true
-                        end
-                    end
+            if HasStatusEffectByTargetIndex(assistIndex, effect[1]) then
+                if TryUseWaltz('Healing Waltz', assistIndex) then
+                    return true
                 end
             end
         end
@@ -3964,7 +3936,63 @@ function TryHealingWaltzTank(assistName)
 	return false
 end
 
--- TODO: Divine waltz / curing waltz 1 slept/lullabied players
+local sleepEffects = {
+    statusEffect.SLEEP_I,
+    statusEffect.SLEEP_II,
+    statusEffect.LULLABY
+}
+
+function TryWakeSleptWithWaltz()
+    local partyMembersSlept = 0
+    local sleepingTargetIndex = 0
+
+    for i = 0, 5 do
+        local targetIndex = AshitaCore:GetMemoryManager():GetParty():GetMemberTargetIndex(i)
+
+        if targetIndex ~= 0 and not IsCharmed(targetIndex) then
+            local isSleeping = false
+
+            for _, effect in pairs(sleepEffects) do
+                if HasStatusEffectByTargetIndex(targetIndex, effect) then
+                    isSleeping = true
+                    break
+                end
+            end
+
+            if isSleeping then
+                partyMembersSlept = partyMembersSlept + 1
+                sleepingTargetIndex = targetIndex
+            end
+        end
+    end
+
+    if partyMembersSlept > 1 then
+        local myIndex = AshitaCore:GetMemoryManager():GetParty():GetMemberTargetIndex(0)
+        return TryUseWaltz('Divine Waltz', myIndex)
+    elseif partyMembersSlept == 1 then
+        return TryUseWaltz('Curing Waltz', sleepingTargetIndex)
+    end
+
+    return false
+end
+
+function TryUseWaltz(waltz, targetIndex)
+    if CanUseAbility(waltz) then
+        if not IsInCastRange(targetIndex) then
+            TooFarAwayMsg(targetIndex, waltz, 15)
+        else
+            if (CheckIfStand(50)) then
+                return true
+            end
+
+            if TryUseAbility(waltz, targetIndex) then
+                return true
+            end
+        end
+    end
+
+    return false
+end
 
 partyBuffTable = {};
 do
