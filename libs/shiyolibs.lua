@@ -460,6 +460,11 @@ end
 function TryCastSpell(spell, target)
     local spellResource = AshitaCore:GetResourceManager():GetSpellByName(spell, 0);
     if (AshitaCore:GetMemoryManager():GetRecast():GetSpellTimer(spellResource.Index) == 0) then
+
+        if spell == "Utsusemi: Ichi" then
+            CancelUtsu()
+        end
+
         AshitaCore:GetChatManager():QueueCommand(0, ('/ma "%s" %u'):fmt(spellResource.Name[1], AshitaCore:GetMemoryManager():GetEntity():GetServerId(target)));
         mActionTimer = os.time() + (spellResource.CastTime / 4) + 3;
         castFinished = os.time() + (spellResource.CastTime / 4) + 1
@@ -1033,7 +1038,9 @@ function TryCastUtsusemi(myIndex)
     end
 
     if not GetAnyBuffActive({66, 444, 445, 446}) then
-        if CheckJobLevels('Utsusemi: Ni') and TryCastSpell('Utsusemi: Ni', myIndex) then
+        if CheckJobLevels('Utsusemi: San') and TryCastSpell('Utsusemi: San', myIndex) then
+            return true
+        elseif CheckJobLevels('Utsusemi: Ni') and TryCastSpell('Utsusemi: Ni', myIndex) then
             return true
         elseif CheckJobLevels('Utsusemi: Ichi') and TryCastSpell('Utsusemi: Ichi', myIndex) then
             return true
@@ -2135,21 +2142,6 @@ function CheckCurrentMP(mp)
       return true
     end
     return false
-end
-
-function CancelUtsu()
-    local buffs = AshitaCore:GetMemoryManager():GetPlayer():GetBuffs();
-    for _,buff in pairs(buffs) do
-      if (buff == 66) then
-        CancelBuff(66);
-      elseif (buff == 444) then
-        CancelBuff(444);
-      elseif (buff == 445) then
-        CancelBuff(445);
-      elseif (buff == 446) then
-        CancelBuff(446);
-      end
-    end
 end
 
 function GetGrimoireType()
