@@ -1783,6 +1783,13 @@ function CheckWSGorget()
     if matchingGorget ~= "Unknown" then
         gFunc.Equip('Neck', matchingGorget)
     end
+    YgnasResolveCheck()
+end
+
+function YgnasResolveCheck()
+	if GetBuffActive(statusEffect.REIVE_MARK) then
+		gFunc.Equip('Neck', 'Ygnas\'s Resolve +1')
+	end
 end
 
 function JseEarringCheck()
