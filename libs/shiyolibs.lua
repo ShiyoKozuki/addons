@@ -21,13 +21,15 @@ function GetPet(masterIndex)
 end
 
 local function GetShortFlags(entityIndex)
-    -- if shortFlags is 0x10, entity is a monster
-    -- if shortflags is 0x01 entity is the player running that instance
-    -- if shortflags is 0x0D its a party member
-    -- if shortflags is 0x09 it's a player not in party
-    -- if fullflags is 4366 its a trust npc
+    -- 0x01 - is player
+    -- 0x02 - is npc
+    -- 0x04 - is party member
+    -- 0x08 - is alliance member
+    -- 0x10 - is monster
+    -- 0x100 - pet
+    -- 0x200 - is self (won't show up here since you drop it to 0xFF)
     local fullFlags = AshitaCore:GetMemoryManager():GetEntity():GetSpawnFlags(entityIndex);
-    return bit.band(fullFlags, 0xFF);
+    return bit.band(fullFlags, 0x3FF);
 end
 
 function GetItemByName(item)
@@ -2587,16 +2589,41 @@ function IsZombie(entityIndex)
     return false
 end
 
-function IsMonster(entityIndex)
-    if (GetShortFlags(entityIndex) == 0x10) then
-        return true
-    end
-  return false
+-- 0x01 - is player
+-- 0x02 - is npc
+-- 0x04 - is party member
+-- 0x08 - is alliance member
+-- 0x10 - is monster
+-- 0x200 - is self (won't show up here since you drop it to 0xFF)
+
+function IsSelf(entityIndex)
+    return (bit.band(GetShortFlags(entityIndex), 0x200) == 0x200);
+end
+
+function IsPlayer(entityIndex)
+    local flags = GetShortFlags(entityIndex)
+    return (bit.band(GetShortFlags(entityIndex), 0x01) == 0x01);
+end
+
+function IsPartyMember(entityIndex)
+    return (bit.band(GetShortFlags(entityIndex), 0x04) == 0x04);
+end
+
+function IsAllianceMember(entityIndex)
+    return (bit.band(GetShortFlags(entityIndex), 0x08) == 0x08);
+end
+
+function IsPet(entityIndex)
+    return (bit.band(GetShortFlags(entityIndex), 0x100) == 0x100);
 end
 
 function IsTrust(entityIndex)
     local fullFlags = AshitaCore:GetMemoryManager():GetEntity():GetSpawnFlags(entityIndex);
     return fullFlags == 4366
+end
+
+function IsMonster(entityIndex)
+    return (bit.band(GetShortFlags(entityIndex), 0x10) == 0x10);
 end
 
 function ParamToName(param)
