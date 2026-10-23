@@ -327,6 +327,25 @@ function HasNaSpell()
     return false
 end
 
+local function CheckAddendum(resource)
+    -- Addendum Spells
+    if bit.band(resource.Requirements, 0x04) == 0x04 then
+        local buff = (resource.Type == 1) and 401 or 402;
+        if (not GetBuffActive(buff)) and (not GetBuffActive(416)) then
+            return false;
+        end
+    end
+
+    -- Kaustra/Embrava
+    if bit.band(resource.Requirements, 0x08) == 0x08 then
+        if not GetBuffActive(377) then
+            return false;
+        end
+    end
+
+    return true;
+end
+
 function CheckJobLevels(spell)
     local mJob = AshitaCore:GetMemoryManager():GetPlayer():GetMainJob();
     local sJob = AshitaCore:GetMemoryManager():GetPlayer():GetSubJob();
@@ -356,11 +375,23 @@ function CheckJobLevels(spell)
     -- Check if the spell is unlocked via normal levels
     if (resource.LevelRequired[mJob + 1] > 0) and (resource.LevelRequired[mJob + 1] <= mJobLevel) then
         if HasSpellByName(spell) then
-            return true;
+            if mJob == 20 then
+                if CheckAddendum(resource) then
+                    return true;
+                end
+            else
+                return true;
+            end
         end
     elseif (resource.LevelRequired[sJob + 1] > 0) and (resource.LevelRequired[sJob + 1] <= sJobLevel) then
         if HasSpellByName(spell) then
-            return true;
+            if sJob == 20 then
+                if CheckAddendum(resource) then
+                    return true;
+                end
+            else
+                return true;
+            end
         end
     end
 
