@@ -65,6 +65,8 @@ local checker = T{
     widescan = T{ },
 };
 
+local msgDelay = 0
+
 --[[
 * event: packet_in
 * desc : Event called when the addon is processing incoming packets.
@@ -78,6 +80,8 @@ ashita.events.register('packet_in', 'packet_in_cb', function (e)
 
     -- Packet: Message Basic
     if (e.id == 0x0029) then
+        if os.time() < msgDelay then return end
+
         local p1    = struct.unpack('l', e.data, 0x0C + 0x01); -- Param 1 (Level)
         local p2    = struct.unpack('L', e.data, 0x10 + 0x01); -- Param 2 (Check Type)
         local m     = struct.unpack('H', e.data, 0x18 + 0x01); -- Message (Defense / Evasion)
@@ -124,6 +128,7 @@ ashita.events.register('packet_in', 'packet_in_cb', function (e)
         end
 
         print(msg:concat(' '));
+        msgDelay = os.time() + 1
         return;
     end
 
