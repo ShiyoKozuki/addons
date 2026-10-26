@@ -3,28 +3,6 @@ local actionhandlers = {};
 
 
 actionhandlers.parse_action_packet = function(act)
-    if not Self then
-        Self = GetPlayerEntity()
-        if not Self then
-            return act
-        end
-    end
-
-    if not SelfPlayer then
-        SelfPlayer = AshitaCore:GetMemoryManager():GetPlayer()
-        if not SelfPlayer then
-            return act
-        end
-    end
-
-    if not act.targets[1] then return end
-    
-    if not act.targets[1].actions[1] then return end
-
-    if not act.targets[1].actions[1].message then
-        return act
-     end
-
     -- Constructing table from act to work with, gathering info
 	act.actor = gActionHandlers.ActorParse(act.actor_id)
     act.action = gActionHandlers.SpellParse(act)
@@ -32,12 +10,9 @@ actionhandlers.parse_action_packet = function(act)
     targets_condensed = false
 
     if not act.action then
-        print(chat.header('SimpleLogDebug') .. chat.message('No Action MSG'))
-        return act
-    end
-
-    if not act.targets then
-        print(chat.header('SimpleLogDebug') .. chat.message('No Action Target'))
+        if gProfileSettings.mode.show_debug_messages then
+            print(chat.header('SimpleLog') .. chat.error("Received a packet with no action message."))
+        end
         return act
     end
 
@@ -195,7 +170,7 @@ actionhandlers.parse_action_packet = function(act)
             if m.message ~= 0 and res_actmsg[m.message] ~= nil then
                 local col = res_actmsg[m.message].color
                 local targ =  gActionHandlers.AssembleTargets(act.actor, v.target, act.category, m.message)
-                local color = gActionHandlers.ColorFilt(col, v.target[1].server_id == Self.ServerId)
+                local color = gActionHandlers.ColorFilt(col, v.target[1].server_id == gStatus.PlayerId)
                 if gProfileSettings.lang.msg_text == 'jp' then
                     if m.reaction == 11 and act.category == 1 then m.simp_name = UTF8toSJIS:UTF8_to_SJIS_str_cnv('によって受け流された')
                     -- elseif m.reaction == 12 and act.category == 1 then m.simp_name = UTF8toSJIS:UTF8_to_SJIS_str_cnv('によってブロックされました')
@@ -231,8 +206,8 @@ actionhandlers.parse_action_packet = function(act)
                     else m.simp_name = act.action.name or ''
                     end
                 else
-                    if m.reaction == 3 and act.category == 1 then m.simp_name = 'parried by'
-                    elseif m.reaction == 4 and act.category == 1 then m.simp_name = 'blocked [' .. m.param .. ']' ..  ' by'
+                    if m.reaction == 11 and act.category == 1 then m.simp_name = 'parried by'
+                    -- elseif m.reaction == 12 and act.category == 1 then m.simp_name = 'blocked by'
                     elseif m.message == 1 and (act.category == 1 or act.category == 11) then m.simp_name = 'hit'
                     elseif m.message == 15 then m.simp_name = 'missed'
                     elseif m.message == 29 or m.message == 84 then m.simp_name = 'is paralyzed'
@@ -321,21 +296,17 @@ actionhandlers.parse_action_packet = function(act)
                     m.status = gFuncs.ColorIt('Immunobreak', gProfileColor['statuscol'])
                 elseif m.message == 655 or m.message == 656 then
                     m.status = gFuncs.ColorIt('Completely Resists', gProfileColor['statuscol'])
-                elseif m.message == 85 then
-                    if m.unknown == 2 then -- What is this?
+                elseif m.message == 85 or m.message == 284 then
+                    if m.unknown == 2 then
                         m.status = gFuncs.ColorIt('Resists!', gProfileColor['statuscol'])
                     else
                         m.status = gFuncs.ColorIt('Resists', gProfileColor['statuscol'])
                     end
-                elseif m.message == 284 then -- Resist! trait proc
-                    m.status = gFuncs.ColorIt('Resist! Resists the effect of the spell.', gProfileColor['statuscol'])
                 elseif m.message == 351 then
                     m.status = gFuncs.ColorIt('status ailments', gProfileColor['statuscol'])
                     m.simp_name = gFuncs.ColorIt('remedy', gProfileColor['itemcol'])
-                elseif T{75,156,189,248,283,312,323,336,355,408,422,423,425,659}:contains(m.message) then
+                elseif T{75,114,156,189,248,283,312,323,336,355,408,422,423,425,659}:contains(m.message) then
                     m.status = gFuncs.ColorIt('No effect', gProfileColor['statuscol']) -- The status code for "No Effect" is 255, so it might actually work without this line
-                elseif m.message == 114 then -- "Fails to take effect" BLU phys spell misses
-                    m.status = gFuncs.ColorIt('Failed to take effect.', gProfileColor['statuscol'])
                 end
                 if m.message == 188 then
                     m.simp_name = m.simp_name..' (Miss)'
@@ -362,7 +333,7 @@ actionhandlers.parse_action_packet = function(act)
                 end
 
                 local count = ''
-                if m.message == 377 and act.actor_id == Self.ServerId then
+                if m.message == 377 and act.actor_id == gStatus.PlayerId then
                     parse_quantity = true
                     item_quantity.id = act.action.item2_id
                     count = '${count}'
@@ -407,7 +378,7 @@ actionhandlers.parse_action_packet = function(act)
                 :gsub('${number}',(act.action.number or m.param)..roll)
                 :gsub('${status}',m.status or 'ERROR 120')
                 :gsub('${gil}',m.param..' gil'), m.message))
-                if m.message == 377 and act.actor_id == Self.ServerId then
+                if m.message == 377 and act.actor_id == gStatus.PlayerId then
                     gFuncs.SendDelayedMessage:bind1(color):bind1(message):once(0.5)
                 else
                     AshitaCore:GetChatManager():AddChatMessage(color, false, message)
@@ -419,7 +390,7 @@ actionhandlers.parse_action_packet = function(act)
             if m.has_add_effect and m.add_effect_message ~= 0 and add_effect_valid[act.category] then
                 local targ = gActionHandlers.AssembleTargets(act.actor, v.target, act.category, m.add_effect_message, m.has_add_effect)
                 local col = res_actmsg[m.add_effect_message].color
-                local color = gActionHandlers.ColorFilt(col, v.target[1].server_id == Self.ServerId)
+                local color = gActionHandlers.ColorFilt(col, v.target[1].server_id == gStatus.PlayerId)
                 if m.add_effect_message > 287 and m.add_effect_message < 303 then m.simp_add_name = UTF8toSJIS:UTF8_to_SJIS_str_cnv(skillchain_arr[gProfileSettings.lang.msg_text][m.add_effect_message-287])
                 elseif m.add_effect_message > 384 and m.add_effect_message < 399 then m.simp_add_name = UTF8toSJIS:UTF8_to_SJIS_str_cnv(skillchain_arr[gProfileSettings.lang.msg_text][m.add_effect_message-384])
                 elseif m.add_effect_message > 766 and m.add_effect_message < 769 then m.simp_add_name = UTF8toSJIS:UTF8_to_SJIS_str_cnv(skillchain_arr[gProfileSettings.lang.msg_text][m.add_effect_message-752])
@@ -474,7 +445,7 @@ actionhandlers.parse_action_packet = function(act)
             if m.has_spike_effect and m.spike_effect_message ~= 0 and spike_effect_valid[act.category] then
                 local targ = gActionHandlers.AssembleTargets(act.actor, v.target, act.category, m.spike_effect_message, m.has_spike_effect)
                 local col = res_actmsg[m.spike_effect_message].color
-                local color = gActionHandlers.ColorFilt(col, act.actor.id == Self.ServerId)
+                local color = gActionHandlers.ColorFilt(col, act.actor.id == gStatus.PlayerId)
 
                 local actor = act.actor
                 if m.spike_effect_message == 14 then
@@ -860,104 +831,116 @@ actionhandlers.MakeCondesedamageNumber = function (number)
     end
 end
 
-actionhandlers.ActorParse = function (actor_id)
+actionhandlers.ActorParse = function(actor_id)
     local actor_table = gFuncs.GetEntityByServerId(actor_id)
     local actor_name, typ, dmg, owner, filt, owner_name
 
     if actor_table == nil then
-        --return {name= nil, id=nil, is_npc=nil, type='debug', owner=nil, owner_name=nil, race=nil}
-        return {name= ('{Debug ID: %s}'):fmt(actor_id), id= '{DebugID}', is_npc= true, type= 'debug', damage= 'otherdmg', filter= 'others', owner= 'other', owner_name= '{Owner}', race= 0}
-    end
-
-    local ActorIsNpc = bit.band(actor_table.SpawnFlags, 0x1) == 0
-
-    for i,v in pairs(gFuncs.GetPartyData()) do
-        if type(v) == 'table' and v.mob and v.mob.ServerId == actor_table.ServerId then
-            typ = i
-            if i == 'p0' then
-                filt = 'me'
-                dmg = 'mydmg'
-            elseif i:sub(1, 1) == 'p' then
-                filt = 'party'
-                dmg = 'partydmg'
-            else
-                filt = 'alliance'
-                dmg = 'allydmg'
-            end
-        end
-    end
-
-    if not filt then
-        if ActorIsNpc then
-            if actor_table.TargetIndex > 1791 then
-                typ = 'other_pets'
-                filt = 'other_pets'
-                owner = 'other'
-                dmg = 'otherdmg'
-                for i, v in pairs(gFuncs.GetPartyData()) do
-                    if type(v) == 'table' and v.mob and v.mob.PetTargetIndex and v.mob.PetTargetIndex == actor_table.TargetIndex then
-                        if i == 'p0' then
-                            typ = 'my_pet'
-                            filt = 'my_pet'
-                            dmg = 'mydmg'
-                        end
-                        owner = i
-                        owner_name = gProfileSettings.mode.showpetownernames and ' ('..gFuncs.ColorIt(v.mob.Name, gProfileColor[owner or typ])..') '
-                        break
-                    elseif type(v) == 'table' and v.mob and v.mob.FellowTargetIndex and v.mob.FellowTargetIndex == actor_table.TargetIndex then
-                        if i == 'p0' then
-                            typ = 'my_fellow'
-                            filt = 'my_fellow'
-                            dmg = 'mydmg'
-                        end
-                        owner = i
-                        owner_name = gProfileSettings.mode.showpetownernames and ' ('..gFuncs.ColorIt(v.mob.Name, gProfileColor[owner or typ])..') '
-                        break
-                    end
-                end
-            else
-                typ = 'mob'
-                filt = 'monsters'
-                dmg = 'mobdmg'
-
-                if gProfileFilter.enemies then
-                    for i,v in pairs(SelfPlayer:GetBuffs()) do
-                        if domain_buffs:contains(v) then
-                            -- If you are in Domain Invasion, or a Reive, or various other places
-                            -- then all monsters should be considered enemies.
-                            filt = 'enemies'
-                            break
-                        end
-                    end
-
-                    if filt ~= 'enemies' then
-                        for i,v in pairs(gFuncs.GetPartyData()) do
-                            if type(v) == 'table' and gFuncs.nf(v.mob, 'ServerId') == bit.band(actor_table.ClaimStatus, 0xFFFFFFFFFF) then
-                                filt = 'enemies'
-                                break
-                            end
-                        end
-                    end
-                end
-            end
+        if gProfileSettings.mode.show_debug_messages then
+            return {name= ('{Debug ID: %s}'):fmt(actor_id), id=actor_id, is_npc= true, type='debug', damage= 'otherdmg', filter= 'others', owner= 'other', owner_name='', race= 0}
         else
-            typ = 'other'
-            filt = 'others'
-            dmg = 'otherdmg'
+            return {name='{Unknown}', id=actor_id, is_npc= true, type='debug', damage= 'otherdmg', filter= 'others', owner= 'other', owner_name='', race= 0}
         end
     end
 
+    local spawnFlags = actor_table.SpawnFlags;
+    if (bit.band(spawnFlags, 0x200) == 0x200) then
+        typ = 'p0';
+        filt = 'me';
+        dmg = 'mydmg';
+    elseif (bit.band(spawnFlags, 0x04) == 0x04) then
+        typ = gFuncs.GetPartyType(actor_id);
+        filt = 'party';
+        dmg = 'partydmg';
+    elseif (bit.band(spawnFlags, 0x08) == 0x08) then
+        typ = gFuncs.GetPartyType(actor_id);
+        filt = 'alliance';
+        dmg = 'allydmg';
+    elseif (bit.band(spawnFlags, 0x01) == 1) then
+        typ = 'other'
+        filt = 'others'
+        dmg = 'otherdmg'
+    elseif (bit.band(spawnFlags, 0x10) == 0x10) then
+        typ = 'mob'
+        filt = 'monsters'
+        dmg = 'mobdmg'
+
+        if gProfileFilter.enemies then
+            for i,v in pairs(AshitaCore:GetMemoryManager():GetPlayer():GetBuffs()) do
+                if domain_buffs:contains(v) then
+                    -- If you are in Domain Invasion, or a Reive, or various other places
+                    -- then all monsters should be considered enemies.
+                    filt = 'enemies'
+                    break
+                end
+            end
+
+            if filt ~= 'enemies' then
+                local claimStatus = bit.band(actor_table.ClaimStatus, 0xFFFFFFFFFF);
+                local ptMgr = AshitaCore:GetMemoryManager():GetParty();
+                for i = 0,17 do
+                    if (ptMgr:GetMemberIsActive(i) == 1) and (ptMgr:GetMemberServerId(i) == claimStatus) then
+                        filt = 'enemies'
+                        break
+                    end
+                end
+            end
+        end
+    elseif (bit.band(spawnFlags, 0x100)) then
+        -- Standard pets here..
+        typ = 'other_pets'
+        filt = 'other_pets'
+        owner = 'other'
+        dmg = 'otherdmg'
+
+        local ownerEntity = gFuncs.FindPetOwner(actor_table.TargetIndex);
+        if ownerEntity then
+            if (ownerEntity.ServerId == gStatus.PlayerId) then
+                typ = 'my_pet'
+                filt = 'my_pet'
+                dmg = 'mydmg'
+            end
+            owner = gFuncs.GetPartyType(ownerEntity.ServerId);
+            if gProfileSettings.mode.showpetownernames then
+                owner_name = ' ('..gFuncs.ColorIt(ownerEntity.Name, gProfileColor[owner or typ])..') ';
+            end
+        end
+    else
+        typ = 'other_pets'
+        filt = 'other_pets'
+        owner = 'other'
+        dmg = 'otherdmg'
+
+        local ownerEntity = gFuncs.FindFellowOwner(actor_table.TargetIndex);
+        if ownerEntity then
+            if (ownerEntity.ServerId == gStatus.PlayerId) then
+                typ = 'my_fellow'
+                filt = 'my_fellow'
+                dmg = 'mydmg'
+            end
+            owner = gFuncs.GetPartyType(ownerEntity.ServerId);
+            if gProfileSettings.mode.showpetownernames then
+                owner_name = ' ('..gFuncs.ColorIt(ownerEntity.Name, gProfileColor[owner or typ])..') ';
+            end
+        end
+    end
+    
     if actor_table.MonstrosityName ~= ' ' then
         actor_name = actor_table.Name
     else
         actor_name = actor_table.MonstrosityName
     end
 
-    return {name = actor_name, id = actor_id, is_npc = ActorIsNpc, type = typ, damage = dmg, filter = filt, owner = (owner or nil), owner_name = (owner_name or ''), race = actor_table.Race}
+    return {name = actor_name, id = actor_id, is_npc=(bit.band(spawnFlags, 0x01) ~= 1), type = typ, damage = dmg, filter = filt, owner = (owner or nil), owner_name = (owner_name or ''), race = actor_table.Race}
 end
 
 actionhandlers.SpellParse = function (act)
     local spell, abil_ID, effect_val = {}
+    -- If the target returns nil, will return No MSG instad of crashing.
+    -- This is a bandaid
+    if(act.targets[1] == nil) then
+        return false;
+    end
     local msg_ID = act.targets[1].actions[1].message
 
     if T{7, 8, 9}:contains(act.category) then
@@ -1044,8 +1027,8 @@ actionhandlers.SpellParse = function (act)
                 spell.data = get_weapon_skill[abil_ID]
             end
             if spell.data then
-                spell.name = gFuncs.ColorIt(spell.data.Name[gProfileSettings.lang.object], act.actor.type == 'mob' and gProfileColor.mobwscol or gProfileColor.wscol):gsub('[^%w :-\'\",.;<>?]', '')
-                spell.weapon_skill = gFuncs.ColorIt(spell.data.Name[gProfileSettings.lang.object], act.actor.type == 'mob' and gProfileColor.mobwscol or gProfileColor.wscol):gsub('[^%w :-\'\",.;<>?]', '')
+                spell.name = gFuncs.ColorIt(spell.data.Name[gProfileSettings.lang.object], act.actor.type == 'mob' and gProfileColor.mobwscol or gProfileColor.wscol)
+                spell.weapon_skill = gFuncs.ColorIt(spell.data.Name[gProfileSettings.lang.object], act.actor.type == 'mob' and gProfileColor.mobwscol or gProfileColor.wscol)
             end
         elseif msg_ID == 303 then
             spell.data = get_job_ability[74] -- Divine Seal

@@ -59,67 +59,22 @@ packethandlers.HandleIncoming0x00A = function(e)
         gStatus.PlayerJob = job;
 		gStatus.SettingsFolder = ('%sconfig\\addons\\simplelog\\%s_%u\\'):fmt(AshitaCore:GetInstallPath(), gStatus.PlayerName, gStatus.PlayerId);
         gStatus.AutoLoadProfile();
-        if (AshitaCore:GetMemoryManager():GetParty():GetMemberIsActive(0) == 1) or initial_load then
-            if GetPlayerEntity() then
-                Self = GetPlayerEntity()
-            else
-                gPacketHandlers.DelayedSelfAssign:once(1)
-            end
-            SelfPlayer = AshitaCore:GetMemoryManager():GetPlayer()
-            initial_load = false
-        end
     end
-    if (get_weapon_skill == nil or get_spell == nil or get_item == nil) then
-        gFuncs.PopulateSkills();
-        gFuncs.PopulateSpells();
-        gFuncs.PopulateItems();
-    end
-end
-
-packethandlers.DelayedSelfAssign = function ()
-    Self = GetPlayerEntity()
 end
 
 packethandlers.HandleIncoming0x28 = function(e)
-    -- Check if e.data is nil
-    if not e.data then
-        return ""
-    end
+	local act_org = gActionHandlers.StringToAct(e.data)
+	act_org.size = e.data:byte(5)
+	local act_mod = gActionHandlers.StringToAct(e.data_modified)
+	act_mod.size = e.data_modified:byte(5)
 
-    local act_org = gActionHandlers.StringToAct(e.data)
-    -- Check if act_org is nil
-    if not act_org then
-        act_org = {} -- provide a default empty table to avoid further errors
-    end
-
-    act_org.size = e.data:byte(5)
-
-    -- Check if e.data_modified is nil
-    if not e.data_modified then
-        return ""
-    end
-
-    local act_mod = gActionHandlers.StringToAct(e.data_modified)
-    -- Check if act_mod is nil
-    if not act_mod then
-        act_mod = {} -- provide a default empty table to avoid further errors
-    end
-
-    act_mod.size = e.data_modified:byte(5)
-
-    local result = gActionHandlers.ActToString(e.data, gActionHandlers.parse_action_packet(act_org, act_mod))
-    -- Check if result is nil
-    if not result then
-        return ""
-    end
-
-    return result
+	return gActionHandlers.ActToString(e.data, gActionHandlers.parse_action_packet(act_org, act_mod))
 end
 
 packethandlers.HandleIncomingPacket = function(e)
-    record_packets(e);
-    if (e.id == 0x00A) then
-        gPacketHandlers.HandleIncoming0x00A(e);
+	record_packets(e);
+	if (e.id == 0x00A) then
+		gPacketHandlers.HandleIncoming0x00A(e);
     elseif (e.id == 0x28) then
         if check_duplicates(e) then return end
         e.data_modified = gPacketHandlers.HandleIncoming0x28(e);
@@ -188,12 +143,12 @@ packethandlers.HandleIncomingPacket = function(e)
         -- Filter these messages
         if not gFuncs.CheckFilter(actor, target, 0, am.message_id) then e.blocked = true end
 
-        if not actor or not target then -- If the actor or target table is nil, ignore the packet
+        if not actor or not target or e.blocked then -- If the actor or target table is nil or the packet should be blocked, ignore the packet
         elseif am.message_id == 800 then -- Spirit bond message
             local status = gFuncs.ColorIt(AshitaCore:GetResourceManager():GetString('buffs.names', am.param_1, gProfileSettings.lang.internal), gProfileColor.statuscol)
             local targ = gFuncs.ColorIt(target.name or '', gProfileColor[target.owner or target.type])
             local number = am.param_2
-            local color = gActionHandlers.ColorFilt(res_actmsg[am.message_id].color, am.target_id==Self.ServerId)
+            local color = gActionHandlers.ColorFilt(res_actmsg[am.message_id].color, am.target_id==gStatus.PlayerId)
             if gProfileSettings.mode.simplify then
                 local msg = gProfileSettings.text.line_noactor
                 :gsub('${abil}',status or '')
@@ -252,7 +207,6 @@ packethandlers.HandleIncomingPacket = function(e)
             am.message_id = false
         elseif passed_messages:contains(am.message_id) then
             local item, status, spell, skill, number, number2
-            local color = gActionHandlers.ColorFilt(res_actmsg[am.message_id].color, am.target_id==Self.ServerId)
             local outstr = nil
             if gProfileSettings.lang.msg_text == 'jp' then
                 outstr = res_actmsg[am.message_id]['jp']
@@ -293,7 +247,14 @@ packethandlers.HandleIncomingPacket = function(e)
                 if not get_item[am.param_1] then
                     e.blocked = false
                 end
-                item = get_item[am.param_1].LogNameSingular[gProfileSettings.lang.object] and get_item[am.param_1].LogNameSingular[gProfileSettings.lang.object] or get_item[am.param_1].Name[gProfileSettings.lang.object]
+                -- This change should stop the nil pointer error
+                local entry = get_item[am.param_1]
+                if entry then
+                    item = entry.LogNameSingular and entry.LogNameSingular[gProfileSettings.lang.object]
+                        or entry.Name and entry.Name[gProfileSettings.lang.object]
+                        or "Unknown Item"
+                end
+                ----
             end
 
             if fields.number then
@@ -333,7 +294,7 @@ packethandlers.HandleIncomingPacket = function(e)
             :gsub('${number2}',number2 or '')
             :gsub('${skill}',skill or '')
             :gsub('${lb}','\7'), am.message_id))
-            AshitaCore:GetChatManager():AddChatMessage(color, false, outstr)
+            AshitaCore:GetChatManager():AddChatMessage(res_actmsg[am.message_id]['color'], false, outstr)
             am.message_id = false
         end
         if not am.message_id then
@@ -341,13 +302,12 @@ packethandlers.HandleIncomingPacket = function(e)
         end
 
 ------------ SYNTHESIS ANIMATION --------------
---[[
     elseif e.id == 0x030 and gProfileSettings.mode.crafting then
         local target = GetEntity(AshitaCore:GetMemoryManager():GetTarget():GetTargetIndex(0))
         local target_id = AshitaCore:GetMemoryManager():GetTarget():GetServerId(0)
 
-        if Self.ServerId == struct.unpack('I', e.data, 5) or target_id == struct.unpack('I', e.data, 5) then
-            local crafter_name = (Self.ServerId == struct.unpack('I', e.data, 5) and Self.Name) or target.Name
+        if gStatus.PlayerId == struct.unpack('I', e.data, 5) or target_id == struct.unpack('I', e.data, 5) then
+            local crafter_name = (gStatus.PlayerId == struct.unpack('I', e.data, 5)) and gStatus.PlayerName or target.Name
             local result = e.data:byte(13)
             if result == 0 then
                 AshitaCore:GetChatManager():AddChatMessage(8, false, ' ------------- NQ Synthesis ('..crafter_name..') -------------')
@@ -370,7 +330,6 @@ packethandlers.HandleIncomingPacket = function(e)
                 AshitaCore:GetChatManager():AddChatMessage(8, false, ' -------------- HQ Tier 3! --------------')
             end
         end
-    ]]
 
     ------------- JOB INFO ----------------
     elseif e.id == 0x01B then
@@ -378,8 +337,7 @@ packethandlers.HandleIncomingPacket = function(e)
         local old_job = AshitaCore:GetResourceManager():GetString("jobs.names_abbr", gStatus.PlayerJob)
         if new_job ~= old_job then
             gStatus.PlayerJob = e.data:byte(9)
-            local jobFiltersFile = (gStatus.SettingsFolder .. '%s.lua'):fmt(new_job)
-            gStatus.LoadProfile(jobFiltersFile, 'filters')
+            gStatus.LoadFilters();
         end
     end
 end
