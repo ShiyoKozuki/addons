@@ -1764,12 +1764,14 @@ T{
         'Last Stand', 'Mandalic Stab', 'Mistral Axe', 'Omniscience', 'Piercing Arrow', 'Power Slash', 'Realmrazer', 'Red Lotus Blade', 'Requiescat', 
         'Resolution', 'Seraph Blade', 'Shadow of Death', 'Shark Bite', 'Shattersoul', 'Sidewinder', 'Slav Shot', 'Spiral Hell', 'Spinning Slash', 
         'Spinning Scythe', 'Stardiver', 'Tachi: Enpi', 'Tachi: Gekko', 'Tachi: Hobaku', 'Tachi: Jinpu', 'Tachi: Kasha', 'Tachi: Rana', 
-        'Tachi: Shoha', 'Trueflight', 'Vorpal Thrust', 'Wheeling Thrust', 'Tachi: Kaiten', 'Tachi: Fudo', 'Chant du Cygne', 'Torcleaver', 'Dimidiation', 'Ukko\'s Fury', 'Jishnu\'s Radiance'  }
+        'Tachi: Shoha', 'Trueflight', 'Vorpal Thrust', 'Wheeling Thrust', 'Tachi: Kaiten', 'Tachi: Fudo', 'Chant du Cygne', 'Torcleaver', 'Dimidiation', 
+        'Ukko\'s Fury', 'Jishnu\'s Radiance', 'Victory Smite',  }
     },
     [8] = T{ Gorget = 'Shadow Gorget', Belt = 'Shadow Belt', Weaponskills = T{
-    'Asuran Fists', 'Black Halo', 'Blade: Ei', 'Blade: Hi', 'Blade: Kamu', 'Blade: Ku', 'Blade: Ten', 'Catastrophe', 'Quietus', 'Entropy', 'Evisceration', 'Impulse Drive', 'Insurgency', 'Keen Edge',
-    'Leaden Salute', 'Mandalic Stab', 'Mercy Stroke', 'Requiescat', 'Rudra\'s Storm', 'Nightmare Scythe', 'Omniscience', 'One Inch Punch', 'Penta Thrust', 'Primal Rend', 'Retribution', 'Shattersoul',
-    'Starburst', 'Stardiver', 'Stringing Pummel', 'Sunburst', 'Swift Blade', 'Tachi: Kasha', 'Tachi: Rana', 'Tachi: Shoha', 'Upheaval', 'Cloudsplitter', 'Exudation', 'Wildfire' }
+    'Asuran Fists', 'Black Halo', 'Blade: Ei', 'Blade: Hi', 'Blade: Kamu', 'Blade: Ku', 'Blade: Ten', 'Catastrophe', 'Quietus', 'Entropy', 'Evisceration', 
+    'Impulse Drive', 'Insurgency', 'Keen Edge', 'Primal Rend', 'Retribution', 'Shattersoul', 'Exudation', 'Wildfire', 'Upheaval', 'Cloudsplitter', 
+    'Leaden Salute', 'Mandalic Stab', 'Mercy Stroke', 'Requiescat', 'Rudra\'s Storm', 'Nightmare Scythe', 'Omniscience', 'One Inch Punch', 'Penta Thrust', 
+    'Starburst', 'Stardiver', 'Stringing Pummel', 'Sunburst', 'Swift Blade', 'Tachi: Kasha', 'Tachi: Rana', 'Tachi: Shoha', }
     }
 }
 
