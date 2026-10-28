@@ -1725,28 +1725,32 @@ T{
         'Iron Tempest', 'King\'s Justice', 'Leaden Salute', 'Mercy Stroke', 'Nightmare Scythe', 'Omniscience', 'Primal Rend', 'Pyrrhic Kleos', 
         'Rampage', 'Requiescat', 'Resolution', 'Retribution', 'Savage Blade', 'Seraph Blade', 'Shattersoul', 'Shining Blade', 'Sickle Moon', 
         'Slice', 'Spinning Axe', 'Spinning Scythe', 'Spiral Hell', 'Stardiver', 'Stringing Pummel', 'Sturmwind', 'Swift Blade', 'Tachi: Enpi', 
-        'Tachi: Jinpu', 'Tachi: Rana', 'Trueflight', 'Viper Bite', 'Vorpal Blade', 'Vorpal Scythe', 'Wasp Sting', 'Blade: Hi', 'Wildfire' }
+        'Tachi: Jinpu', 'Tachi: Rana', 'Trueflight', 'Viper Bite', 'Vorpal Blade', 'Vorpal Scythe', 'Wasp Sting', 'Blade: Hi', 'Wildfire', 
+        'Onslaught' }
     },
     [3] = T{ Gorget = 'Aqua Gorget', Belt = 'Aqua Belt', Weaponskills = T{
         'Atonement', 'Blade: Teki', 'Brainshaker', 'Circle Blade', 'Cross Reaper', 'Dark Harvest', 'Entropy', 'Quietus', 'Death Blossom', 
         'Decimation', 'Expiacion', 'Full Break', 'Garland of Bliss', 'Gate of Tartarus', 'Gust Slash', 'Ground Strike', 'Last Stand', 
         'Mordant Rime', 'Namas Arrow', 'Piercing Arrow', 'Pyrrhic Kleos', 'Rudra\'s Storm', 'Primal Rend', 'Raging Rush', 'Retribution', 
-        'Ruinator', 'Shadow of Death', 'Shadowstitch', 'Shadowstrike', 'Shark Bite', 'Shattersoul', 'Shoulder Tackle', 'Sidewinder', 'Slug Shot', 
-        'Smash Axe', 'Spinning Slash', 'Spinning Scythe', 'Spiral Hell', 'Split Shot', 'Starburst', 'Steel Cyclone', 'Sturmwind', 'Sunburst', 
-        'Tachi: Koki', 'Tachi: Rana', 'Trueflight', 'Vidofnir', 'Vorpal Thrust', 'Tachi: Fudo', 'Chant du Cygne', 'Torcleaver' }
+        'Ruinator', 'Shadow of Death', 'Shadowstitch', 'Shadowstrike', 'Shark Bite', 'Shattersoul', 'Shoulder Tackle', 'Sidewinder', 
+        'Smash Axe', 'Spinning Slash', 'Spinning Scythe', 'Spiral Hell', 'Split Shot', 'Starburst', 'Steel Cyclone', 'Sturmwind',
+        'Tachi: Koki', 'Tachi: Rana', 'Trueflight', 'Vidofnir', 'Vorpal Thrust', 'Tachi: Fudo', 'Chant du Cygne', 'Torcleaver', 
+        'Slug Shot', 'Sunburst', 'Geirskogul' }
     },
     [4] = T{ Gorget = 'Breeze Gorget', Belt = 'Breeze Belt', Weaponskills = T{
         'Aeolian Edge', 'Asuran Fists', 'Avalanche Axe', 'Blade: Jin', 'Blade: Kamu', 'Blade: Metsu', 'Blade: To', 'Camlan\'s Torment', 'Corona', 
         'Cyclone', 'Dancing Edge', 'Death Blossom', 'Dragon Kick', 'Earth Crusher', 'Exenterator', 'Expiacion', 'Gale Axe', 'Ground Strike', 
         'Gust Slash', 'King\'s Justice', 'Mordant Rime', 'Raging Axe', 'Randgrith', 'Red Lotus Blade', 'Resolution', 'Ruinator', 'Savage Blade', 
         'Shark Bite', 'Shell Crusher', 'Sidewinder', 'Slug Shot', 'Spinning Slash', 'Steel Cyclone', 'Stingray', 'Tachi: Jinpu', 'Tachi: Kasha', 
-        'Tachi: Yukikaze', 'Tornado Kick', 'True Strike', 'Victory Smite', 'Vidofnir', 'Dimidiation', 'Cloudsplitter', 'Ukko\'s Fury', 'Exudation' }
+        'Tachi: Yukikaze', 'Tornado Kick', 'True Strike', 'Victory Smite', 'Vidofnir', 'Dimidiation', 'Cloudsplitter', 'Ukko\'s Fury', 'Exudation', 
+        'Tachi: Kaiten', 'Coronach' }
     },
     [5] = T{ Gorget = 'Snow Gorget', Belt = 'Snow Belt', Weaponskills = T{
         'Blade: To', 'Blast Arrow', 'Blast Shot', 'Cross Reaper', 'Death Blossom', 'Expiacion', 'Freezebite', 'Frostbite', 'Full Break', 
         'Gate of Tartarus', 'Ginsenk', 'Guillotine', 'Quietus', 'Impulse Drive', 'Last Stand', 'Mordant Rime', 'Namas Arrow', 'Piercing Arrow', 
         'Raging Rush', 'Shadow of Death', 'Shattersoul', 'Skullbreaker', 'Smash Axe', 'Spiral Hell', 'Steel Cyclone', 'Tachi: Gekko', 
-        'Tachi: Hobaku', 'Tachi: Jinpu', 'Tachi: Koki', 'Tachi: Rana', 'Tachi: Yukikaze', 'Tornado Kick', 'Vidofnir', 'Tachi: Fudo', 'Chant du Cygne', 'Torcleaver' }
+        'Tachi: Hobaku', 'Tachi: Jinpu', 'Tachi: Koki', 'Tachi: Rana', 'Tachi: Yukikaze', 'Tornado Kick', 'Vidofnir', 'Tachi: Fudo', 'Chant du Cygne', 
+        'Torcleaver', 'Geirskogul' }
     },
     [6] = T{ Gorget = 'Thunder Gorget', Belt = 'Thunder Belt', Weaponskills = T{
         'Aeolian Edge', 'Apex Arrow', 'Armor Break', 'Avalanche Axe', 'Black Halo', 'Blade: Chi', 'Blade: Jin', 'Blade: Ku', 'Blade: Metsu', 
@@ -1755,7 +1759,7 @@ T{
         'Ruinator', 'Savage Blade', 'Shark Bite', 'Shining Blade', 'Shoulder Tackle', 'Sidewinder', 'Sickle Moon', 'Slice', 'Spinning Attack', 
         'Spinning Axe', 'Spinning Scythe', 'Stingray', 'Swift Blade', 'Tachi: Gotetsu', 'Tachi: Goten', 'Tachi: Hobaku', 'Tachi: Koki', 
         'Tachi: Shoha', 'Thunder Thrust', 'Tornado Kick', 'True Strike', 'Victory Smite', 'Vidofnir', 'Vorpal Blade', 'Vorpal Scythe', 
-        'Weapon Break', 'Dimidiation', 'Cloudsplitter', 'Ukko\'s Fury', 'Exudation' }
+        'Weapon Break', 'Dimidiation', 'Cloudsplitter', 'Ukko\'s Fury', 'Exudation', 'Tachi: Kaiten', 'Coronach' }
     },
     [7] = T{ Gorget = 'Light Gorget', Belt = 'Light Belt', Weaponskills = T{
         'Apex Arrow', 'Arching Arrow', 'Ascetic\'s Fury', 'Atonement', 'Blade: Chi', 'Blade: Ku', 'Blade: Retsu', 'Blade: Ten', 'Blast Shot', 
@@ -1765,13 +1769,14 @@ T{
         'Resolution', 'Seraph Blade', 'Shadow of Death', 'Shark Bite', 'Shattersoul', 'Sidewinder', 'Slav Shot', 'Spiral Hell', 'Spinning Slash', 
         'Spinning Scythe', 'Stardiver', 'Tachi: Enpi', 'Tachi: Gekko', 'Tachi: Hobaku', 'Tachi: Jinpu', 'Tachi: Kasha', 'Tachi: Rana', 
         'Tachi: Shoha', 'Trueflight', 'Vorpal Thrust', 'Wheeling Thrust', 'Tachi: Kaiten', 'Tachi: Fudo', 'Chant du Cygne', 'Torcleaver', 'Dimidiation', 
-        'Ukko\'s Fury', 'Jishnu\'s Radiance', 'Victory Smite',  }
+        'Ukko\'s Fury', 'Jishnu\'s Radiance', 'Victory Smite', 'Scourge', 'Metatron Torment', 'Geirskogul', 'Namas Arrow', }
     },
     [8] = T{ Gorget = 'Shadow Gorget', Belt = 'Shadow Belt', Weaponskills = T{
-    'Asuran Fists', 'Black Halo', 'Blade: Ei', 'Blade: Hi', 'Blade: Kamu', 'Blade: Ku', 'Blade: Ten', 'Catastrophe', 'Quietus', 'Entropy', 'Evisceration', 
-    'Impulse Drive', 'Insurgency', 'Keen Edge', 'Primal Rend', 'Retribution', 'Shattersoul', 'Exudation', 'Wildfire', 'Upheaval', 'Cloudsplitter', 
-    'Leaden Salute', 'Mandalic Stab', 'Mercy Stroke', 'Requiescat', 'Rudra\'s Storm', 'Nightmare Scythe', 'Omniscience', 'One Inch Punch', 'Penta Thrust', 
-    'Starburst', 'Stardiver', 'Stringing Pummel', 'Sunburst', 'Swift Blade', 'Tachi: Kasha', 'Tachi: Rana', 'Tachi: Shoha', }
+        'Asuran Fists', 'Black Halo', 'Blade: Ei', 'Blade: Hi', 'Blade: Kamu', 'Blade: Ku', 'Blade: Ten', 'Catastrophe', 'Quietus', 'Entropy', 'Evisceration', 
+        'Impulse Drive', 'Insurgency', 'Keen Edge', 'Primal Rend', 'Retribution', 'Shattersoul', 'Exudation', 'Wildfire', 'Upheaval', 'Cloudsplitter', 
+        'Leaden Salute', 'Mandalic Stab', 'Mercy Stroke', 'Requiescat', 'Rudra\'s Storm', 'Nightmare Scythe', 'Omniscience', 'One Inch Punch', 'Penta Thrust', 
+        'Starburst', 'Stardiver', 'Stringing Pummel', 'Sunburst', 'Swift Blade', 'Tachi: Kasha', 'Tachi: Rana', 'Tachi: Shoha', 'Onslaught', 'Blade: Metsu',
+        'Gate of Tartarus', 'Coronach' }
     }
 }
 
