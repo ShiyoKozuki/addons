@@ -490,6 +490,15 @@ function UnregisterJobPointsCheck()
     ashita.events.unregister('packet_in', 'jp_packet_cb');
 end
 
+function RegisterRoECheck()
+    ashita.events.register('packet_out', 'roe_check', function (e)
+        if (e.id == 0x10C) then
+            local roe_id = struct.unpack('H', e.data, 0x04+1);
+            print("ROE ID: " .. tostring(roe_id))
+        end
+    end)
+end
+
 function TryCastSpell(spell, target)
     local spellResource = AshitaCore:GetResourceManager():GetSpellByName(spell, 0);
     if (AshitaCore:GetMemoryManager():GetRecast():GetSpellTimer(spellResource.Index) == 0) then
@@ -1701,16 +1710,16 @@ function canUseMount(zoneId)
     return zonesWithMounts[zoneId]
 end
 
-local WeaponskillGorgets =
+local weaponSkillBeltAndNecks =
 T{
-    [1] = T{ Gorget = 'Flame Gorget', Weaponskills = T{
+    [1] = T{ Gorget = 'Flame Gorget', Belt = 'Flame Belt', Weaponskills = T{
         'Arching Arrow', 'Ascetic\'s Fury', 'Asuran Fists', 'Atonement', 'Blade: Shun', 'Burning Blade', 'Camlan\'s Torment', 'Decimation', 'Detonator', 
         'Drakesbane', 'Dulling Arrow', 'Empyreal Arrow', 'Final Heaven', 'Flaming Arrow', 'Full Swing', 'Garland of Bliss', 'Heavy Shot', 
         'Hexa Strike', 'Hot Shot', 'Insurgency', 'Knight\'s of Round', 'Last Stand', 'Mandalic Stab', 'Mistral Axe', 'Metatron Torment', 'Realmrazer', 
         'Red Lotus Blade', 'Scourge', 'Shijin Spiral', 'Sniper Shot', 'Spinning Attack', 'Spinning Axe', 'Tachi: Kagero', 'Tachi: Kasha', 'Upheaval', 
         'Wheeling Thrust' }
     },
-    [2] = T{ Gorget = 'Soil Gorget', Weaponskills = T{
+    [2] = T{ Gorget = 'Soil Gorget', Belt = 'Soil Belt', Weaponskills = T{
         'Aeolian Edge', 'Asuran Fists', 'Avalanche Axe', 'Blade: Ei', 'Blade: Ku', 'Blade: Retsu', 'Blade: Ten', 'Calamity', 'Catastrophe', 
         'Crescent Moon', 'Dancing Edge', 'Entropy', 'Evisceration', 'Exenterator', 'Expiacion', 'Fast Blade', 'Hard Slash', 'Impulse Drive', 
         'Iron Tempest', 'King\'s Justice', 'Leaden Salute', 'Mercy Stroke', 'Nightmare Scythe', 'Omniscience', 'Primal Rend', 'Pyrrhic Kleos', 
@@ -1718,7 +1727,7 @@ T{
         'Slice', 'Spinning Axe', 'Spinning Scythe', 'Spiral Hell', 'Stardiver', 'Stringing Pummel', 'Sturmwind', 'Swift Blade', 'Tachi: Enpi', 
         'Tachi: Jinpu', 'Tachi: Rana', 'Trueflight', 'Viper Bite', 'Vorpal Blade', 'Vorpal Scythe', 'Wasp Sting' }
     },
-    [3] = T{ Gorget = 'Aqua Gorget', Weaponskills = T{
+    [3] = T{ Gorget = 'Aqua Gorget', Belt = 'Aqua Belt', Weaponskills = T{
         'Atonement', 'Blade: Teki', 'Brainshaker', 'Circle Blade', 'Cross Reaper', 'Dark Harvest', 'Entropy', 'Quietus', 'Death Blossom', 
         'Decimation', 'Expiacion', 'Full Break', 'Garland of Bliss', 'Gate of Tartarus', 'Gust Slash', 'Ground Strike', 'Last Stand', 
         'Mordant Rime', 'Namas Arrow', 'Piercing Arrow', 'Pyrrhic Kleos', 'Rudra\'s Storm', 'Primal Rend', 'Raging Rush', 'Retribution', 
@@ -1726,20 +1735,20 @@ T{
         'Smash Axe', 'Spinning Slash', 'Spinning Scythe', 'Spiral Hell', 'Split Shot', 'Starburst', 'Steel Cyclone', 'Sturmwind', 'Sunburst', 
         'Tachi: Koki', 'Tachi: Rana', 'Trueflight', 'Vidofnir', 'Vorpal Thrust' }
     },
-    [4] = T{ Gorget = 'Breeze Gorget', Weaponskills = T{
+    [4] = T{ Gorget = 'Breeze Gorget', Belt = 'Breeze Belt', Weaponskills = T{
         'Aeolian Edge', 'Asuran Fists', 'Avalanche Axe', 'Blade: Jin', 'Blade: Kamu', 'Blade: Metsu', 'Blade: To', 'Camlan\'s Torment', 'Corona', 
         'Cyclone', 'Dancing Edge', 'Death Blossom', 'Dragon Kick', 'Earth Crusher', 'Exenterator', 'Expiacion', 'Gale Axe', 'Ground Strike', 
         'Gust Slash', 'King\'s Justice', 'Mordant Rime', 'Raging Axe', 'Randgrith', 'Red Lotus Blade', 'Resolution', 'Ruinator', 'Savage Blade', 
         'Shark Bite', 'Shell Crusher', 'Sidewinder', 'Slug Shot', 'Spinning Slash', 'Steel Cyclone', 'Stingray', 'Tachi: Jinpu', 'Tachi: Kasha', 
         'Tachi: Yukikaze', 'Tornado Kick', 'True Strike', 'Victory Smite', 'Vidofnir' }
     },
-    [5] = T{ Gorget = 'Snow Gorget', Weaponskills = T{
+    [5] = T{ Gorget = 'Snow Gorget', Belt = 'Snow Belt', Weaponskills = T{
         'Blade: To', 'Blast Arrow', 'Blast Shot', 'Cross Reaper', 'Death Blossom', 'Expiacion', 'Freezebite', 'Frostbite', 'Full Break', 
         'Gate of Tartarus', 'Ginsenk', 'Guillotine', 'Quietus', 'Impulse Drive', 'Last Stand', 'Mordant Rime', 'Namas Arrow', 'Piercing Arrow', 
         'Raging Rush', 'Shadow of Death', 'Shattersoul', 'Skullbreaker', 'Smash Axe', 'Spiral Hell', 'Steel Cyclone', 'Tachi: Gekko', 
         'Tachi: Hobaku', 'Tachi: Jinpu', 'Tachi: Koki', 'Tachi: Rana', 'Tachi: Yukikaze', 'Tornado Kick', 'Vidofnir' }
     },
-    [6] = T{ Gorget = 'Thunder Gorget', Weaponskills = T{
+    [6] = T{ Gorget = 'Thunder Gorget', Belt = 'Thunder Belt', Weaponskills = T{
         'Aeolian Edge', 'Apex Arrow', 'Armor Break', 'Avalanche Axe', 'Black Halo', 'Blade: Chi', 'Blade: Jin', 'Blade: Ku', 'Blade: Metsu', 
         'Blast Shot', 'Camlan\'s Torment', 'Circle Blade', 'Corona', 'Cyclone', 'Death Blossom', 'Dragon Kick', 'Earth Crusher', 'Exenterator', 
         'Freezebite', 'Gale Axe', 'Ground Strike', 'Gust Slash', 'King\'s Justice', 'Mordant Rime', 'Raging Axe', 'Randgrith', 'Resolution', 
@@ -1748,7 +1757,7 @@ T{
         'Tachi: Shoha', 'Thunder Thrust', 'Tornado Kick', 'True Strike', 'Victory Smite', 'Vidofnir', 'Vorpal Blade', 'Vorpal Scythe', 
         'Weapon Break' }
     },
-    [7] = T{ Gorget = 'Light Gorget', Weaponskills = T{
+    [7] = T{ Gorget = 'Light Gorget', Belt = 'Light Belt', Weaponskills = T{
         'Apex Arrow', 'Arching Arrow', 'Ascetic\'s Fury', 'Atonement', 'Blade: Chi', 'Blade: Ku', 'Blade: Retsu', 'Blade: Ten', 'Blast Shot', 
         'Camlan\'s Torment', 'Decimation', 'Detonator', 'Double Thrust', 'Drakesbane', 'Dulling Arrow', 'Empyreal Arrow', 'Evisceration', 'Final Heaven', 
         'Flaming Arrow', 'Garland of Bliss', 'Heavy Shot', 'Hexa Strike', 'Hot Shot', 'Howling Fist', 'Insurgency', 'Knight\'s of Round', 'Leaden Salute', 
@@ -1757,14 +1766,14 @@ T{
         'Spinning Scythe', 'Stardiver', 'Tachi: Enpi', 'Tachi: Gekko', 'Tachi: Hobaku', 'Tachi: Jinpu', 'Tachi: Kasha', 'Tachi: Rana', 
         'Tachi: Shoha', 'Trueflight', 'Vorpal Thrust', 'Wheeling Thrust' }
     },
-    [8] = T{ Gorget = 'Shadow Gorget', Weaponskills = T{
+    [8] = T{ Gorget = 'Shadow Gorget', Belt = 'Shadow Belt', Weaponskills = T{
     'Asuran Fists', 'Black Halo', 'Blade: Ei', 'Blade: Hi', 'Blade: Kamu', 'Blade: Ku', 'Blade: Ten', 'Catastrophe', 'Quietus', 'Entropy', 'Evisceration', 'Impulse Drive', 'Insurgency', 'Keen Edge',
     'Leaden Salute', 'Mandalic Stab', 'Mercy Stroke', 'Requiescat', 'Rudra\'s Storm', 'Nightmare Scythe', 'Omniscience', 'One Inch Punch', 'Penta Thrust', 'Primal Rend', 'Retribution', 'Shattersoul',
     'Starburst', 'Stardiver', 'Stringing Pummel', 'Sunburst', 'Swift Blade', 'Tachi: Kasha', 'Tachi: Rana', 'Tachi: Shoha', 'Upheaval'}
     }
 }
 
-for _,entry in ipairs(WeaponskillGorgets) do
+for _,entry in ipairs(weaponSkillBeltAndNecks) do
     local newTable = {};
     for _,ws in ipairs(entry.Weaponskills) do
         newTable[ws] = true;
@@ -1788,13 +1797,14 @@ function UpdateInventory()
 end
 
 local gorgetByWeaponskill = {};
+local beltByWeaponskill = {};
 
 function GetMatchingGorget(weaponskillName)
     if gorgetByWeaponskill[weaponskillName] then
         return gorgetByWeaponskill[weaponskillName]
     end
 
-    for _,v in pairs(WeaponskillGorgets) do
+    for _,v in pairs(weaponSkillBeltAndNecks) do
         if v.Weaponskills[weaponskillName] then
             if (v.Gorget ~= nil) then
                 if SEARCHABLE_INVENTORY[GetItemByName(v.Gorget)] then
@@ -1808,12 +1818,37 @@ function GetMatchingGorget(weaponskillName)
     return 'Unknown'
 end
 
+function GetMatchingBelt(weaponskillName)
+    if beltByWeaponskill[weaponskillName] then
+        return beltByWeaponskill[weaponskillName]
+    end
+
+    for _,v in pairs(weaponSkillBeltAndNecks) do
+        if v.Weaponskills[weaponskillName] then
+            if (v.Belt ~= nil) then
+                if SEARCHABLE_INVENTORY[GetItemByName(v.Belt)] then
+                    beltByWeaponskill[weaponskillName] = v.Belt;
+                    return v.Belt;
+                end
+            end
+        end
+    end
+
+    return 'Unknown'
+end
+
 function CheckWSGorget()
     local action = gData.GetAction()
     local matchingGorget = GetMatchingGorget(action.Name);
+    local matchingBelt = GetMatchingBelt(action.Name);
+
     if matchingGorget ~= "Unknown" then
         gFunc.Equip('Neck', matchingGorget)
     end
+    if matchingBelt ~= "Unknown" then
+        gFunc.Equip('Waist', matchingBelt)
+    end
+
     YgnasResolveCheck()
 end
 
@@ -3816,34 +3851,66 @@ function TryEngage(engageData)
     end
 end
 
-function TryCurePartyMembers(cureThreshold, cure)
-    for i = 0,5,1 do
-		local memberIndex = AshitaCore:GetMemoryManager():GetParty():GetMemberTargetIndex(i);
-		local memberHpPercent = AshitaCore:GetMemoryManager():GetParty():GetMemberHPPercent(i);
-		local buffs = GetBuffsByPartyIndex(memberIndex)
+local function TryCastCure(memberID, memberMissingHp)
+    local cureThresholds =
+    {
+        { Threshold = 0,  Cure = 'Cure III' },
+        { Threshold = 500,  Cure = 'Cure IV' },
+        { Threshold = 900, Cure = 'Cure V' },
+        { Threshold = 1200, Cure = 'Cure VI' },
+    }
 
-		if (memberIndex ~= 0) and not IsCharmed(memberIndex) and not buffs:contains(statusEffect.CURSE_II) then
+    local selectedCure = nil
+    -- Find the strongest suitable cure that is learned and available.
+    for _, entry in ipairs(cureThresholds) do
+        if memberMissingHp >= entry.Threshold then
+            if CheckJobLevels(entry.Cure) then
+                selectedCure = entry.Cure
+                -- print(string.format("MememberMissingHp: %d, Selected Cure %s", memberMissingHp, selectedCure))
+            end
+        end
+    end
 
-			if CanCurePartyMembers((cureThreshold), cure, memberHpPercent, memberIndex) then
-				return true
-			end
-		end
-	end
+    local cures = {
+        'Cure VI',
+        'Cure V',
+        'Cure IV',
+        'Cure III',
+        'Cure II',
+        'Cure'
+    }
+
+    -- Try the selected cure first, then fall back to weaker cures.
+    if not selectedCure then
+        selectedCure = GetBestSpell(cures)
+    end
+
+    if selectedCure ~= 'None' then
+        local startIndex = 1
+
+        -- Find the selected cure's position in the list.
+        for i, cure in ipairs(cures) do
+            if cure == selectedCure then
+                startIndex = i
+                break
+            end
+        end
+
+        -- Try the selected cure and every weaker cure until one succeeds.
+        for i = startIndex, #cures do
+            local cure = cures[i]
+
+            if CheckJobLevels(cure) and TryCastSpell(cure, memberID) then
+                return true
+            end
+        end
+    end
 
     return false
 end
 
-function CanCurePartyMembers(hpthreshold, highestcure, memberhpp, memberID)
-    local cureLists =
-    {
-        ['Cure VI']  = {'Cure VI', 'Cure V', 'Cure IV', 'Cure III', 'Cure II', 'Cure'},
-        ['Cure V']   = {'Cure V', 'Cure IV', 'Cure III', 'Cure II', 'Cure'},
-        ['Cure IV']  = {'Cure IV', 'Cure III', 'Cure II', 'Cure'},
-        ['Cure III'] = {'Cure III', 'Cure II', 'Cure'},
-        ['Cure II']  = {'Cure II', 'Cure'},
-    }
-
-    if memberhpp >= hpthreshold or memberhpp <= 0 then
+local function CanCurePartyMembers(hpthreshold, highestcure, memberHpPercent, memberMissingHp, memberID)
+    if memberHpPercent >= hpthreshold or memberHpPercent <= 0 then
         return false
     end
 
@@ -3865,25 +3932,33 @@ function CanCurePartyMembers(hpthreshold, highestcure, memberhpp, memberID)
         return true
     end
 
-    local cures = cureLists[highestcure]
-
-    if cures then
-        return TryCastCure(cures, memberID)
-    end
-
-    return false
+    return TryCastCure(memberID, memberMissingHp)
 end
 
-function TryCastCure(cureTable, memberID)
-    for _, cure in ipairs(cureTable) do
-        if CheckJobLevels(cure) and (TryCastSpell(cure, memberID)) then
-            return true
+function TryCurePartyMembers(cureThreshold, cure, cureTarget)
+    for i = 0, 5 do
+        local memberIndex = AshitaCore:GetMemoryManager():GetParty():GetMemberTargetIndex(i)
+        local memberName = AshitaCore:GetMemoryManager():GetParty():GetMemberName(i)
+        local memberHpPercent = AshitaCore:GetMemoryManager():GetParty():GetMemberHPPercent(i)
+        local memberHp = AshitaCore:GetMemoryManager():GetParty():GetMemberHP(i)
+		local memberMaxHp = (100 / memberHpPercent) * memberHp;
+		local memberMissingHp = memberMaxHp - memberHp;
+        local buffs = GetBuffsByPartyIndex(memberIndex)
+
+
+        if memberIndex ~= 0
+            and (not cureTarget or cureTarget == memberName)
+            and not IsCharmed(memberIndex)
+            and not buffs:contains(statusEffect.CURSE_II) then
+
+            if CanCurePartyMembers(cureThreshold, cure, memberHpPercent, memberMissingHp, memberIndex) then
+                return true
+            end
         end
     end
 
     return false
 end
-
 
 function TryCureWaltzPartyMembers(cureThreshold)
     for i = 0,5,1 do
