@@ -555,6 +555,19 @@ function GetStratagemCount()
     return 0;
 end
 
+function GetAbilityTarget(ability, myIndex, targetIndex)
+    local abilityResource = AshitaCore:GetResourceManager():GetAbilityByName(ability, 0);
+    if not abilityResource then
+        return false
+    end
+
+    if bit.band(abilityResource.Targets, 0x20) == 0x20 then
+        return targetIndex
+    end
+
+    return myIndex
+end
+
 function CanUseAbility(ability)
     local abilityResource = AshitaCore:GetResourceManager():GetAbilityByName(ability, 0);
     if not abilityResource then 
