@@ -568,6 +568,19 @@ function GetAbilityTarget(ability, myIndex, targetIndex)
     return myIndex
 end
 
+function HasJobAbility(ability)
+    local abilityResource = AshitaCore:GetResourceManager():GetAbilityByName(ability, 0);
+    if not abilityResource then 
+        return false
+    end
+
+    if not AshitaCore:GetMemoryManager():GetPlayer():HasAbility(abilityResource.Id) then
+        return false;
+    end
+    
+    return true
+end
+
 function CanUseAbility(ability)
     local abilityResource = AshitaCore:GetResourceManager():GetAbilityByName(ability, 0);
     if not abilityResource then 
