@@ -2278,7 +2278,7 @@ function DarkArts()
     return false
 end
 
-function SublimationCheck()
+function HasSublimation()
   local level = AshitaCore:GetMemoryManager():GetPlayer():GetMainJobLevel()
   if (level < 59) then -- So Helm isn't constantly displaced
     return false
@@ -2552,7 +2552,11 @@ function DoWeaponSkill(ws, myIndex, targetIndex)
         AshitaCore:GetChatManager():QueueCommand(0, ('/ws "%s" %u'):fmt(ws, AshitaCore:GetMemoryManager():GetEntity():GetServerId(target)));
         mActionTimer = os.time() + 1;
         CloseSC = false
+
+        return true
     end
+
+    return false
 end
 
 function AutoRAToggle(toggle)
