@@ -274,13 +274,13 @@ packethandlers.HandleIncomingPacket = function(e)
                 end
             end
 
-            if am.message_id > 169 and am.message_id < 179 then
-                if am.param_1 > 2147483647 then
-                    skill = 'to be level -1 ('..ratings_arr[am.param_2-63]..')'
-                else
-                    skill = 'to be level '..am.param_1..' ('..ratings_arr[am.param_2-63]..')'
-                end
-            end
+            -- if am.message_id > 169 and am.message_id < 179 then
+            --     if am.param_1 > 2147483647 then
+            --         skill = 'to be level -1 ('..ratings_arr[am.param_2-63]..')'
+            --     else
+            --         skill = 'to be level '..am.param_1..' ('..ratings_arr[am.param_2-63]..')'
+            --     end
+            -- end
             outstr = (gFuncs.CleanMsg(outstr
             :gsub('${actor}\'s',actor_article..gFuncs.ColorIt(actor.name or '',gProfileColor[actor.owner or actor.type])..'\'s'..actor.owner_name)
             :gsub('${actor}',actor_article..gFuncs.ColorIt(actor.name or '',gProfileColor[actor.owner or actor.type])..actor.owner_name)
@@ -302,34 +302,34 @@ packethandlers.HandleIncomingPacket = function(e)
         end
 
 ------------ SYNTHESIS ANIMATION --------------
-    elseif e.id == 0x030 and gProfileSettings.mode.crafting then
-        local target = GetEntity(AshitaCore:GetMemoryManager():GetTarget():GetTargetIndex(0))
-        local target_id = AshitaCore:GetMemoryManager():GetTarget():GetServerId(0)
+    -- elseif e.id == 0x030 and gProfileSettings.mode.crafting then
+    --     local target = GetEntity(AshitaCore:GetMemoryManager():GetTarget():GetTargetIndex(0))
+    --     local target_id = AshitaCore:GetMemoryManager():GetTarget():GetServerId(0)
 
-        if gStatus.PlayerId == struct.unpack('I', e.data, 5) or target_id == struct.unpack('I', e.data, 5) then
-            local crafter_name = (gStatus.PlayerId == struct.unpack('I', e.data, 5)) and gStatus.PlayerName or target.Name
-            local result = e.data:byte(13)
-            if result == 0 then
-                AshitaCore:GetChatManager():AddChatMessage(8, false, ' ------------- NQ Synthesis ('..crafter_name..') -------------')
-            elseif result == 1 then
-                AshitaCore:GetChatManager():AddChatMessage(8, false, ' ---------------- Break ('..crafter_name..') -----------------')
-            elseif result == 2 then
-                AshitaCore:GetChatManager():AddChatMessage(8, false, ' ------------- HQ Synthesis ('..crafter_name..') -------------')
-            else
-                AshitaCore:GetChatManager():AddChatMessage(8, false, 'Craftmod: Unhandled result '..tostring(result))
-            end
-        end
-    elseif e.id == 0x06F and gProfileSettings.mode.crafting then
-        if e.data:byte(5) == 0 or e.data:byte(5) == 12 then
-            local result = e.data:byte(6)
-            if result == 1 then
-                AshitaCore:GetChatManager():AddChatMessage(8, false, ' -------------- HQ Tier 1! --------------')
-            elseif result == 2 then
-                AshitaCore:GetChatManager():AddChatMessage(8, false, ' -------------- HQ Tier 2! --------------')
-            elseif result == 3 then
-                AshitaCore:GetChatManager():AddChatMessage(8, false, ' -------------- HQ Tier 3! --------------')
-            end
-        end
+    --     if gStatus.PlayerId == struct.unpack('I', e.data, 5) or target_id == struct.unpack('I', e.data, 5) then
+    --         local crafter_name = (gStatus.PlayerId == struct.unpack('I', e.data, 5)) and gStatus.PlayerName or target.Name
+    --         local result = e.data:byte(13)
+    --         if result == 0 then
+    --             AshitaCore:GetChatManager():AddChatMessage(8, false, ' ------------- NQ Synthesis ('..crafter_name..') -------------')
+    --         elseif result == 1 then
+    --             AshitaCore:GetChatManager():AddChatMessage(8, false, ' ---------------- Break ('..crafter_name..') -----------------')
+    --         elseif result == 2 then
+    --             AshitaCore:GetChatManager():AddChatMessage(8, false, ' ------------- HQ Synthesis ('..crafter_name..') -------------')
+    --         else
+    --             AshitaCore:GetChatManager():AddChatMessage(8, false, 'Craftmod: Unhandled result '..tostring(result))
+    --         end
+    --     end
+    -- elseif e.id == 0x06F and gProfileSettings.mode.crafting then
+    --     if e.data:byte(5) == 0 or e.data:byte(5) == 12 then
+    --         local result = e.data:byte(6)
+    --         if result == 1 then
+    --             AshitaCore:GetChatManager():AddChatMessage(8, false, ' -------------- HQ Tier 1! --------------')
+    --         elseif result == 2 then
+    --             AshitaCore:GetChatManager():AddChatMessage(8, false, ' -------------- HQ Tier 2! --------------')
+    --         elseif result == 3 then
+    --             AshitaCore:GetChatManager():AddChatMessage(8, false, ' -------------- HQ Tier 3! --------------')
+    --         end
+    --     end
 
     ------------- JOB INFO ----------------
     elseif e.id == 0x01B then
