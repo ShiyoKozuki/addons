@@ -3035,6 +3035,7 @@ local hideMenus = T{
     ['menu    missionm'] = true,
     ['menu    miss00  '] = true,
     ['menu    quest00 '] = true,
+    ['menu    quest01 '] = true,
     ['menu    evitem  '] = true,
     ['menu    mogcont '] = true,
     ['menu    bank    '] = true,
