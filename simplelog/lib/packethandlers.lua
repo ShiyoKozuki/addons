@@ -274,13 +274,14 @@ packethandlers.HandleIncomingPacket = function(e)
                 end
             end
 
-            -- if am.message_id > 169 and am.message_id < 179 then
-            --     if am.param_1 > 2147483647 then
-            --         skill = 'to be level -1 ('..ratings_arr[am.param_2-63]..')'
-            --     else
-            --         skill = 'to be level '..am.param_1..' ('..ratings_arr[am.param_2-63]..')'
-            --     end
-            -- end
+            if am.message_id > 169 and am.message_id < 179 then
+                -- if am.param_1 > 2147483647 then
+                --     skill = 'to be level -1 ('..ratings_arr[am.param_2-63]..')'
+                -- else
+                --     skill = 'to be level '..am.param_1..' ('..ratings_arr[am.param_2-63]..')'
+                -- end
+                return
+            end
             outstr = (gFuncs.CleanMsg(outstr
             :gsub('${actor}\'s',actor_article..gFuncs.ColorIt(actor.name or '',gProfileColor[actor.owner or actor.type])..'\'s'..actor.owner_name)
             :gsub('${actor}',actor_article..gFuncs.ColorIt(actor.name or '',gProfileColor[actor.owner or actor.type])..actor.owner_name)
