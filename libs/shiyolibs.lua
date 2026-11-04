@@ -3658,6 +3658,38 @@ function GetBestSpell(spellTable)
     return 'None'
 end
 
+function GetMeleeRange(myIndex, enemyIndex)
+    local eMgr = AshitaCore:GetMemoryManager():GetEntity()
+    return eMgr:GetHitBoxSize(myIndex) + eMgr:GetHitBoxSize(enemyIndex) + 1.9;
+end
+
+function ShouldDispel(actionPacket, enemyIndex)
+    if IsMonster(actionPacket.UserIndex) and (enemyIndex == actionPacket.UserIndex) then
+        local skillId = actionPacket.Id
+        local actionMessage = actionPacket.Targets[1].Actions[1].Message
+        local actionAnimation = actionPacket.Targets[1].Actions[1].Animation
+        local mobSkill = AshitaCore:GetResourceManager():GetString('monsters.abilities', skillId - 256);
+
+        -- Check message (Buffs)
+        if actionMessage == 194 then
+            return true
+        end
+
+        -- Check ones without a message
+        if type(mobSkill) == 'string' then
+            mobSkill = mobSkill:trimend('\x00');
+
+            -- TODO: List to ighnore i.e dhalmel/bomb and wivre zerks
+            -- if not T{'Berserk'}:contains(mobSkill) then 
+            if T{'Water Wall', 'Water Shield', 'Infernal Bulwark'}:contains(mobSkill) then
+                return true
+            end
+        end
+    end
+
+    return false
+end
+
 --[[
 Creates a table of entity name then x, y, z positions. example:
 positionsById =
