@@ -1182,8 +1182,8 @@ function TryCastNa(assistName)
     return false
 end
 
-function TryCastNaTank(assistName)
-    local assistIndex = GetPlayerIndex(assistName)
+function TryCastNaTank(tankName)
+    local assistIndex = GetPlayerIndex(tankName)
     -- Use -na spell for corresponding status effect
 	local spell = ''
     for i,effect in pairs(naList) do
@@ -1211,6 +1211,20 @@ function TryCastNaTank(assistName)
     end
 
 	return false
+end
+
+function TryConvert(MyIndex, hpp, mpp, currentlyHealing)
+    if (mpp < 15) and not HasDot() and not currentlyHealing then
+        if GetAbilityRecast(49) == 0 then
+            if hpp > 50 then
+                if TryUseAbility('Convert', MyIndex) then
+                    return true
+                end
+            end
+        end
+    end
+
+    return false
 end
 
 function GetTargetValue(index)
@@ -2699,6 +2713,10 @@ function IsZombie(entityIndex)
     return false
 end
 
+function IsParalyzed()
+    return GetBuffActive(statusEffect.PARALYSIS)
+end
+
 -- 0x01 - is player
 -- 0x02 - is npc
 -- 0x04 - is party member
@@ -3660,7 +3678,12 @@ end
 
 function GetMeleeRange(myIndex, enemyIndex)
     local eMgr = AshitaCore:GetMemoryManager():GetEntity()
-    return eMgr:GetHitBoxSize(myIndex) + eMgr:GetHitBoxSize(enemyIndex) + 1.9;
+
+    if not myIndex or not enemyIndex then 
+        return 0
+    end
+
+    return eMgr:GetModelHitboxSize(myIndex) + eMgr:GetModelHitboxSize(enemyIndex) + 1.9;
 end
 
 function ShouldDispel(actionPacket, enemyIndex)
