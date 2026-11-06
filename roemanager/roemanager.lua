@@ -208,10 +208,17 @@ local render_settings_ui = function()
 
                     ['Comrade'] = T{
                         [3001] = 'Home Point Comrade A (UC)',
+                        [3019] = 'Home Point Comrade C (UC)',
+                        [3037] = 'Home Point Comrade E (UC)',
                     },
 
                     ['Vanquish Enemies'] = T{
                         [3002] = 'Vanquish Multiple Enemies A (UC)',
+                        [3011] = 'Vanquish Multiple Enemies B (UC)',
+                        [3020] = 'Vanquish Multiple Enemies C (UC)',
+                        [3029] = 'Vanquish Multiple Enemies D (UC)',
+                        [3038] = 'Vanquish Multiple Enemies E (UC)',
+                        [3047] = 'Vanquish Multiple Enemies F (UC)',
                     },
 
                     ['Van. Enemies w. Unity Leader'] = {
