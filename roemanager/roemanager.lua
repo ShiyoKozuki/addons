@@ -1,6 +1,6 @@
 addon.name      = 'RoEManager';
 addon.author    = 'Shiyo';
-addon.version   = '1.0.0.0';
+addon.version   = '1.0.0.1';
 addon.desc      = 'Manages and automatically flags records of eminence quests.';
 addon.link      = 'https://ashitaxi.com/';
 
@@ -321,15 +321,33 @@ local render_settings_ui = function()
     end
 end
 
-local function FlagRoeDailues()
+local function FlagRoeDailies()
     for roeId, enabled in pairs(roeManager.settings.roeManager_Flags) do
         if enabled then
             local numericId = tonumber(roeId)
 
             if numericId then
-                local packet = struct.pack('LHH', 0, numericId, 0)
-                AshitaCore:GetPacketManager():AddOutgoingPacket(0x10C, packet:totable())
-                coroutine.sleep(3)
+
+                if Player.CurrentROE == nil then return end
+
+                local roeFlagged = false
+
+                for i = 2, 31 do
+                    local roe = Player.CurrentROE[i]
+
+                    if roe ~= nil then
+                        if numericId ==  roe.Id then
+                            roeFlagged = true
+                            break
+                        end
+                    end
+                end
+
+                if not roeFlagged then
+                    local packet = struct.pack('LHH', 0, numericId, 0)
+                    AshitaCore:GetPacketManager():AddOutgoingPacket(0x10C, packet:totable())
+                    coroutine.sleep(3)
+                end
             end
         end
     end
@@ -358,7 +376,7 @@ ashita.events.register('packet_in', 'roe_incoming', function (e)
                 Player.CompletedROE[offset + 1] = nil;
             end
         end
-        FlagRoeDailues()
+        FlagRoeDailies()
     end
 end)
 
