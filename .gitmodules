@@ -28,9 +28,6 @@
 [submodule "treasurepool"]
 	path = treasurepool
 	url = https://github.com/ShiyoKozuki/treasurepool
-[submodule "roe-manager"]
-	path = roe-manager
-	url = https://github.com/ShiyoKozuki/RoE-Manager
 [submodule "roemanager"]
 	path = roemanager
 	url = https://github.com/ShiyoKozuki/RoE-Manager
