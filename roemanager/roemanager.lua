@@ -1,6 +1,6 @@
 addon.name      = 'RoEManager';
 addon.author    = 'Shiyo';
-addon.version   = '1.0.0.1';
+addon.version   = '1.0.1.0';
 addon.desc      = 'Manages and automatically flags records of eminence quests.';
 addon.link      = 'https://ashitaxi.com/';
 
@@ -32,6 +32,9 @@ end
 local activeContent;
 local selectedROE;
 local filterText = { '' };
+
+local dailyCheckDone = false
+local nextDailyCheck = 0
 
 -- Dailies missing from DAT:
     -- DAILY_VANQUISH_MULTIPLE = 4082,
@@ -178,8 +181,17 @@ local render_settings_ui = function()
             roeManager.ui.showAutoFlagWindow[1] = not roeManager.ui.showAutoFlagWindow[1]
         end
 
-        -- Extra Windows
+        imgui.SameLine(0, 16)
 
+        local remaining = math.max(0, os.difftime(nextDailyCheck, os.time()))
+        local hours = math.floor(remaining / 3600)
+        local minutes = math.floor((remaining % 3600) / 60)
+        local seconds = math.floor(remaining % 60)
+
+        -- Timer for when dailies will be autoflagged
+        imgui.TextColored({ 1.0, 0.0, 0.0, 1.0 }, string.format('Next daily check: %s (%02d:%02d:%02d)', os.date('%I:%M %p', nextDailyCheck), hours, minutes, seconds))
+
+        -- Extra Windows
         if roeManager.ui.showAutoFlagWindow[1] then
             if imgui.Begin('Autoflag Window', roeManager.ui.showAutoFlagWindow, ImGuiWindowFlags_AlwaysAutoResize) then
 
@@ -351,6 +363,22 @@ local function FlagRoeDailies()
             end
         end
     end
+
+    local now = os.time()
+    local today = os.date('*t', now)
+
+    today.hour = 11
+    today.min = 0
+    today.sec = 0
+
+    nextDailyCheck = os.time(today)
+
+    -- If 11 AM has already passed, schedule for tomorrow.
+    if nextDailyCheck <= now then
+        nextDailyCheck = nextDailyCheck + 86400
+    end
+
+    dailyCheckDone = true
 end
 
 ashita.events.register('packet_in', 'roe_incoming', function (e)
@@ -376,15 +404,19 @@ ashita.events.register('packet_in', 'roe_incoming', function (e)
                 Player.CompletedROE[offset + 1] = nil;
             end
         end
-        FlagRoeDailies()
+
+        if os.time() > nextDailyCheck then
+            FlagRoeDailies()
+        end
     end
 end)
 
 ashita.events.register('command', 'command_cb', function (e)
     local args = e.command:args();
-    if (#args == 0 or args[1] ~= '/rma') then
-        return;
+    if (#args == 0 or (args[1] ~= '/rma' and args[1] ~= '/roemanager')) then
+        return
     end
+
     e.blocked = true;
 
     if (#args < 2) then
@@ -431,6 +463,11 @@ ashita.events.register('d3d_present', 'd3d_present', function ()
         return
     end
 
+    if dailyCheckDone then
+        print(chat.header("RoEManager") .. chat.message("All selected dailies flagged!"))
+        dailyCheckDone = false
+    end
+    
     render_settings_ui();
 end);
 
