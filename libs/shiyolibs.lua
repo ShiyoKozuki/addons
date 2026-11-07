@@ -895,6 +895,24 @@ function GetBuffsByPartyIndex(partyIndex)
     return T{};
 end
 
+lastEnemyIndex = 0
+
+function TryClearTargetVars(EnemyIndex)
+    if EnemyIndex and EnemyIndex ~= 0 and IsMonster(EnemyIndex) then
+        if EnemyIndex ~= lastEnemyIndex then
+            lastEnemyIndex = EnemyIndex
+            return true
+        end
+    end
+
+    -- If target is no longer rendered or dead, clear variables
+    if not IsEntityRendered(EnemyIndex) or AshitaCore:GetMemoryManager():GetEntity():GetHPPercent(EnemyIndex) == 0 then
+        return true
+    end
+
+    return false
+end
+
 function HasBarEleSpell(flags)
 	if GetAnyBuffActive({statusEffect.BARFIRE, statusEffect.BARBLIZZARD, statusEffect.BARAERO, statusEffect.BARSTONE, statusEffect.BARTHUNDER, statusEffect.BARWATER}) then
 		return true
