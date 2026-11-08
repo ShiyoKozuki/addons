@@ -83,10 +83,12 @@ function TryUseItem(item, target)
 end
 
 function TryUseHealingItem(EntityIndex)
-    for _,v in pairs(hpTemps) do
-      if TryUseItem(v, EntityIndex) then
-        return true;
-      end
+    for _, itemName in pairs(hpTemps) do
+        if itemName and HasItemByName(itemName) then
+            if TryUseItem(itemName, EntityIndex) then
+                return true;
+            end
+        end
     end
     return false;
 end
@@ -106,6 +108,24 @@ function TryUseMPRestoreItem(MyIndex, flags)
                         return true
                     end
                 end
+            end
+        end
+    end
+
+    return false
+end
+
+function TryUseTPRestoreItem(myIndex, settings)
+    local tpRestoreItems = 
+    {
+        'Icarus Wing', 'Dusty Wing', 'Daedalus Wing', 'Lucid Wings I', 'Lucid Wings II'
+    }
+    local TP = AshitaCore:GetMemoryManager():GetParty():GetMemberTP(0)
+
+    if (TP <= 500) and settings.AutoWing then
+        for _, itemName in ipairs(tpRestoreItems) do
+            if TryUseItem(itemName, myIndex) then
+                return true
             end
         end
     end
@@ -1077,18 +1097,18 @@ function TryUseStatusCureItem(statusCures)
 
         -- Is this status enabled in the UI?
         if statusCures[effectName] then
-
             -- Do we actually have the status?
             if GetBuffActive(effectId) then
-
-                if CheckIfStand(50) then
-                    return true
-                end
-
                 -- Try each item in order
-                for _, item in ipairs(items) do
-                    if TryUseItem(item, MyIndex) then
-                        return true
+                for _, itemName in ipairs(items) do
+                    if itemName and HasItemByName(itemName) then
+                        if CheckIfStand(50) then
+                            return true
+                        end
+                        
+                        if TryUseItem(itemName, MyIndex) then
+                            return true
+                        end
                     end
                 end
             end
@@ -3942,7 +3962,6 @@ end
 
 function TryEngage(engageData)
     if (engageData.TankEngaged) and (engageData.TargetDistance <= 25) then
-
         -- Swap targets if I'm not on the tanks target
         if (engageData.meEngaged) then
             if (IsMonster(engageData.EnemyIndex) and engageData.myTarget ~= engageData.EnemyIndex and engageData.assistTargetDistance <= 25) then
@@ -3954,12 +3973,13 @@ function TryEngage(engageData)
                 return true
             end
         else
-
-        AshitaCore:GetChatManager():QueueCommand(0, ('/attack %u'):fmt(AshitaCore:GetMemoryManager():GetEntity():GetServerId(engageData.EnemyIndex)));
-        mActionTimer = os.time() + 2;
+            AshitaCore:GetChatManager():QueueCommand(0, ('/attack %u'):fmt(AshitaCore:GetMemoryManager():GetEntity():GetServerId(engageData.EnemyIndex)));
+            mActionTimer = os.time() + 2;
             return true
         end
     end
+
+    return false
 end
 
 local function TryCastCure(memberID, memberMissingHp)
@@ -4093,10 +4113,6 @@ function CanCureWaltzPartyMembers(hpthreshold, memberhpp, memberID)
         return false
     end
 
-    if CheckIfStand(25) then
-        return true
-    end
-
     local curingWaltz = GetBestCureWaltz()
 
     -- Make sure target is in Curing Waltz range
@@ -4224,10 +4240,6 @@ function TryUseWaltz(waltz, targetIndex)
         if not IsInCastRange(targetIndex) then
             TooFarAwayMsg(targetIndex, waltz, 15)
         else
-            if (CheckIfStand(50)) then
-                return true
-            end
-
             if TryUseAbility(waltz, targetIndex) then
                 return true
             end
