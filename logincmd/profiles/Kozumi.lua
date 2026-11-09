@@ -13,6 +13,7 @@ local function delayed_setup()
 	AshitaCore:GetChatManager():QueueCommand(-1, '/addon load toggles');
 	AshitaCore:GetChatManager():QueueCommand(-1, '/trigger LS /winfocus *nextalpha');
 	AshitaCore:GetChatManager():QueueCommand(-1, '/addon load parse');
+    AshitaCore:GetChatManager():QueueCommand(-1, '/addon load roemanager');
 	print('-- done --');
 end
 
