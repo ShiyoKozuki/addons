@@ -637,7 +637,6 @@ function TryUseAbility(ability, target)
 
     if CanUseAbility(ability) then
         AshitaCore:GetChatManager():QueueCommand(0, ('/ja "%s" %u'):fmt(abilityResource.Name[1], AshitaCore:GetMemoryManager():GetEntity():GetServerId(target)));
-        mActionTimer = os.time() + 1;
         return true
     end
 
@@ -2602,9 +2601,6 @@ function DoWeaponSkill(ws, myIndex, targetIndex)
 
     if target then
         AshitaCore:GetChatManager():QueueCommand(0, ('/ws "%s" %u'):fmt(ws, AshitaCore:GetMemoryManager():GetEntity():GetServerId(target)));
-        mActionTimer = os.time() + 1;
-        CloseSC = false
-
         return true
     end
 
