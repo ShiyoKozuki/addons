@@ -692,7 +692,6 @@ function CheckIfStand(mp)
     local myMp = AshitaCore:GetMemoryManager():GetParty():GetMemberMPPercent(0);
     if (myStatus == 33 and myMp >= mp) then
         AshitaCore:GetChatManager():QueueCommand(1, '/heal');
-        mActionTimer = os.time() + 1;
         return true;
     end
     return false;
@@ -3970,7 +3969,6 @@ function TryEngage(engageData)
             end
         else
             AshitaCore:GetChatManager():QueueCommand(0, ('/attack %u'):fmt(AshitaCore:GetMemoryManager():GetEntity():GetServerId(engageData.EnemyIndex)));
-            mActionTimer = os.time() + 2;
             return true
         end
     end
