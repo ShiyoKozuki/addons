@@ -3359,6 +3359,137 @@ function BuildWeaponSkillList()
     return ws;
 end
 
+availableJAs = {}
+function RebuildJobAbilityList(flags, jaTable)
+    if type(jaTable) ~= 'table' then
+        return
+    end
+
+    availableJAs = {}
+
+    for _, jobAbility in ipairs(jaTable) do
+        if HasJobAbility(jobAbility.Name) then
+            availableJAs[#availableJAs + 1] = jobAbility
+
+            if flags.jobAbilities[jobAbility.Name] == nil then
+                flags.jobAbilities[jobAbility.Name] = false
+            end
+        end
+    end
+end
+
+
+availableDebuffs = {}
+function RebuildDebuffSpellList(flags, debuffTable)
+    if type(debuffTable) ~= 'table' then
+        return
+    end
+
+    availableDebuffs = {}
+
+    flags.activeDebuffs = flags.activeDebuffs or T{}
+
+    for _, debuff in ipairs(debuffTable) do
+        if CheckJobLevels(debuff.name) then
+            availableDebuffs[#availableDebuffs + 1] = debuff
+
+            if flags.activeDebuffs[debuff.name] == nil then
+                flags.activeDebuffs[debuff.name] = false
+            end
+
+            debuff.active = flags.activeDebuffs[debuff.name]
+        end
+    end
+end
+
+availableBuffs = {}
+function RebuildBuffSpellList(flags, ui, buffTable)
+    if type(buffTable) ~= 'table' then
+        return
+    end
+
+    availableBuffs = {}
+
+    flags.selfBuffs = flags.selfBuffs or T{}
+
+    for _, buff in ipairs(buffTable) do
+        local displayName = buff[1]
+        local settingName = buff[2]
+
+        local available = false
+
+        if settingName == 'Enspell' then
+            local spell = ui.enspell[flags.enspell_index[1]]
+            available = spell ~= nil and spell ~= 'None'
+
+        elseif settingName == 'Gain' then
+            local spell = ui.gain[flags.gain_index[1]]
+            available = spell ~= nil and spell ~= 'None'
+
+        elseif settingName == 'BarEle' then
+            local spell = ui.bar_ele_spell[flags.bar_ele_index[1]]
+            available = spell ~= nil and spell ~= 'None'
+
+        elseif settingName == 'BarStatus' then
+            local spell = ui.bar_status_spell[flags.bar_status_index[1]]
+            available = spell ~= nil and spell ~= 'None'
+
+        else
+            available = CheckJobLevels(displayName)
+        end
+
+        if available then
+            availableBuffs[#availableBuffs + 1] = buff
+
+            if flags.selfBuffs[settingName] == nil then
+                flags.selfBuffs[settingName] = false
+            end
+        end
+    end
+end
+
+availableAoeBuffs = {}
+function RebuildAoeBuffSpellList(flags, ui, buffTable)
+    if type(buffTable) ~= 'table' then
+        return
+    end
+
+    availableAoeBuffs = {}
+
+    flags.aoeBuffs = flags.aoeBuffs or T{}
+
+    for _, buff in ipairs(buffTable) do
+        local displayName = buff[1]
+        local settingName = buff[2]
+
+        local available = false
+
+        if settingName == 'Boost' then
+            local spell = ui.boost_spell[flags.boost_index[1]]
+            available = spell ~= nil and spell ~= 'None'
+
+        elseif settingName == 'BarEle' then
+            local spell = ui.bar_ele_spell[flags.bar_ele_index[1]]
+            available = spell ~= nil and spell ~= 'None'
+
+        elseif settingName == 'BarStatus' then
+            local spell = ui.bar_status_spell[flags.bar_status_index[1]]
+            available = spell ~= nil and spell ~= 'None'
+
+        else
+            available = CheckJobLevels(displayName)
+        end
+
+        if available then
+            availableAoeBuffs[#availableAoeBuffs + 1] = buff
+
+            if flags.aoeBuffs[settingName] == nil then
+                flags.aoeBuffs[settingName] = false
+            end
+        end
+    end
+end
+
 function BuildCorsairRollList()
     local roll = T{};
     local playMgr = AshitaCore:GetMemoryManager():GetPlayer();
@@ -3723,7 +3854,6 @@ function ShouldDispel(actionPacket, enemyIndex)
     if IsMonster(actionPacket.UserIndex) and (enemyIndex == actionPacket.UserIndex) then
         local skillId = actionPacket.Id
         local actionMessage = actionPacket.Targets[1].Actions[1].Message
-        local actionAnimation = actionPacket.Targets[1].Actions[1].Animation
         local mobSkill = AshitaCore:GetResourceManager():GetString('monsters.abilities', skillId - 256);
 
         -- Check message (Buffs)
@@ -3735,7 +3865,7 @@ function ShouldDispel(actionPacket, enemyIndex)
         if type(mobSkill) == 'string' then
             mobSkill = mobSkill:trimend('\x00');
 
-            -- TODO: List to ighnore i.e dhalmel/bomb and wivre zerks
+            -- TODO: List to ignore i.e dhalmel/bomb and wivre zerks
             -- if not T{'Berserk'}:contains(mobSkill) then 
             if T{'Water Wall', 'Water Shield', 'Infernal Bulwark'}:contains(mobSkill) then
                 return true
@@ -3744,6 +3874,45 @@ function ShouldDispel(actionPacket, enemyIndex)
     end
 
     return false
+end
+
+function IsSelfDispelTPMove(actionPacket, enemyIndex)
+    if IsMonster(actionPacket.UserIndex) and (enemyIndex == actionPacket.UserIndex) then
+        local skillId = actionPacket.Id
+        local actionMessage = actionPacket.Targets[1].Actions[1].Message
+        local mobSkill = AshitaCore:GetResourceManager():GetString('monsters.abilities', skillId - 256);
+
+        -- Check message
+        if actionMessage == 231 then -- (<num> of <target>'s effects disappear!)
+            return true
+        end
+
+        -- Check ones without a message
+        if type(mobSkill) == 'string' then
+            mobSkill = mobSkill:trimend('\x00');
+
+            -- TODO: List to ighnore i.e dhalmel/bomb and wivre zerks
+            -- if not T{'Berserk'}:contains(mobSkill) then 
+            if T{ 
+                'Benediction', 'Exuviation', 'Summer Breeze', 'Uproot', 'Yaksha Stance', 'Damsel Memento', 'Divine Favor', 'Stgian Sphere', 
+                'Rapid Molt', 'Hellborn Yawp', 'Carcharian Verve', 'Depuration' 
+            }:contains(mobSkill) then
+                return true
+            end
+        end
+    end
+
+    return false
+end
+
+function ResetDebuffTimers(debuffTable)
+     if type(debuffTable) ~= 'table' then
+        return
+     end
+
+    for key, value in ipairs(debuffTable) do
+        value.timer = os.time() - 1
+    end
 end
 
 --[[
@@ -4035,7 +4204,7 @@ local function TryCastCure(memberID, memberMissingHp)
 end
 
 local function CanCurePartyMembers(hpthreshold, highestcure, memberHpPercent, memberMissingHp, memberID)
-    if memberHpPercent >= hpthreshold or memberHpPercent <= 0 then
+    if memberHpPercent > hpthreshold or memberHpPercent <= 0 then
         return false
     end
 
@@ -4103,7 +4272,7 @@ function TryCureWaltzPartyMembers(cureThreshold)
 end
 
 function CanCureWaltzPartyMembers(hpthreshold, memberhpp, memberID)
-    if memberhpp >= hpthreshold or memberhpp <= 0 then
+    if memberhpp > hpthreshold or memberhpp <= 0 then
         return false
     end
 
