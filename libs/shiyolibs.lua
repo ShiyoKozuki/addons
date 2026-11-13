@@ -632,6 +632,10 @@ function CanUseAbility(ability)
     return true
 end
 
+function IsJaEnabled(ability, flags)
+    return flags.jobAbilities[ability]
+end
+
 function TryUseAbility(ability, target)
     local abilityResource = AshitaCore:GetResourceManager():GetAbilityByName(ability, 0);
 
