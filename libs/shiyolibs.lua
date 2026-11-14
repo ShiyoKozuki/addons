@@ -3,6 +3,7 @@ local chat = require('chat')
 local dats = require('ffxi.dats');
 local statusEffect = require('statuseffect')
 local job = require('job')
+local mobModel = require('MobModels')
 
 hpTemps = T{ 'Dusty Potion', 'Lucid Potion I', 'Lucid Potion II', 'Lucid Potion III', 'Dusty Elixir', 'Lucid Elixir I', 'Lucid Elixir II', 'Healing Mist', 'Healing Powder', 'Megalixir' }
 mpRestoreItems = 
@@ -528,7 +529,6 @@ function TryCastSpell(spell, target)
         end
 
         AshitaCore:GetChatManager():QueueCommand(0, ('/ma "%s" %u'):fmt(spellResource.Name[1], AshitaCore:GetMemoryManager():GetEntity():GetServerId(target)));
-        mActionTimer = os.time() + (spellResource.CastTime / 4) + 3;
         castFinished = os.time() + (spellResource.CastTime / 4) + 1
         return true;
     end
@@ -1394,8 +1394,19 @@ function FindEntity()
 end
 
 function GetModelID(entityIndex)
-    local modelId = GetAshitaCore():GetMemoryManager():GetEntity():GetLookHair(entityIndex) 
+    local modelId = AshitaCore:GetMemoryManager():GetEntity():GetLookHair(entityIndex) 
     return modelId
+end
+
+function IsMobEcoSystem(ecosystem, modelId)
+    for index, value in ipairs(mobModel) do
+    end
+
+    if mobModel:contains(ecosystem) then
+        return true
+    end
+
+    return false
 end
 
 local thTable = {};
