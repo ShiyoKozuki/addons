@@ -529,6 +529,7 @@ function TryCastSpell(spell, target)
         end
 
         AshitaCore:GetChatManager():QueueCommand(0, ('/ma "%s" %u'):fmt(spellResource.Name[1], AshitaCore:GetMemoryManager():GetEntity():GetServerId(target)));
+        mActionTimer = os.time() + (spellResource.CastTime / 4) + 3;
         castFinished = os.time() + (spellResource.CastTime / 4) + 1
         return true;
     end
@@ -1398,15 +1399,8 @@ function GetModelID(entityIndex)
     return modelId
 end
 
-function IsMobEcoSystem(ecosystem, modelId)
-    for index, value in ipairs(mobModel) do
-    end
-
-    if mobModel:contains(ecosystem) then
-        return true
-    end
-
-    return false
+function GetMobEcoSystem(modelId)
+    return mobModel[modelId] or 'None'
 end
 
 local thTable = {};
