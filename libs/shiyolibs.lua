@@ -522,6 +522,18 @@ end
 
 function TryCastSpell(spell, target)
     local spellResource = AshitaCore:GetResourceManager():GetSpellByName(spell, 0);
+
+    if not spellResource then
+        return false
+    end
+
+    local spellRange = AshitaCore:GetResourceManager():GetSpellRange(spellResource.Index, false)
+    local targetDistance = math.sqrt(AshitaCore:GetMemoryManager():GetEntity():GetDistance(EnemyIndex));
+
+    if targetDistance >= (spellRange - 0.2) then
+        return false
+    end
+
     if (AshitaCore:GetMemoryManager():GetRecast():GetSpellTimer(spellResource.Index) == 0) then
 
         if spell == "Utsusemi: Ichi" then
@@ -535,6 +547,7 @@ function TryCastSpell(spell, target)
     end
     return false;
 end
+
 
 local SCH_550_JP_GIFT = false;
 
