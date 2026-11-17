@@ -423,12 +423,11 @@ local function Initialize(tracker, buffer)
 		return CalculateEnfeeblingDuration(300, targetId), 404;
 	end
 
-    --[[UNKNOWN
 	--Addle II
 	buffer[884] = function(targetId)
-		return 0;
-	end
-    ]]--    
+    -- Stubbed with base duration
+		return CalculateEnfeeblingDuration(180, targetId), 21;
+	end 
 
 	--Inundation
 	buffer[879] = function(targetId)
