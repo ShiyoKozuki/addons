@@ -13,6 +13,64 @@ mpRestoreItems =
 dpsTemps = T{ 'Braver\'s Drink', 'Berserker\'s Tonic', 'Spy\'s Drink', 'Monarch\'s Drink', 'Stalwart\'s Tonic' }
 wingTemps = T{ 'Dusty Wing', 'Daedalus Wing', 'Lucid Wings I',  }
 
+skillchainList = {
+    'Light',
+    'Darkness',
+    'Gravitation',
+    'Fragmentation',
+    'Distortion',
+    'Fusion',
+    'Compression',
+    'Liquefaction',
+    'Induration',
+    'Reverberation',
+    'Transfixion',
+    'Scission',
+    'Detonation',
+    'Impaction',
+    'Radiance',
+    'Umbra',
+}
+
+skillchainElements = {
+    Light = { 'Fire', 'Aero', 'Thunder' },
+    Darkness = { 'Stone', 'Water', 'Blizzard' },
+    Gravitation = { 'Stone' },
+    Fragmentation = { 'Aero', 'Thunder' },
+    Distortion = { 'Blizzard', 'Water' },
+    Fusion = { 'Fire' },
+    Compression = {},
+    Liquefaction = { 'Fire' },
+    Induration = { 'Blizzard' },
+    Reverberation = { 'Water' },
+    Transfixion = {},
+    Scission = { 'Stone' },
+    Detonation = { 'Aero' },
+    Impaction = { 'Thunder' },
+    Radiance = { 'Fire', 'Aero', 'Thunder' },
+    Umbra = { 'Stone', 'Water', 'Blizzard' },
+}
+
+scMsgData =
+{
+    [288] = 'Light',
+    [289] = 'Darkness',
+    [290] = 'Gravitation',
+    [291] = 'Fragmentation',
+    [292] = 'Distortion',
+    [293] = 'Fusion',
+    [294] = 'Compression',
+    [295] = 'Liquefaction',
+    [296] = 'Induration',
+    [297] = 'Reverberation',
+    [298] = 'Transfixion',
+    [299] = 'Scission',
+    [300] = 'Detonation',
+    [301] = 'Impaction',
+    [767] = 'Radiance',
+    [768] = 'Umbra',
+}
+
 function GetMyIndex()
     return AshitaCore:GetMemoryManager():GetParty():GetMemberTargetIndex(0)
 end
@@ -367,6 +425,20 @@ local function CheckAddendum(resource)
     return true;
 end
 
+function IsSpellReady(spell)
+    local spellResource = AshitaCore:GetResourceManager():GetSpellByName(spell, 0);
+
+    if not spellResource then
+        return false
+    end
+
+    if (AshitaCore:GetMemoryManager():GetRecast():GetSpellTimer(spellResource.Index) == 0) then
+        return true
+    end
+
+    return false
+end
+
 function CheckJobLevels(spell)
     local mJob = AshitaCore:GetMemoryManager():GetPlayer():GetMainJob();
     local sJob = AshitaCore:GetMemoryManager():GetPlayer():GetSubJob();
@@ -534,7 +606,7 @@ function TryCastSpell(spell, target)
         return false
     end
 
-    if (AshitaCore:GetMemoryManager():GetRecast():GetSpellTimer(spellResource.Index) == 0) then
+    if IsSpellReady(spell) then
 
         if spell == "Utsusemi: Ichi" then
             CancelUtsu()
@@ -1215,10 +1287,16 @@ function TryCastNa(assistName)
                         if CheckJobLevels(spell) then
                             if not IsInCastRange(targetIndex) then
                                 if HasNaSpell() then
-                                    TooFarAwayMsg(targetIndex, 'Na', 15)
+                                    TooFarAwayMsg(targetIndex, spell, 15)
                                 end
                             else
                                 if (CheckIfStand(50)) then
+                                    return true
+                                end
+
+                                local myIndex = AshitaCore:GetMemoryManager():GetParty():GetMemberTargetIndex(0)
+
+                                if not IsParalyzed() and TryUseAbility('Divine Caress', myIndex) then
                                     return true
                                 end
 
@@ -1248,10 +1326,16 @@ function TryCastNaTank(tankName)
                 if CheckJobLevels(spell) then
                     if not IsInCastRange(assistIndex) then
                         if HasNaSpell() then
-                            TooFarAwayMsg(assistIndex, 'Na', 15)
+                            TooFarAwayMsg(assistIndex, spell, 15)
                         end
                     else
                         if (CheckIfStand(50)) then
+                            return true
+                        end
+
+                        local myIndex = AshitaCore:GetMemoryManager():GetParty():GetMemberTargetIndex(0)
+
+                        if not IsParalyzed() and TryUseAbility('Divine Caress', myIndex) then
                             return true
                         end
 
@@ -1267,11 +1351,78 @@ function TryCastNaTank(tankName)
 	return false
 end
 
-function TryConvert(MyIndex, hpp, mpp, currentlyHealing)
+function GetBestMBSpell(skillchain, flags, ui)
+    local elementSettings = {
+        Stone = 'stone_active',
+        Water = 'water_active',
+        Aero = 'aero_active',
+        Fire = 'fire_active',
+        Blizzard = 'blizzard_active',
+        Thunder = 'thunder_active',
+    }
+
+    local elements = skillchainElements[skillchain]
+
+    if elements then
+        for _, element in ipairs(elements) do
+            local setting = elementSettings[element]
+
+            if setting then
+                local spellList = ui[setting]
+                local selectedSpell = flags[setting]
+
+                if spellList and selectedSpell then
+                    local selectedIndex
+
+                    for i, spell in ipairs(spellList) do
+                        if spell == selectedSpell then
+                            selectedIndex = i
+                            break
+                        end
+                    end
+
+                    if selectedIndex then
+                        for i = selectedIndex, 1, -1 do
+                            local spell = spellList[i]
+
+                            if spell and spell ~= 'None' and IsSpellReady(spell) then
+                                return spell
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    return 'None'
+end
+
+function TryMagicBurst(EnemyIndex, mbData, flags, ui)
+    if not mbData then
+        return false
+    end
+
+    if mbData.mbEnabled and (os.time() >= mbData.mbWindowOpen) and (os.time() <= mbData.mbWindowClosed) then
+        local mbSpell = GetBestMBSpell(mbData.skillchain, flags, ui)
+
+        if not mbSpell or mbSpell == 'None' then
+            return false
+        end
+
+        if TryCastSpell(mbSpell, EnemyIndex) then
+            return true
+        end
+    end
+
+    return false
+end
+
+function TryConvert(myIndex, hpp, mpp, currentlyHealing)
     if (mpp < 15) and not HasDot() and not currentlyHealing then
         if GetAbilityRecast(49) == 0 then
             if hpp > 50 then
-                if TryUseAbility('Convert', MyIndex) then
+                if TryUseAbility('Convert', myIndex) then
                     return true
                 end
             end
@@ -3536,6 +3687,69 @@ function BuildCorsairRollList()
     end
 
     return roll;
+end
+
+function BuildSpellList(spellName, includeNone)
+    local spellList = T{};
+    local player = AshitaCore:GetMemoryManager():GetPlayer();
+    local resMgr = AshitaCore:GetResourceManager();
+
+    if includeNone then
+        spellList:append('None');
+    end
+
+    for i = 1, 1024 do
+        if player:HasSpell(i) then
+            local res = resMgr:GetSpellById(i);
+
+            if res and res.Name[1] then
+                local name = res.Name[1];
+
+            if name:sub(1, #spellName) == spellName
+                and (name:sub(#spellName + 1, #spellName + 1) == ' ' or #name == #spellName)
+                and CheckJobLevels(name) 
+            then
+                spellList:append(name);
+                end
+            end
+        end
+    end
+
+    if #spellList == 0 then
+        spellList:append('None');
+    end
+
+    return spellList;
+end
+
+function BuildNukeSpellList(spellName, ui, flags)
+    ui = BuildSpellList(spellName, true)
+
+    local found = false
+
+    for i, name in ipairs(ui) do
+        if name == flags.active then
+            flags.index[1] = i
+            found = true
+            break
+        end
+    end
+
+    if not found and #ui > 0 then
+        flags.index[1] = 1
+        flags.active = ui[1]
+    end
+
+    return ui
+end
+
+function BuildAllNukeSpellLists(ui, flags)
+    ui.stone_active    = BuildNukeSpellList('Stone', ui.stone_active, { active = flags.stone_active, index = flags.stone_index })
+    ui.water_active    = BuildNukeSpellList('Water', ui.water_active, { active = flags.water_active, index = flags.water_index })
+    ui.aero_active     = BuildNukeSpellList('Aero', ui.aero_active, { active = flags.aero_active, index = flags.aero_index })
+    ui.fire_active     = BuildNukeSpellList('Fire', ui.fire_active, { active = flags.fire_active, index = flags.fire_index })
+    ui.blizzard_active = BuildNukeSpellList('Blizzard', ui.blizzard_active, { active = flags.blizzard_active, index = flags.blizzard_index })
+    ui.thunder_active  = BuildNukeSpellList('Thunder', ui.thunder_active, { active = flags.thunder_active, index = flags.thunder_index })
 end
 
 function BuildSongSpellList()
