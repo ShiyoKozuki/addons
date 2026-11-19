@@ -1084,6 +1084,44 @@ function HasHasteEffect()
     return false
 end
 
+function HasStormSpell()
+    for storm = statusEffect.FIRESTORM, statusEffect.VOIDSTORM, 1 do
+        if GetBuffActive(storm) then
+            return true
+        end
+    end
+
+    for storm = statusEffect.FIRESTORM_II, statusEffect.VOIDSTORM_II, 1 do
+        if GetBuffActive(storm) then
+            return true
+        end
+    end
+
+    return false
+end
+
+function TargetHasStormSpell(Target, playerName)
+    if IsDead(playerName) then
+        return false
+    end
+
+    local targetBuffs = GetBuffsByTargetIndex(Target)
+
+    for storm = statusEffect.FIRESTORM, statusEffect.VOIDSTORM, 1 do
+        if targetBuffs:contains(storm) then
+            return true
+        end
+    end
+
+    for storm = statusEffect.FIRESTORM_II, statusEffect.VOIDSTORM_II, 1 do
+        if targetBuffs:contains(storm) then
+            return true
+        end
+    end
+
+    return false
+end
+
 function TryUseStatusCureItem(statusCures)
     local consumableEffects = {
         Poison = {
@@ -3979,7 +4017,7 @@ function BuildBarStatusSpellList()
             if res and res.Name[1] then
                 local name = res.Name[1];
 
-                if string.find(name, '^Bar') and CheckJobLevels(name) then
+                if string.find(name, '^Bar') and CheckJobLevels(name) then -- ^ matches beginning of string (name starts with bar)
                     barStatus:append(name);
                 end
             end
@@ -4017,6 +4055,34 @@ function BuildThrenodySpellList()
     end
 
     return threnody;
+end
+
+function BuildStormSpellList()
+    local storm = T{};
+    local player = AshitaCore:GetMemoryManager():GetPlayer();
+    local resMgr = AshitaCore:GetResourceManager();
+
+    for i = 1, 1024 do
+        if player:HasSpell(i) then
+            local res = resMgr:GetSpellById(i);
+
+            if res and res.Name[1] then
+                local spellName = res.Name[1];
+
+                if CheckJobLevels(spellName) then
+                    if string.find(spellName, 'storm$') or string.find(spellName, 'storm II$') then -- $ matches ending of string (name ends with storm or storm II)
+                        storm:append(spellName);
+                    end
+                end
+            end
+        end
+    end
+
+    if #storm == 0 then
+        storm:append('None');
+    end
+
+    return storm;
 end
 
 function GetAbilityIdByName(Name)
@@ -4767,7 +4833,6 @@ function TryHasteCycle(flags)
         if enabled then
             local Target = GetPlayerIndex(playerName)
 
-
             if Target and Target > 0 then
                 local targetBuffs = GetBuffsByTargetIndex(Target)
 
@@ -4800,7 +4865,6 @@ function TryPhalanxCycle(flags)
         if enabled then
             local Target = GetPlayerIndex(playerName)
 
-
             if Target and Target > 0 then
             local targetBuffs = GetBuffsByTargetIndex(Target)
 
@@ -4816,6 +4880,37 @@ function TryPhalanxCycle(flags)
                         end
 
                         if CheckJobLevels('Phalanx II') and (TryCastSpell('Phalanx II', Target)) then
+                            return true;
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    return false
+end
+
+function TryStormCycle(flags)
+    for playerName, enabled in pairs(flags.stormCycle) do
+        if enabled then
+            local Target = GetPlayerIndex(playerName)
+
+            if Target and Target > 0 then
+                if not IsDead(playerName) and not TargetHasStormSpell(Target, playerName) then
+                    local storm = flags.storm_active
+
+                    if not IsInCastRange(Target) then
+                        if (os.time() > mChatTimer) and IsInVisionRange(Target) then
+                            AshitaCore:GetChatManager():QueueCommand(0, ('/p %s is too far away to %s!'):fmt(playerName, storm))
+                            mChatTimer = os.time() + 15;
+                        end
+                    else
+                        if (CheckIfStand(33)) then
+                            return true
+                        end
+
+                        if CheckJobLevels(storm) and (TryCastSpell(storm, Target)) then
                             return true;
                         end
                     end
