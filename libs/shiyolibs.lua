@@ -4363,6 +4363,7 @@ local function ToggleFollowAndBotsCommand()
 
     if followAndBotsDualCommand then
         AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /meleebot enabled off");
+        AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /blmbot enabled off");
         AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /rdmbot enabled off");
         AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /kozumibot enabled off");
         AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /yukibot enabled off");
@@ -4372,6 +4373,7 @@ local function ToggleFollowAndBotsCommand()
         followAndBotsDualCommand = false
     else
         AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /meleebot enabled on");
+        AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /blmbot enabled on");
         AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /rdmbot enabled on");
         AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /kozumibot enabled on");
         AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /yukibot enabled on");
