@@ -4069,10 +4069,8 @@ function BuildStormSpellList()
             if res and res.Name[1] then
                 local spellName = res.Name[1];
 
-                if CheckJobLevels(spellName) then
-                    if string.find(spellName, 'storm$') or string.find(spellName, 'storm II$') then -- $ matches ending of string (name ends with storm or storm II)
-                        storm:append(spellName);
-                    end
+                if string.find(spellName, 'storm$') or string.find(spellName, 'storm II$') then -- $ matches ending of string (name ends with storm or storm II)
+                    storm:append(spellName);
                 end
             end
         end
@@ -4341,6 +4339,7 @@ local function ToggleBotsCommand()
 
     if botsEnabled then
         AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /meleebot enabled off");
+        AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /blmbot enabled off");
         AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /rdmbot enabled off");
         AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /kozumibot enabled off");
         AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /yukibot enabled off");
@@ -4349,6 +4348,7 @@ local function ToggleBotsCommand()
         botsEnabled = false
     else
         AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /meleebot enabled on");
+        AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /blmbot enabled on");
         AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /rdmbot enabled on");
         AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /kozumibot enabled on");
         AshitaCore:GetChatManager():QueueCommand(-1, "/ms send /yukibot enabled on");
