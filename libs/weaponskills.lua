@@ -76,6 +76,7 @@ T{
         SCOURGE             = 57,
         TORCLEAVER          = 59,
         RESOLUTION          = 60,
+        DIMIDIATION         = 61,
     },
 
     ['Axe'] = T{
